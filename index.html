@@ -1,3322 +1,710 @@
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IB65 — Social Platform</title>
 
-<script>
-/* =========================================
-   IB65 FIREBASE — COMPLETE SYSTEM
-   Auth + Firestore + Storage
-   Posts + Photos + Videos + Likes
-   Comments + Follow + Profile
-========================================= */
+  <!-- Firebase Compat Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBlM05NZl4bKjRsrZ0ZUDpjYi0fdPP2-X4",
-  authDomain: "ib65-67f62.firebaseapp.com",
-  projectId: "ib65-67f62",
-  storageBucket: "ib65-67f62.firebasestorage.app",
-  messagingSenderId: "323877271127",
-  appId: "1:323877271127:web:8318d8904784503b061512",
-  measurementId: "G-GZKXSWQGRV"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-const KEY = 'ib65_v3_state';
-
-let currentUser = null;
-let firebaseReady = false;
-
-
-/* =========================================
-   DEFAULT LOCAL DATA
-========================================= */
-
-const defaultState = {
-  user:{
-    name:'Manish',
-    handle:'@manish',
-    initial:'M',
-    bio:'Building IB65 🚀',
-    followers:128,
-    following:64,
-    avatar:''
-  },
-
-  following:[],
-
-  saved:[],
-
-  notifications:[
-    {
-      text:'Welcome to IB65! 🎉',
-      time:'Now'
-    }
-  ],
-
-  posts:[]
-};
-
-let state = loadLocal();
-
-
-/* =========================================
-   LOCAL STORAGE
-========================================= */
-
-function loadLocal(){
-
-  try{
-
-    return deepMerge(
-      defaultState,
-      JSON.parse(
-        localStorage.getItem(KEY) || '{}'
-      )
-    );
-
-  }catch(e){
-
-    return JSON.parse(
-      JSON.stringify(defaultState)
-    );
-
-  }
-
-}
-
-
-function deepMerge(base,extra){
-
-  const out =
-    JSON.parse(JSON.stringify(base));
-
-  Object.keys(extra || {}).forEach(k=>{
-
-    if(
-      extra[k] &&
-      typeof extra[k] === 'object' &&
-      !Array.isArray(extra[k]) &&
-      out[k]
-    ){
-
-      out[k] =
-        Object.assign(out[k],extra[k]);
-
-    }else{
-
-      out[k] = extra[k];
-
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --card: #151a24;
+      --card-hover: #1c2230;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --border: #262f40;
+      --radius: 14px;
     }
 
-  });
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 70px; }
 
-  return out;
+    /* Layout */
+    .app-container { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 240px 1fr 280px; gap: 20px; padding: 20px 10px; }
+    @media (max-width: 900px) { .app-container { grid-template-columns: 1fr; } .sidebar-left, .sidebar-right { display: none; } }
 
-}
+    /* UI Components */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+    .row { display: flex; align-items: center; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; flex-shrink: 0; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .logo { width: 44px; height: 44px; border-radius: 12px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #fff; }
 
+    input, textarea { width: 100%; background: #0e121a; border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 10px 14px; margin-top: 8px; margin-bottom: 12px; outline: none; }
+    input:focus, textarea:focus { border-color: var(--primary); }
+    textarea { resize: vertical; min-height: 80px; }
 
-function saveLocal(){
+    button { cursor: pointer; border: 0; border-radius: 10px; padding: 8px 16px; font-weight: 600; transition: 0.2s; }
+    button.primary { background: var(--primary); color: #fff; }
+    button.primary:hover { background: var(--primary-hover); }
+    button.pill { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
+    button.pill:hover { background: rgba(255, 255, 255, 0.15); }
+    button.icon { background: transparent; color: var(--muted); font-size: 18px; padding: 6px 10px; }
+    button.liked { color: #ef4444; }
+    button.saved { color: #f59e0b; }
 
-  try{
+    /* Navigation */
+    .nav-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px; text-align: left; background: transparent; color: var(--text); border-radius: 10px; margin-bottom: 4px; }
+    .nav-btn:hover, .nav-btn.active { background: var(--card); color: var(--primary); }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px; z-index: 1000; }
+    @media (min-width: 901px) { .bottom-nav { display: none; } }
 
-    localStorage.setItem(
-      KEY,
-      JSON.stringify(state)
-    );
+    /* Post Card */
+    .post-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .post-head .user { display: flex; align-items: center; gap: 10px; }
+    .name { font-weight: 600; font-size: 15px; }
+    .handle { font-size: 13px; color: var(--muted); }
+    .post-actions { display: flex; justify-content: space-around; border-top: 1px solid var(--border); margin-top: 12px; padding-top: 8px; }
+    .media img, .media video { width: 100%; border-radius: 10px; margin-top: 10px; max-height: 480px; object-fit: cover; }
 
-  }catch(e){
+    /* Comments & Chat */
+    .comments { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .comment { display: flex; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+    .hidden { display: none !important; }
+    .notice { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 10px; border-radius: 8px; font-size: 13px; margin: 10px 0; }
+    .upload-label { cursor: pointer; padding: 8px 12px; background: rgba(255,255,255,0.06); border-radius: 8px; font-size: 13px; margin-right: 8px; display: inline-flex; align-items: center; gap: 6px; }
+    .upload-label input { display: none; }
 
-    console.warn(
-      'Local storage error',
-      e
-    );
+    /* Modal */
+    #modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 9999; align-items: center; justify-content: center; padding: 16px; }
+    #modal.show { display: flex; }
+    #modalBox { background: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 480px; padding: 20px; max-height: 90vh; overflow-y: auto; }
+    #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 10px 20px; border-radius: 20px; font-weight: 600; display: none; z-index: 100001; }
+    #toast.show { display: block; }
+  </style>
+</head>
+<body>
 
-  }
+  <div class="app-container">
+    <!-- Left Navigation -->
+    <aside class="sidebar-left">
+      <div class="logo" style="margin-bottom:20px;">IB</div>
+      <button class="nav-btn active" onclick="navigate(this, 'Home')">🏠 Home</button>
+      <button class="nav-btn" onclick="navigate(this, 'Explore')">🔍 Explore</button>
+      <button class="nav-btn" onclick="navigate(this, 'Reels')">🎬 Reels</button>
+      <button class="nav-btn" onclick="navigate(this, 'Messages')">💬 Messages</button>
+      <button class="nav-btn" onclick="openNotifications()">🔔 Notifications <span id="notifCount"></span></button>
+      <button class="nav-btn" onclick="openProfile()">👤 Profile</button>
+      <button class="primary" style="width:100%; margin-top: 15px;" onclick="openCreate()">+ New Post</button>
+    </aside>
 
-}
-
-
-/* =========================================
-   HTML HELPERS
-========================================= */
-
-function esc(s){
-
-  return String(s ?? '').replace(
-    /[&<>'"]/g,
-    c => ({
-      '&':'&amp;',
-      '<':'&lt;',
-      '>':'&gt;',
-      "'":'&#39;',
-      '"':'&quot;'
-    }[c])
-  );
-
-}
-
-
-function avatarHTML(
-  initial,
-  avatar,
-  cls='avatar'
-){
-
-  return avatar
-
-    ? `<div class="${cls}">
-         <img
-           src="${esc(avatar)}"
-           alt="">
-       </div>`
-
-    : `<div class="${cls}">
-         ${esc(initial || '?')}
-       </div>`;
-
-}
-
-
-/* =========================================
-   FIREBASE AUTH
-========================================= */
-
-auth.onAuthStateChanged(
-  async user => {
-
-    currentUser = user;
-
-    if(user){
-
-      firebaseReady = true;
-
-      try{
-
-        await loadFirebaseUser();
-
-        await loadFirebasePosts();
-
-        await loadFollowing();
-
-        render();
-
-        toast('Firebase connected ✓');
-
-      }catch(error){
-
-        console.error(
-          'Firebase initialization error:',
-          error
-        );
-
-      }
-
-    }else{
-
-      firebaseReady = false;
-
-      showLogin();
-
-    }
-
-  }
-);
-
-
-/* =========================================
-   LOGIN / SIGNUP
-========================================= */
-
-function showLogin(){
-
-  openModal(`
-
-    <div style="text-align:center;padding:10px">
-
-      <div
-        class="logo"
-        style="margin:auto;width:58px;height:58px">
-
-        <b>IB</b>
-
+    <!-- Main Feed -->
+    <main>
+      <div class="card row" style="gap: 12px; cursor:pointer;" onclick="openCreate()">
+        <div id="composerAvatar" class="avatar">M</div>
+        <div style="color:var(--muted); flex:1;">What's on your mind?</div>
+        <button class="primary" style="padding:6px 12px;">Post</button>
       </div>
 
-      <h2>Welcome to IB65</h2>
-
-      <p class="small">
-        Login या नया account बनाकर IB65 इस्तेमाल करें।
-      </p>
-
-      <input
-        id="authName"
-        placeholder="Your name"
-        autocomplete="name">
-
-      <input
-        id="authEmail"
-        type="email"
-        placeholder="Email"
-        autocomplete="email">
-
-      <input
-        id="authPassword"
-        type="password"
-        placeholder="Password"
-        autocomplete="current-password">
-
-      <div class="modal-actions">
-
-        <button
-          class="pill"
-          onclick="loginUser()">
-
-          Login
-
-        </button>
-
-        <button
-          class="primary"
-          onclick="signupUser()">
-
-          Sign up
-
-        </button>
-
-      </div>
-
-      <div class="notice">
-
-        🔐 आपका account Firebase Authentication
-        से सुरक्षित रहेगा।
-
-      </div>
-
-    </div>
-
-  `);
-
-}
-
-
-async function signupUser(){
-
-  const name =
-    document
-      .getElementById('authName')
-      ?.value
-      .trim();
-
-  const email =
-    document
-      .getElementById('authEmail')
-      ?.value
-      .trim();
-
-  const password =
-    document
-      .getElementById('authPassword')
-      ?.value;
-
-  if(!name)
-    return toast('Name डालो');
-
-  if(!email)
-    return toast('Email डालो');
-
-  if(password.length < 6)
-    return toast(
-      'Password कम से कम 6 characters का रखें'
-    );
-
-  try{
-
-    showLoading(
-      'Account बनाया जा रहा है...'
-    );
-
-    const result =
-      await auth
-        .createUserWithEmailAndPassword(
-          email,
-          password
-        );
-
-    const user = result.user;
-
-    const cleanName =
-      name
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g,'')
-        .slice(0,18) ||
-      'user';
-
-    const handle =
-      '@' +
-      cleanName +
-      Math.floor(Math.random()*1000);
-
-    await db
-      .collection('users')
-      .doc(user.uid)
-      .set({
-
-        uid:user.uid,
-
-        name:name,
-
-        handle:handle,
-
-        initial:
-          name
-            .charAt(0)
-            .toUpperCase(),
-
-        bio:'Building IB65 🚀',
-
-        avatar:'',
-
-        followers:0,
-
-        following:0,
-
-        email:user.email,
-
-        createdAt:
-          firebase.firestore.FieldValue
-            .serverTimestamp()
-
-      });
-
-    hideLoading();
-
-    closeModal();
-
-    toast('Account created ✓');
-
-  }catch(error){
-
-    console.error(error);
-
-    hideLoading();
-
-    toast(
-      firebaseError(error)
-    );
-
-  }
-
-}
-
-
-async function loginUser(){
-
-  const email =
-    document
-      .getElementById('authEmail')
-      ?.value
-      .trim();
-
-  const password =
-    document
-      .getElementById('authPassword')
-      ?.value;
-
-  if(!email || !password)
-    return toast(
-      'Email और password डालो'
-    );
-
-  try{
-
-    showLoading(
-      'Login हो रहा है...'
-    );
-
-    await auth
-      .signInWithEmailAndPassword(
-        email,
-        password
-      );
-
-    hideLoading();
-
-    closeModal();
-
-    toast('Login successful ✓');
-
-  }catch(error){
-
-    console.error(error);
-
-    hideLoading();
-
-    toast(
-      firebaseError(error)
-    );
-
-  }
-
-}
-
-
-function firebaseError(error){
-
-  const code =
-    error?.code || '';
-
-  if(
-    code.includes('invalid-credential')
-  )
-    return 'Email या password गलत है';
-
-  if(
-    code.includes('email-already-in-use')
-  )
-    return 'यह email पहले से registered है';
-
-  if(
-    code.includes('invalid-email')
-  )
-    return 'Email सही नहीं है';
-
-  if(
-    code.includes('weak-password')
-  )
-    return 'Password बहुत छोटा है';
-
-  if(
-    code.includes('network-request-failed')
-  )
-    return 'Internet connection check करो';
-
-  if(
-    code.includes('too-many-requests')
-  )
-    return 'बहुत ज्यादा कोशिश हुई है, थोड़ी देर बाद try करें';
-
-  return 'Firebase error: ' + code;
-
-}
-
-
-/* =========================================
-   FIREBASE USER
-========================================= */
-
-async function loadFirebaseUser(){
-
-  if(!currentUser)
-    return;
-
-  const ref =
-    db
-      .collection('users')
-      .doc(currentUser.uid);
-
-  const snap =
-    await ref.get();
-
-  if(snap.exists){
-
-    const data =
-      snap.data();
-
-    state.user = {
-
-      name:
-        data.name ||
-        'User',
-
-      handle:
-        data.handle ||
-        '@user',
-
-      initial:
-        data.initial ||
-        (
-          data.name ||
-          'U'
-        )
-        .charAt(0)
-        .toUpperCase(),
-
-      bio:
-        data.bio ||
-        'Building IB65 🚀',
-
-      followers:
-        Number(data.followers || 0),
-
-      following:
-        Number(data.following || 0),
-
-      avatar:
-        data.avatar || ''
-
+      <input id="search" placeholder="Search posts or creators... (Ctrl+K)" oninput="renderFeed()" />
+      <div id="feed"></div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="sidebar-right">
+      <div id="profileCard" class="card" style="text-align:center;"></div>
+      <div id="suggestions" class="card"></div>
+    </aside>
+  </div>
+
+  <!-- Mobile Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="icon" onclick="navigate(this, 'Home')">🏠</button>
+    <button class="icon" onclick="navigate(this, 'Explore')">🔍</button>
+    <button class="primary" style="padding: 4px 14px; border-radius: 50%;" onclick="openCreate()">+</button>
+    <button class="icon" onclick="navigate(this, 'Messages')">💬</button>
+    <button class="icon" onclick="openProfile()">👤</button>
+  </div>
+
+  <!-- Modal Container -->
+  <div id="modal"><div id="modalBox"></div></div>
+  <div id="toast"></div>
+
+  <!-- Logic Script -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlM05NZl4bKjRsrZ0ZUDpjYi0fdPP2-X4",
+      authDomain: "ib65-67f62.firebaseapp.com",
+      projectId: "ib65-67f62",
+      storageBucket: "ib65-67f62.firebasestorage.app",
+      messagingSenderId: "323877271127",
+      appId: "1:323877271127:web:8318d8904784503b061512",
+      measurementId: "G-GZKXSWQGRV"
     };
 
-  }else{
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
-    const name =
-      currentUser
-        .email
-        ?.split('@')[0] ||
-      'User';
+    const KEY = 'ib65_v3_state';
+    let currentUser = null;
+    let firebaseReady = false;
+    let activeChatUnsubscribe = null;
 
-    await ref.set({
+    const defaultState = {
+      user: { name: 'Manish', handle: '@manish', initial: 'M', bio: 'Building IB65 🚀', followers: 0, following: 0, avatar: '' },
+      following: [],
+      saved: [],
+      notifications: [{ text: 'Welcome to IB65! 🎉', time: 'Now' }],
+      posts: []
+    };
 
-      uid:currentUser.uid,
+    let state = loadLocal();
 
-      name:name,
+    function loadLocal() {
+      try {
+        return Object.assign({}, defaultState, JSON.parse(localStorage.getItem(KEY) || '{}'));
+      } catch (e) {
+        return JSON.parse(JSON.stringify(defaultState));
+      }
+    }
 
-      handle:
-        '@' +
-        name
-          .toLowerCase()
-          .replace(/[^a-z0-9]/g,''),
+    function saveLocal() {
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    }
 
-      initial:
-        name
-          .charAt(0)
-          .toUpperCase(),
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+    }
 
-      bio:'Building IB65 🚀',
+    function avatarHTML(initial, avatar, cls = 'avatar') {
+      return avatar
+        ? `<div class="${cls}"><img src="${esc(avatar)}" alt=""></div>`
+        : `<div class="${cls}">${esc(initial || '?')}</div>`;
+    }
 
-      avatar:'',
-
-      followers:0,
-
-      following:0,
-
-      email:currentUser.email,
-
-      createdAt:
-        firebase.firestore.FieldValue
-          .serverTimestamp()
-
+    /* AUTH OBSERVER */
+    auth.onAuthStateChanged(async user => {
+      currentUser = user;
+      if (user) {
+        firebaseReady = true;
+        try {
+          await loadFirebaseUser();
+          await loadFirebasePosts();
+          await loadFollowing();
+          render();
+          toast('Firebase connected ✓');
+        } catch (error) {
+          console.error('Init error:', error);
+        }
+      } else {
+        firebaseReady = false;
+        showLogin();
+      }
     });
 
-    await loadFirebaseUser();
+    function showLogin() {
+      openModal(`
+        <div style="text-align:center;padding:10px">
+          <div class="logo" style="margin:auto;width:58px;height:58px"><b>IB</b></div>
+          <h2 style="margin-top:10px;">Welcome to IB65</h2>
+          <p class="small" style="color:var(--muted); margin-bottom:14px;">Login ya naya account banayein</p>
+          <input id="authName" placeholder="Your name" autocomplete="name">
+          <input id="authEmail" type="email" placeholder="Email" autocomplete="email">
+          <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password">
+          <div class="row" style="gap:10px; margin-top:10px;">
+            <button class="pill" style="flex:1" onclick="loginUser()">Login</button>
+            <button class="primary" style="flex:1" onclick="signupUser()">Sign up</button>
+          </div>
+        </div>
+      `);
+    }
 
-  }
+    async function signupUser() {
+      const name = document.getElementById('authName')?.value.trim();
+      const email = document.getElementById('authEmail')?.value.trim();
+      const password = document.getElementById('authPassword')?.value;
+      if (!name || !email || password.length < 6) return toast('Form sahi se bharein (Password 6+ chars)');
 
-  saveLocal();
+      try {
+        showLoading('Account banaya ja raha hai...');
+        const result = await auth.createUserWithEmailAndPassword(email, password);
+        const handle = '@' + name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 18) + Math.floor(Math.random() * 1000);
+        await db.collection('users').doc(result.user.uid).set({
+          uid: result.user.uid, name: name, handle: handle, initial: name.charAt(0).toUpperCase(),
+          bio: 'Building IB65 🚀', avatar: '', followers: 0, following: 0, email: email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        hideLoading();
+        closeModal();
+        toast('Account created ✓');
+      } catch (e) {
+        hideLoading();
+        toast(e.message);
+      }
+    }
 
-}
+    async function loginUser() {
+      const email = document.getElementById('authEmail')?.value.trim();
+      const password = document.getElementById('authPassword')?.value;
+      if (!email || !password) return toast('Email aur Password dalein');
+      try {
+        showLoading('Login ho raha hai...');
+        await auth.signInWithEmailAndPassword(email, password);
+        hideLoading();
+        closeModal();
+        toast('Login successful ✓');
+      } catch (e) {
+        hideLoading();
+        toast(e.message);
+      }
+    }
 
-
-/* =========================================
-   LOAD POSTS
-========================================= */
-
-async function loadFirebasePosts(){
-
-  if(!firebaseReady)
-    return;
-
-  try{
-
-    const snap =
-      await db
-        .collection('posts')
-        .orderBy(
-          'createdAt',
-          'desc'
-        )
-        .limit(50)
-        .get();
-
-    const posts =
-      snap.docs.map(doc => {
-
-        const p =
-          doc.data();
-
-        const likedBy =
-          Array.isArray(p.likedBy)
-            ? p.likedBy
-            : [];
-
-        return {
-
-          id:doc.id,
-
-          uid:p.uid || '',
-
-          user:p.user || 'User',
-
-          handle:p.handle || '@user',
-
-          initial:p.initial || 'U',
-
-          text:p.text || '',
-
-          likes:
-            Number(p.likeCount || 0),
-
-          likedBy:likedBy,
-
-          liked:
-            currentUser
-              ? likedBy.includes(
-                  currentUser.uid
-                )
-              : false,
-
-          comments:
-            Array.isArray(p.comments)
-              ? p.comments
-              : [],
-
-          media:p.media || '',
-
-          type:p.type || 'text',
-
-          createdAt:
-            p.createdAt || null
-
+    async function loadFirebaseUser() {
+      if (!currentUser) return;
+      const doc = await db.collection('users').doc(currentUser.uid).get();
+      if (doc.exists) {
+        const d = doc.data();
+        state.user = {
+          name: d.name || 'User', handle: d.handle || '@user',
+          initial: d.initial || d.name?.charAt(0).toUpperCase() || 'U',
+          bio: d.bio || 'Building IB65 🚀', followers: Number(d.followers || 0),
+          following: Number(d.following || 0), avatar: d.avatar || ''
         };
-
-      });
-
-    /* -----------------------------------------
-       LOAD REAL COMMENTS FROM SUBCOLLECTION
-    ----------------------------------------- */
-
-    await Promise.all(
-
-      posts.map(
-        async post => {
-
-          try{
-
-            const commentsSnap =
-              await db
-                .collection('posts')
-                .doc(post.id)
-                .collection('comments')
-                .orderBy(
-                  'createdAt',
-                  'asc'
-                )
-                .limit(100)
-                .get();
-
-            post.comments =
-              commentsSnap.docs.map(
-                d => ({
-                  id:d.id,
-                  ...d.data()
-                })
-              );
-
-          }catch(commentError){
-
-            console.warn(
-              'Comment loading error:',
-              commentError
-            );
-
-          }
-
-        }
-      )
-
-    );
-
-    state.posts = posts;
-
-    saveLocal();
-
-  }catch(error){
-
-    console.error(
-      'Posts loading error:',
-      error
-    );
-
-    if(
-      error.code ===
-      'failed-precondition'
-    ){
-
-      toast(
-        'Firestore index की जरूरत है'
-      );
-
-    }else{
-
-      toast(
-        'Posts load नहीं हुए'
-      );
-
+      }
+      saveLocal();
     }
 
-  }
-
-}
-
-
-/* =========================================
-   FOLLOWING LOAD
-========================================= */
-
-async function loadFollowing(){
-
-  if(!currentUser)
-    return;
-
-  try{
-
-    const snap =
-      await db
-        .collection('follows')
-        .where(
-          'followerId',
-          '==',
-          currentUser.uid
-        )
-        .get();
-
-    state.following =
-      snap.docs.map(
-        d =>
-          d.data().followingId
-      );
-
-    saveLocal();
-
-  }catch(error){
-
-    console.error(
-      'Following load error:',
-      error
-    );
-
-  }
-
-}
-
-
-/* =========================================
-   RENDER
-========================================= */
-
-function render(){
-
-  renderFeed();
-
-  renderProfileCard();
-
-  renderSuggestions();
-
-  const ca =
-    document.getElementById(
-      'composerAvatar'
-    );
-
-  if(ca){
-
-    ca.innerHTML =
-      state.user.avatar
-
-        ? `<img
-             src="${esc(state.user.avatar)}"
-             alt="">`
-
-        : esc(
-            state.user.initial
-          );
-
-  }
-
-  const nc =
-    document.getElementById(
-      'notifCount'
-    );
-
-  if(nc){
-
-    nc.textContent =
-      state.notifications.length
-        ? `(${state.notifications.length})`
-        : '';
-
-  }
-
-}
-
-
-/* =========================================
-   FEED
-========================================= */
-
-function renderFeed(){
-
-  const feed =
-    document.getElementById(
-      'feed'
-    );
-
-  if(!feed)
-    return;
-
-  const search =
-    document.getElementById(
-      'search'
-    );
-
-  const q =
-    (
-      search?.value ||
-      ''
-    )
-    .toLowerCase();
-
-  const f =
-    state.posts.filter(p =>
-
-      (
-        p.text +
-        p.user +
-        p.handle
-      )
-      .toLowerCase()
-      .includes(q)
-
-    );
-
-  feed.innerHTML =
-
-    f.map(postHTML).join('') ||
-
-    `<div
-      class="card"
-      style="
-        padding:30px;
-        text-align:center;
-        color:var(--muted)
-      ">
-
-      ${
-        firebaseReady
-          ? 'अभी कोई post नहीं है। पहला post बनाओ 🚀'
-          : 'Firebase से connect हो रहा है...'
+    /* POSTS FEED */
+    async function loadFirebasePosts() {
+      if (!firebaseReady) return;
+      try {
+        const snap = await db.collection('posts').orderBy('createdAt', 'desc').limit(50).get();
+        state.posts = snap.docs.map(doc => {
+          const p = doc.data();
+          const likedBy = Array.isArray(p.likedBy) ? p.likedBy : [];
+          return {
+            id: doc.id, uid: p.uid || '', user: p.user || 'User', handle: p.handle || '@user',
+            initial: p.initial || 'U', text: p.text || '', likes: Number(p.likeCount || 0),
+            likedBy: likedBy, liked: currentUser ? likedBy.includes(currentUser.uid) : false,
+            comments: Array.isArray(p.comments) ? p.comments : [], media: p.media || '',
+            type: p.type || 'text', createdAt: p.createdAt || null
+          };
+        });
+        saveLocal();
+      } catch (e) {
+        console.error('Posts load error:', e);
       }
-
-    </div>`;
-
-}
-
-
-/* =========================================
-   MEDIA HTML
-========================================= */
-
-function mediaHTML(p){
-
-  if(!p.media)
-    return '';
-
-  if(p.type === 'video'){
-
-    return `
-
-      <div class="media">
-
-        <video
-          src="${esc(p.media)}"
-          controls
-          playsinline
-          preload="metadata">
-        </video>
-
-      </div>
-
-    `;
-
-  }
-
-  if(p.type === 'image'){
-
-    return `
-
-      <div class="media">
-
-        <img
-          src="${esc(p.media)}"
-          alt="IB65 post"
-          loading="lazy"
-          onclick="openMediaViewer('${esc(p.media)}')">
-
-      </div>
-
-    `;
-
-  }
-
-  return '';
-
-}
-
-
-/* =========================================
-   POST HTML
-========================================= */
-
-function postHTML(p){
-
-  const isSaved =
-    state.saved.includes(
-      p.id
-    );
-
-  const isFollowing =
-    state.following.includes(
-      p.uid
-    );
-
-  return `
-
-  <article
-    id="post-${esc(p.id)}"
-    class="card post">
-
-    <div class="post-head">
-
-      <div class="user">
-
-        ${avatarHTML(
-          p.initial,
-          (
-            p.uid === currentUser?.uid
-          )
-            ? state.user.avatar
-            : '',
-          'avatar'
-        )}
-
-        <div>
-
-          <div class="name">
-            ${esc(p.user)}
-          </div>
-
-          <div class="handle">
-            ${esc(p.handle)}
-          </div>
-
-        </div>
-
-      </div>
-
-      ${
-        p.uid !== currentUser?.uid
-
-        ? `<button
-            class="follow"
-            onclick="followUser('${esc(p.uid)}')">
-
-            ${
-              isFollowing
-                ? 'Following'
-                : 'Follow'
-            }
-
-           </button>`
-
-        : `<button
-            class="icon"
-            onclick="openProfile()">
-
-            •••
-
-           </button>`
-      }
-
-    </div>
-
-    ${
-      p.text
-        ? `<p>${esc(p.text)}</p>`
-        : ''
     }
 
-    ${mediaHTML(p)}
+    async function loadFollowing() {
+      if (!currentUser) return;
+      try {
+        const snap = await db.collection('follows').where('followerId', '==', currentUser.uid).get();
+        state.following = snap.docs.map(d => d.data().followingId);
+        saveLocal();
+      } catch (e) {}
+    }
 
-    <div class="post-actions">
+    function renderFeed() {
+      const feed = document.getElementById('feed');
+      if (!feed) return;
+      const q = (document.getElementById('search')?.value || '').toLowerCase();
+      const filtered = state.posts.filter(p => (p.text + p.user + p.handle).toLowerCase().includes(q));
 
-      <button
-        class="${p.liked ? 'liked':''}"
-        onclick="likePost('${esc(p.id)}')">
+      feed.innerHTML = filtered.map(postHTML).join('') || `
+        <div class="card" style="text-align:center; color:var(--muted); padding:30px;">
+          ${firebaseReady ? 'Koi post nahi mili. Pehla post banayein! 🚀' : 'Firebase connect ho raha hai...'}
+        </div>`;
+    }
 
-        ♥ ${p.likes}
+    function postHTML(p) {
+      const isSaved = state.saved.includes(p.id);
+      const isFollowing = state.following.includes(p.uid);
 
-      </button>
-
-      <button
-        onclick="toggleComments('${esc(p.id)}')">
-
-        💬 ${p.comments?.length || 0}
-
-      </button>
-
-      <button
-        onclick="sharePost('${esc(p.id)}')">
-
-        ↗ Share
-
-      </button>
-
-      <button
-        class="${isSaved?'saved':''}"
-        onclick="toggleSave('${esc(p.id)}')">
-
-        🔖
-
-      </button>
-
-    </div>
-
-    <div
-      id="comments-${esc(p.id)}"
-      class="comments hidden">
-
-      ${(p.comments || []).map(c => `
-
-        <div class="comment">
-
-          ${avatarHTML(
-            c.initial || 'U',
-            '',
-            'avatar'
-          )}
-
-          <div class="comment-body">
-
-            <b>
-              ${esc(c.user || 'User')}
-            </b>
-
-            <div>
-              ${esc(c.text || '')}
+      return `
+        <article class="card post" id="post-${esc(p.id)}">
+          <div class="post-head">
+            <div class="user">
+              ${avatarHTML(p.initial, p.uid === currentUser?.uid ? state.user.avatar : '', 'avatar')}
+              <div>
+                <div class="name">${esc(p.user)}</div>
+                <div class="handle">${esc(p.handle)}</div>
+              </div>
             </div>
-
+            ${p.uid !== currentUser?.uid ? `
+              <button class="pill" onclick="followUser('${esc(p.uid)}')">${isFollowing ? 'Following' : 'Follow'}</button>
+            ` : ''}
           </div>
+          ${p.text ? `<p style="margin: 8px 0; line-height:1.4;">${esc(p.text)}</p>` : ''}
+          ${p.media ? `
+            <div class="media">
+              ${p.type === 'video' ? `<video src="${esc(p.media)}" controls playsinline></video>` : `<img src="${esc(p.media)}" loading="lazy" onclick="openMediaViewer('${esc(p.media)}')">`}
+            </div>` : ''}
+          <div class="post-actions">
+            <button class="${p.liked ? 'liked' : ''}" onclick="likePost('${esc(p.id)}')">♥ ${p.likes}</button>
+            <button onclick="toggleComments('${esc(p.id)}')">💬 ${p.comments?.length || 0}</button>
+            <button onclick="sharePost('${esc(p.id)}')">↗ Share</button>
+            <button class="${isSaved ? 'saved' : ''}" onclick="toggleSave('${esc(p.id)}')">🔖</button>
+          </div>
+          <div id="comments-${esc(p.id)}" class="comments hidden">
+            <div id="commentList-${esc(p.id)}"></div>
+            <div class="row" style="gap:6px; margin-top:8px;">
+              <input id="comment-input-${esc(p.id)}" placeholder="Write a comment..." style="margin:0;" onkeydown="if(event.key==='Enter') addComment('${esc(p.id)}')">
+              <button class="primary" onclick="addComment('${esc(p.id)}')">Send</button>
+            </div>
+          </div>
+        </article>`;
+    }
 
+    async function likePost(id) {
+      if (!currentUser) return showLogin();
+      const post = state.posts.find(p => p.id === id);
+      if (!post) return;
+      const ref = db.collection('posts').doc(id);
+      const isLiked = (post.likedBy || []).includes(currentUser.uid);
+
+      await ref.update({
+        likedBy: isLiked ? firebase.firestore.FieldValue.arrayRemove(currentUser.uid) : firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+        likeCount: firebase.firestore.FieldValue.increment(isLiked ? -1 : 1)
+      });
+      await loadFirebasePosts();
+      render();
+    }
+
+    function toggleComments(id) {
+      const box = document.getElementById('comments-' + id);
+      if (!box) return;
+      box.classList.toggle('hidden');
+      if (!box.classList.contains('hidden')) loadComments(id);
+    }
+
+    async function loadComments(postId) {
+      const list = document.getElementById('commentList-' + postId);
+      if (!list) return;
+      const snap = await db.collection('posts').doc(postId).collection('comments').orderBy('createdAt', 'asc').get();
+      list.innerHTML = snap.docs.map(d => {
+        const c = d.data();
+        return `
+          <div class="comment">
+            <b>${esc(c.user)}:</b>
+            <span>${esc(c.text)}</span>
+          </div>`;
+      }).join('') || '<p class="small" style="color:var(--muted)">No comments yet.</p>';
+    }
+
+    async function addComment(postId) {
+      if (!currentUser) return showLogin();
+      const input = document.getElementById('comment-input-' + postId);
+      const text = input?.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      await db.collection('posts').doc(postId).collection('comments').add({
+        uid: currentUser.uid, user: state.user.name, text: text,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      loadComments(postId);
+      toast('Comment posted ✓');
+    }
+
+    /* CREATE POST */
+    function openCreate() {
+      if (!currentUser) return showLogin();
+      openModal(`
+        <div class="row" style="justify-content:space-between;">
+          <h2>Create Post</h2>
+          <button class="icon" onclick="closeModal()">✕</button>
         </div>
-
-      `).join('')}
-
-      <div class="comment-input">
-
-        <input
-          id="comment-${esc(p.id)}"
-          placeholder="Write a comment..."
-          onkeydown="
-            if(event.key==='Enter')
-            addComment('${esc(p.id)}')
-          ">
-
-        <button
-          class="primary"
-          onclick="addComment('${esc(p.id)}')">
-
-          Send
-
-        </button>
-
-      </div>
-
-    </div>
-
-  </article>
-
-  `;
-
-}
-
-
-/* =========================================
-   LIKE
-========================================= */
-
-async function likePost(id){
-
-  if(!currentUser)
-    return showLogin();
-
-  const post =
-    state.posts.find(
-      p => p.id === id
-    );
-
-  if(!post)
-    return;
-
-  const ref =
-    db.collection('posts')
-      .doc(id);
-
-  try{
-
-    const alreadyLiked =
-      (
-        post.likedBy || []
-      )
-      .includes(
-        currentUser.uid
-      );
-
-    if(alreadyLiked){
-
-      await ref.update({
-
-        likedBy:
-          firebase.firestore.FieldValue
-            .arrayRemove(
-              currentUser.uid
-            ),
-
-        likeCount:
-          firebase.firestore.FieldValue
-            .increment(-1)
-
-      });
-
-    }else{
-
-      await ref.update({
-
-        likedBy:
-          firebase.firestore.FieldValue
-            .arrayUnion(
-              currentUser.uid
-            ),
-
-        likeCount:
-          firebase.firestore.FieldValue
-            .increment(1)
-
-      });
-
+        <textarea id="postText" placeholder="Share something with IB65..."></textarea>
+        <div class="row" style="margin-bottom:10px;">
+          <label class="upload-label">🖼 Photo <input id="photoInput" type="file" accept="image/*" onchange="previewUpload(this,'image')"></label>
+          <label class="upload-label">🎬 Video <input id="videoInput" type="file" accept="video/*" onchange="previewUpload(this,'video')"></label>
+        </div>
+        <div id="uploadPreview"></div>
+        <div class="row" style="justify-content:flex-end; gap:8px; margin-top:14px;">
+          <button class="pill" onclick="closeModal()">Cancel</button>
+          <button class="primary" onclick="createPost()">Publish</button>
+        </div>
+      `);
+      window.pendingMedia = null;
     }
 
-    await loadFirebasePosts();
-
-    render();
-
-  }catch(error){
-
-    console.error(
-      'Like error:',
-      error
-    );
-
-    toast(
-      'Like नहीं हो पाया'
-    );
-
-  }
-
-}
-
-
-/* =========================================
-   COMMENTS
-========================================= */
-
-function toggleComments(id){
-
-  const box =
-    document.getElementById(
-      'comments-'+id
-    );
-
-  if(box)
-    box.classList.toggle(
-      'hidden'
-    );
-
-}
-
-
-async function addComment(id){
-
-  if(!currentUser)
-    return showLogin();
-
-  const input =
-    document.getElementById(
-      'comment-'+id
-    );
-
-  if(!input)
-    return;
-
-  const text =
-    input.value.trim();
-
-  if(!text)
-    return;
-
-  try{
-
-    const comment = {
-
-      uid:currentUser.uid,
-
-      user:state.user.name,
-
-      initial:state.user.initial,
-
-      text:text,
-
-      createdAt:
-        firebase.firestore.FieldValue
-          .serverTimestamp()
-
-    };
-
-    await db
-      .collection('posts')
-      .doc(id)
-      .collection('comments')
-      .add(comment);
-
-    input.value='';
-
-    await refreshPostComments(id);
-
-    render();
-
-    setTimeout(()=>{
-
-      document
-        .getElementById(
-          'comments-'+id
-        )
-        ?.classList.remove(
-          'hidden'
-        );
-
-    },50);
-
-    toast(
-      'Comment added ✓'
-    );
-
-  }catch(error){
-
-    console.error(
-      'Comment error:',
-      error
-    );
-
-    toast(
-      'Comment नहीं जुड़ा'
-    );
-
-  }
-
-}
-
-
-async function refreshPostComments(id){
-
-  try{
-
-    const snap =
-      await db
-        .collection('posts')
-        .doc(id)
-        .collection('comments')
-        .orderBy(
-          'createdAt',
-          'asc'
-        )
-        .limit(100)
-        .get();
-
-    const comments =
-      snap.docs.map(
-        d => ({
-          id:d.id,
-          ...d.data()
-        })
-      );
-
-    const p =
-      state.posts.find(
-        x => x.id === id
-      );
-
-    if(p)
-      p.comments = comments;
-
-  }catch(error){
-
-    console.error(
-      'Refresh comments error:',
-      error
-    );
-
-  }
-
-}
-
-
-/* =========================================
-   CREATE POST MODAL
-========================================= */
-
-function openCreate(){
-
-  if(!currentUser)
-    return showLogin();
-
-  openModal(`
-
-    <div
-      class="row"
-      style="justify-content:space-between">
-
-      <h2 style="margin:0">
-        Create post
-      </h2>
-
-      <button
-        class="icon"
-        onclick="closeModal()">
-
-        ✕
-
-      </button>
-
-    </div>
-
-    <textarea
-      id="postText"
-      placeholder="Share something with IB65...">
-    </textarea>
-
-    <div
-      class="row"
-      style="flex-wrap:wrap">
-
-      <label class="upload-label">
-
-        🖼 Photo
-
-        <input
-          id="photoInput"
-          type="file"
-          accept="image/*"
-          onchange="
-            previewUpload(this,'image')
-          ">
-
-      </label>
-
-      <label class="upload-label">
-
-        🎬 Video
-
-        <input
-          id="videoInput"
-          type="file"
-          accept="video/*"
-          onchange="
-            previewUpload(this,'video')
-          ">
-
-      </label>
-
-    </div>
-
-    <div id="uploadPreview"></div>
-
-    <div class="notice">
-
-      📸 Photo और 🎬 Video
-      Firebase Cloud Storage में upload होंगे।
-
-    </div>
-
-    <div class="modal-actions">
-
-      <button
-        class="pill"
-        onclick="closeModal()">
-
-        Cancel
-
-      </button>
-
-      <button
-        class="primary"
-        onclick="createPost()">
-
-        Publish
-
-      </button>
-
-    </div>
-
-  `);
-
-  window.pendingMedia = null;
-
-}
-
-
-/* =========================================
-   MEDIA PREVIEW
-========================================= */
-
-function previewUpload(input,type){
-
-  const file =
-    input.files?.[0];
-
-  if(!file)
-    return;
-
-  /* -----------------------------------------
-     TYPE CHECK
-  ----------------------------------------- */
-
-  if(
-    type === 'image' &&
-    !file.type.startsWith('image/')
-  ){
-
-    toast(
-      'कृपया केवल Photo चुनें'
-    );
-
-    input.value='';
-
-    return;
-
-  }
-
-  if(
-    type === 'video' &&
-    !file.type.startsWith('video/')
-  ){
-
-    toast(
-      'कृपया केवल Video चुनें'
-    );
-
-    input.value='';
-
-    return;
-
-  }
-
-
-  /* -----------------------------------------
-     SIZE LIMIT
-  ----------------------------------------- */
-
-  const maxSize =
-    type === 'video'
-      ? 100 * 1024 * 1024
-      : 10 * 1024 * 1024;
-
-  if(file.size > maxSize){
-
-    toast(
-      type === 'video'
-        ? 'Video 100 MB से छोटी रखें'
-        : 'Photo 10 MB से छोटी रखें'
-    );
-
-    input.value='';
-
-    return;
-
-  }
-
-
-  /* -----------------------------------------
-     PREVIEW
-  ----------------------------------------- */
-
-  const reader =
-    new FileReader();
-
-  reader.onload = function(e){
-
-    window.pendingMedia = {
-
-      file:file,
-
-      preview:e.target.result,
-
-      type:type,
-
-      name:file.name
-
-    };
-
-    const preview =
-      document.getElementById(
-        'uploadPreview'
-      );
-
-    if(!preview)
-      return;
-
-    if(type === 'video'){
-
-      preview.innerHTML = `
-
-        <video
-          class="preview"
-          src="${e.target.result}"
-          controls
-          playsinline
-          style="
-            width:100%;
-            max-height:300px;
-            border-radius:14px;
-            background:#000;
-          ">
-        </video>
-
-      `;
-
-    }else{
-
-      preview.innerHTML = `
-
-        <img
-          class="preview"
-          src="${e.target.result}"
-          style="
-            width:100%;
-            max-height:300px;
-            object-fit:contain;
-            border-radius:14px;
-          ">
-
-      `;
-
+    function previewUpload(input, type) {
+      const file = input.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        window.pendingMedia = { file: file, type: type };
+        document.getElementById('uploadPreview').innerHTML = type === 'video'
+          ? `<video src="${e.target.result}" controls style="width:100%; border-radius:10px; max-height:220px;"></video>`
+          : `<img src="${e.target.result}" style="width:100%; border-radius:10px; max-height:220px; object-fit:contain;">`;
+      };
+      reader.readAsDataURL(file);
     }
 
-    toast(
-      type === 'video'
-        ? 'Video तैयार है ✓'
-        : 'Photo तैयार है ✓'
-    );
-
-  };
-
-  reader.readAsDataURL(file);
-
-}
-
-
-/* =========================================
-   CREATE POST + FIREBASE STORAGE
-========================================= */
-
-async function createPost(){
-
-  if(!currentUser)
-    return showLogin();
-
-  const textEl =
-    document.getElementById(
-      'postText'
-    );
-
-  const text =
-    textEl
-      ?.value
-      .trim() || '';
-
-  const media =
-    window.pendingMedia;
-
-  if(
-    !text &&
-    !media?.file
-  ){
-
-    return toast(
-      'Post में text या Photo/Video जोड़ें'
-    );
-
-  }
-
-  try{
-
-    showLoading(
-      'Post upload हो रही है...'
-    );
-
-
-    /* -----------------------------------------
-       MEDIA UPLOAD
-    ----------------------------------------- */
-
-    let mediaUrl = '';
-
-    let mediaType = 'text';
-
-
-    if(media?.file){
-
-      const file =
-        media.file;
-
-      mediaType =
-        media.type;
-
-
-      const extension =
-        file.name
-          .split('.')
-          .pop()
-          .toLowerCase();
-
-
-      const safeName =
-        Date.now() +
-        '_' +
-        Math.random()
-          .toString(36)
-          .substring(2,10) +
-        '.' +
-        extension;
-
-
-      const storagePath =
-        `posts/${currentUser.uid}/${safeName}`;
-
-
-      const storageRef =
-        storage
-          .ref()
-          .child(storagePath);
-
-
-      const uploadTask =
-        await storageRef.put(
-          file,
-          {
-            contentType:
-              file.type
-          }
-        );
-
-
-      mediaUrl =
-        await uploadTask
-          .ref
-          .getDownloadURL();
-
-    }
-
-
-    /* -----------------------------------------
-       FIRESTORE POST
-    ----------------------------------------- */
-
-    const post = {
-
-      uid:
-        currentUser.uid,
-
-      user:
-        state.user.name,
-
-      handle:
-        state.user.handle,
-
-      initial:
-        state.user.initial,
-
-      text:
-        text ||
-        (
-          mediaType === 'video'
-            ? '🎬 New video'
-            : mediaType === 'image'
-              ? '📸 New photo'
-              : 'New post'
-        ),
-
-      likeCount:0,
-
-      likedBy:[],
-
-      media:
-        mediaUrl,
-
-      type:
-        mediaType,
-
-      createdAt:
-        firebase.firestore.FieldValue
-          .serverTimestamp()
-
-    };
-
-
-    await db
-      .collection('posts')
-      .add(post);
-
-
-    /* -----------------------------------------
-       RESET
-    ----------------------------------------- */
-
-    window.pendingMedia = null;
-
-
-    if(textEl)
-      textEl.value='';
-
-
-    const photo =
-      document.getElementById(
-        'photoInput'
-      );
-
-    const video =
-      document.getElementById(
-        'videoInput'
-      );
-
-    if(photo)
-      photo.value='';
-
-    if(video)
-      video.value='';
-
-
-    hideLoading();
-
-    closeModal();
-
-    await loadFirebasePosts();
-
-    render();
-
-    toast(
-      'Post published online ✓'
-    );
-
-
-  }catch(error){
-
-    console.error(
-      'CREATE POST ERROR:',
-      error
-    );
-
-    hideLoading();
-
-    toast(
-      'Post upload नहीं हुआ: ' +
-      (
-        error.message ||
-        'Unknown error'
-      )
-    );
-
-  }
-
-}
-
-
-/* =========================================
-   SAVE
-========================================= */
-
-function toggleSave(id){
-
-  const i =
-    state.saved.indexOf(id);
-
-  if(i >= 0){
-
-    state.saved.splice(i,1);
-
-    toast(
-      'Removed from saved'
-    );
-
-  }else{
-
-    state.saved.push(id);
-
-    toast(
-      'Saved ✓'
-    );
-
-  }
-
-  saveLocal();
-
-  render();
-
-}
-
-
-/* =========================================
-   FOLLOW / UNFOLLOW
-========================================= */
-
-async function followUser(targetUid){
-
-  if(!currentUser)
-    return showLogin();
-
-  if(!targetUid)
-    return toast(
-      'User profile उपलब्ध नहीं है'
-    );
-
-  if(
-    targetUid === currentUser.uid
-  )
-    return;
-
-
-  try{
-
-    showLoading(
-      'Follow update हो रहा है...'
-    );
-
-
-    const followId =
-      currentUser.uid +
-      '_' +
-      targetUid;
-
-
-    const followRef =
-      db
-        .collection('follows')
-        .doc(followId);
-
-
-    const currentUserRef =
-      db
-        .collection('users')
-        .doc(currentUser.uid);
-
-
-    const targetUserRef =
-      db
-        .collection('users')
-        .doc(targetUid);
-
-
-    const followSnap =
-      await followRef.get();
-
-
-    if(followSnap.exists){
-
-      await followRef.delete();
-
-
-      await db.runTransaction(
-        async transaction => {
-
-          const targetSnap =
-            await transaction.get(
-              targetUserRef
-            );
-
-          const currentSnap =
-            await transaction.get(
-              currentUserRef
-            );
-
-          const targetData =
-            targetSnap.exists
-              ? targetSnap.data()
-              : {};
-
-          const currentData =
-            currentSnap.exists
-              ? currentSnap.data()
-              : {};
-
-          transaction.update(
-            targetUserRef,
-            {
-              followers:
-                Math.max(
-                  0,
-                  Number(
-                    targetData.followers || 0
-                  ) - 1
-                )
-            }
-          );
-
-          transaction.update(
-            currentUserRef,
-            {
-              following:
-                Math.max(
-                  0,
-                  Number(
-                    currentData.following || 0
-                  ) - 1
-                )
-            }
-          );
-
+    async function createPost() {
+      const text = document.getElementById('postText')?.value.trim() || '';
+      const media = window.pendingMedia;
+      if (!text && !media) return toast('Kuch likhein ya photo/video attach karein');
+
+      try {
+        showLoading('Uploading post...');
+        let mediaUrl = '';
+        if (media?.file) {
+          const path = `posts/${currentUser.uid}/${Date.now()}_${media.file.name}`;
+          const snap = await storage.ref().child(path).put(media.file);
+          mediaUrl = await snap.ref.getDownloadURL();
         }
-      );
 
+        await db.collection('posts').add({
+          uid: currentUser.uid, user: state.user.name, handle: state.user.handle,
+          initial: state.user.initial, text: text, likeCount: 0, likedBy: [],
+          media: mediaUrl, type: media ? media.type : 'text',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-      state.following =
-        state.following.filter(
-          id => id !== targetUid
-        );
-
-      toast(
-        'Unfollowed'
-      );
-
-
-    }else{
-
-      await followRef.set({
-
-        followerId:
-          currentUser.uid,
-
-        followingId:
-          targetUid,
-
-        createdAt:
-          firebase.firestore.FieldValue
-            .serverTimestamp()
-
-      });
-
-
-      await db.runTransaction(
-        async transaction => {
-
-          const targetSnap =
-            await transaction.get(
-              targetUserRef
-            );
-
-          const currentSnap =
-            await transaction.get(
-              currentUserRef
-            );
-
-          const targetData =
-            targetSnap.exists
-              ? targetSnap.data()
-              : {};
-
-          const currentData =
-            currentSnap.exists
-              ? currentSnap.data()
-              : {};
-
-          transaction.update(
-            targetUserRef,
-            {
-              followers:
-                Number(
-                  targetData.followers || 0
-                ) + 1
-            }
-          );
-
-          transaction.update(
-            currentUserRef,
-            {
-              following:
-                Number(
-                  currentData.following || 0
-                ) + 1
-            }
-          );
-
-        }
-      );
-
-
-      if(
-        !state.following.includes(
-          targetUid
-        )
-      ){
-
-        state.following.push(
-          targetUid
-        );
-
+        hideLoading();
+        closeModal();
+        await loadFirebasePosts();
+        render();
+        toast('Post published ✓');
+      } catch (e) {
+        hideLoading();
+        toast('Error: ' + e.message);
       }
-
-      toast(
-        'Following ✓'
-      );
-
     }
 
-
-    await loadFirebaseUser();
-
-    saveLocal();
-
-    hideLoading();
-
-    render();
-
-
-  }catch(error){
-
-    console.error(
-      'Follow error:',
-      error
-    );
-
-    hideLoading();
-
-    toast(
-      'Follow नहीं हो पाया'
-    );
-
-  }
-
-}
-
-
-/* =========================================
-   PROFILE CARD
-========================================= */
-
-function renderProfileCard(){
-
-  const card =
-    document.getElementById(
-      'profileCard'
-    );
-
-  if(!card)
-    return;
-
-
-  const myPosts =
-    state.posts.filter(
-      p =>
-        p.uid ===
-        currentUser?.uid
-    ).length;
-
-
-  card.innerHTML = `
-
-    ${avatarHTML(
-      state.user.initial,
-      state.user.avatar
-    )}
-
-    <h3 style="margin:4px 0">
-
-      ${esc(
-        state.user.name
-      )}
-
-    </h3>
-
-    <div class="small">
-
-      ${esc(
-        state.user.handle
-      )}
-
-    </div>
-
-    <p class="small">
-
-      ${esc(
-        state.user.bio
-      )}
-
-    </p>
-
-    <div class="stats">
-
-      <div class="stat">
-
-        <b>
-          ${myPosts}
-        </b>
-
-        <span>
-          Posts
-        </span>
-
-      </div>
-
-      <div class="stat">
-
-        <b>
-          ${state.user.followers}
-        </b>
-
-        <span>
-          Followers
-        </span>
-
-      </div>
-
-      <div class="stat">
-
-        <b>
-          ${state.user.following}
-        </b>
-
-        <span>
-          Following
-        </span>
-
-      </div>
-
-    </div>
-
-    <button
-      class="pill"
-      onclick="openProfile()">
-
-      View profile
-
-    </button>
-
-  `;
-
-}
-
-
-/* =========================================
-   SUGGESTIONS
-========================================= */
-
-function renderSuggestions(){
-
-  const box =
-    document.getElementById(
-      'suggestions'
-    );
-
-  if(!box)
-    return;
-
-  box.innerHTML = `
-
-    <div class="notice">
-
-      👥 नए creators के profiles
-      Firebase में signup करने के बाद
-      यहाँ दिखाई दे सकते हैं।
-
-    </div>
-
-  `;
-
-}
-
-
-/* =========================================
-   PROFILE
-========================================= */
-
-function openProfile(){
-
-  if(!currentUser)
-    return showLogin();
-
-  openModal(`
-
-    <div
-      class="row"
-      style="justify-content:space-between">
-
-      <h2 style="margin:0">
-        My Profile
-      </h2>
-
-      <button
-        class="icon"
-        onclick="closeModal()">
-
-        ✕
-
-      </button>
-
-    </div>
-
-    <div
-      class="profile-card"
-      style="
-        background:transparent;
-        border:0
-      ">
-
-      <div class="profile-big">
-
-        ${
-          state.user.avatar
-
-            ? `<img
-                 src="${esc(
-                   state.user.avatar
-                 )}">`
-
-            : esc(
-                state.user.initial
-              )
+    /* REAL-TIME 1-ON-1 CHAT MODULE */
+    async function openMessages() {
+      if (!currentUser) return showLogin();
+      openModal(`
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <h2 style="margin:0">Messages</h2>
+          <button class="icon" onclick="closeModal()">✕</button>
+        </div>
+        <div id="chatContainer" style="margin-top:14px; min-height:360px;">
+          <div id="chatUsersList">
+            <p class="small" style="color:var(--muted); margin-bottom:10px;">Select a user to start conversation:</p>
+            <div id="usersListContent">Loading users...</div>
+          </div>
+          <div id="activeChatBox" class="hidden"></div>
+        </div>
+      `);
+      loadChatUsers();
+    }
+
+    async function loadChatUsers() {
+      const container = document.getElementById('usersListContent');
+      if (!container) return;
+      try {
+        const snap = await db.collection('users').limit(30).get();
+        const users = snap.docs.map(doc => doc.data()).filter(u => u.uid !== currentUser.uid);
+
+        if (!users.length) {
+          container.innerHTML = `<p class="small" style="color:var(--muted)">No other users found.</p>`;
+          return;
         }
 
-      </div>
+        container.innerHTML = users.map(u => `
+          <div class="card row" style="align-items:center; justify-content:space-between; padding:10px; margin-bottom:8px; cursor:pointer;" onclick="openChatWith('${esc(u.uid)}', '${esc(u.name)}')">
+            <div class="row" style="align-items:center; gap:10px;">
+              ${avatarHTML(u.initial || 'U', u.avatar, 'avatar')}
+              <div>
+                <b>${esc(u.name)}</b>
+                <div class="small" style="color:var(--muted)">${esc(u.handle || '')}</div>
+              </div>
+            </div>
+            <button class="pill" style="font-size:12px;">Chat</button>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = `<p class="small" style="color:red">Failed to load users.</p>`;
+      }
+    }
 
-      <h2>
-        ${esc(
-          state.user.name
-        )}
-      </h2>
+    function openChatWith(targetUid, targetName) {
+      const chatId = [currentUser.uid, targetUid].sort().join('_');
+      document.getElementById('chatUsersList')?.classList.add('hidden');
+      const chatBox = document.getElementById('activeChatBox');
+      if (!chatBox) return;
 
-      <div class="small">
+      chatBox.classList.remove('hidden');
+      chatBox.innerHTML = `
+        <div class="row" style="align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:10px;">
+          <button class="pill" style="padding:4px 8px; font-size:12px;" onclick="backToUserList()">← Back</button>
+          <b>${esc(targetName)}</b>
+          <div style="width:40px;"></div>
+        </div>
+        <div id="messageStream" style="height:260px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:4px;">
+          <p class="small" style="text-align:center; color:var(--muted);">Connecting chat...</p>
+        </div>
+        <div class="row" style="margin-top:10px; gap:8px;">
+          <input id="chatInputMsg" placeholder="Type a message..." style="margin:0; flex:1;" onkeydown="if(event.key==='Enter') sendChatMessage('${chatId}')">
+          <button class="primary" onclick="sendChatMessage('${chatId}')">Send</button>
+        </div>
+      `;
+      listenForMessages(chatId);
+    }
 
-        ${esc(
-          state.user.handle
-        )}
+    function listenForMessages(chatId) {
+      if (activeChatUnsubscribe) activeChatUnsubscribe();
+      const stream = document.getElementById('messageStream');
 
-      </div>
+      activeChatUnsubscribe = db.collection('chats').doc(chatId).collection('messages')
+        .orderBy('createdAt', 'asc').limitToLast(60)
+        .onSnapshot(snapshot => {
+          if (!stream) return;
+          if (snapshot.empty) {
+            stream.innerHTML = `<p class="small" style="text-align:center; color:var(--muted); margin:auto;">No messages yet. Say hello! 👋</p>`;
+            return;
+          }
+          stream.innerHTML = snapshot.docs.map(doc => {
+            const msg = doc.data();
+            const isMe = msg.senderId === currentUser.uid;
+            return `
+              <div style="align-self:${isMe ? 'flex-end' : 'flex-start'}; background:${isMe ? 'var(--primary)' : 'rgba(255,255,255,0.08)'}; color:#fff; padding:7px 12px; border-radius:${isMe ? '14px 14px 2px 14px' : '14px 14px 14px 2px'}; max-width:75%; word-break:break-word; font-size:13px;">
+                ${esc(msg.text)}
+              </div>`;
+          }).join('');
+          stream.scrollTop = stream.scrollHeight;
+        });
+    }
 
-      <p>
+    async function sendChatMessage(chatId) {
+      const input = document.getElementById('chatInputMsg');
+      const text = input?.value.trim();
+      if (!text || !currentUser) return;
+      input.value = '';
 
-        ${esc(
-          state.user.bio
-        )}
-
-      </p>
-
-      <button
-        class="primary"
-        onclick="openEditProfile()">
-
-        Edit profile
-
-      </button>
-
-      <button
-        class="pill"
-        style="margin-left:6px"
-        onclick="logoutUser()">
-
-        Logout
-
-      </button>
-
-    </div>
-
-  `);
-
-}
-
-
-/* =========================================
-   EDIT PROFILE
-========================================= */
-
-function openEditProfile(){
-
-  openModal(`
-
-    <div
-      class="row"
-      style="justify-content:space-between">
-
-      <h2 style="margin:0">
-        Edit profile
-      </h2>
-
-      <button
-        class="icon"
-        onclick="closeModal()">
-
-        ✕
-
-      </button>
-
-    </div>
-
-    <label>
-      Name
-    </label>
-
-    <input
-      id="editName"
-      value="${esc(
-        state.user.name
-      )}">
-
-    <label>
-      Username
-    </label>
-
-    <input
-      id="editHandle"
-      value="${esc(
-        state.user.handle
-      )}">
-
-    <label>
-      Bio
-    </label>
-
-    <input
-      id="editBio"
-      value="${esc(
-        state.user.bio
-      )}">
-
-    <div class="modal-actions">
-
-      <button
-        class="pill"
-        onclick="openProfile()">
-
-        Cancel
-
-      </button>
-
-      <button
-        class="primary"
-        onclick="saveProfile()">
-
-        Save
-
-      </button>
-
-    </div>
-
-  `);
-
-}
-
-
-async function saveProfile(){
-
-  if(!currentUser)
-    return;
-
-  const name =
-    document
-      .getElementById('editName')
-      ?.value
-      .trim() ||
-    state.user.name;
-
-  let handle =
-    document
-      .getElementById('editHandle')
-      ?.value
-      .trim() ||
-    state.user.handle;
-
-  const bio =
-    document
-      .getElementById('editBio')
-      ?.value
-      .trim() ||
-    '';
-
-
-  if(!handle.startsWith('@'))
-    handle = '@' + handle;
-
-
-  const initial =
-    name
-      .charAt(0)
-      .toUpperCase();
-
-
-  try{
-
-    showLoading(
-      'Profile save हो रही है...'
-    );
-
-
-    await db
-      .collection('users')
-      .doc(currentUser.uid)
-      .update({
-
-        name:name,
-
-        handle:handle,
-
-        initial:initial,
-
-        bio:bio
-
+      await db.collection('chats').doc(chatId).collection('messages').add({
+        senderId: currentUser.uid, text: text, createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+      await db.collection('chats').doc(chatId).set({
+        lastMessage: text, lastUpdated: firebase.firestore.FieldValue.serverTimestamp(), users: chatId.split('_')
+      }, { merge: true });
+    }
 
+    function backToUserList() {
+      if (activeChatUnsubscribe) { activeChatUnsubscribe(); activeChatUnsubscribe = null; }
+      document.getElementById('activeChatBox')?.classList.add('hidden');
+      document.getElementById('chatUsersList')?.classList.remove('hidden');
+    }
 
-    state.user.name =
-      name;
+    /* GENERAL HELPERS & NAVIGATION */
+    async function followUser(targetUid) {
+      if (!currentUser || targetUid === currentUser.uid) return;
+      const followId = `${currentUser.uid}_${targetUid}`;
+      const ref = db.collection('follows').doc(followId);
+      const snap = await ref.get();
 
-    state.user.handle =
-      handle;
+      if (snap.exists) {
+        await ref.delete();
+        state.following = state.following.filter(id => id !== targetUid);
+        toast('Unfollowed');
+      } else {
+        await ref.set({ followerId: currentUser.uid, followingId: targetUid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        state.following.push(targetUid);
+        toast('Following ✓');
+      }
+      saveLocal();
+      renderFeed();
+    }
 
-    state.user.initial =
-      initial;
+    function toggleSave(id) {
+      const i = state.saved.indexOf(id);
+      if (i >= 0) { state.saved.splice(i, 1); toast('Removed from saved'); }
+      else { state.saved.push(id); toast('Saved ✓'); }
+      saveLocal();
+      renderFeed();
+    }
 
-    state.user.bio =
-      bio;
+    function sharePost(id) {
+      const url = location.href.split('#')[0] + '#post-' + id;
+      navigator.clipboard?.writeText(url).then(() => toast('Link copied ✓'));
+    }
 
+    function openMediaViewer(url) {
+      const v = document.createElement('div');
+      v.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+      v.innerHTML = `<img src="${esc(url)}" style="max-width:100%;max-height:90vh;object-fit:contain;border-radius:10px;"><button style="position:absolute;top:20px;right:20px;background:#fff;border-radius:50%;width:36px;height:36px;" onclick="this.parentElement.remove()">✕</button>`;
+      document.body.appendChild(v);
+    }
 
-    saveLocal();
+    function openModal(html) {
+      document.getElementById('modalBox').innerHTML = html;
+      document.getElementById('modal').classList.add('show');
+    }
 
-    await loadFirebasePosts();
+    function closeModal() {
+      if (activeChatUnsubscribe) { activeChatUnsubscribe(); activeChatUnsubscribe = null; }
+      document.getElementById('modal').classList.remove('show');
+    }
+
+    function navigate(btn, name) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      if (name === 'Home') renderFeed();
+      if (name === 'Messages') openMessages();
+      if (name === 'Explore') renderFeed();
+      if (name === 'Reels') openModal('<h2>Reels</h2><p class="small" style="color:var(--muted)">Short-form video stream</p>');
+    }
+
+    function openProfile() {
+      openModal(`
+        <div style="text-align:center;">
+          ${avatarHTML(state.user.initial, state.user.avatar)}
+          <h2 style="margin-top:10px;">${esc(state.user.name)}</h2>
+          <div style="color:var(--muted);">${esc(state.user.handle)}</div>
+          <p style="margin:10px 0;">${esc(state.user.bio)}</p>
+          <button class="pill" onclick="auth.signOut(); closeModal();">Logout</button>
+        </div>
+      `);
+    }
+
+    function openNotifications() {
+      openModal(`<h2>Notifications</h2><div class="notice">Welcome to IB65! 🎉</div>`);
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function showLoading(msg) {
+      let b = document.getElementById('ibLoader');
+      if (!b) {
+        b = document.createElement('div');
+        b.id = 'ibLoader';
+        b.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;display:flex;align-items:center;justify-content:center;color:#fff;';
+        document.body.appendChild(b);
+      }
+      b.innerHTML = `<div class="card" style="padding:20px;text-align:center;">⏳ ${esc(msg)}</div>`;
+    }
+
+    function hideLoading() { document.getElementById('ibLoader')?.remove(); }
+
+    function renderProfileCard() {
+      const el = document.getElementById('profileCard');
+      if (!el) return;
+      el.innerHTML = `
+        ${avatarHTML(state.user.initial, state.user.avatar)}
+        <h3 style="margin-top:8px;">${esc(state.user.name)}</h3>
+        <div class="small" style="color:var(--muted);">${esc(state.user.handle)}</div>
+        <p class="small" style="margin:8px 0;">${esc(state.user.bio)}</p>
+        <button class="pill" style="width:100%;" onclick="openProfile()">View Profile</button>
+      `;
+    }
+
+    function render() {
+      renderFeed();
+      renderProfileCard();
+      const ca = document.getElementById('composerAvatar');
+      if (ca) ca.innerHTML = state.user.avatar ? `<img src="${esc(state.user.avatar)}">` : esc(state.user.initial);
+    }
 
     render();
-
-    hideLoading();
-
-    openProfile();
-
-    toast(
-      'Profile updated ✓'
-    );
-
-
-  }catch(error){
-
-    console.error(error);
-
-    hideLoading();
-
-    toast(
-      'Profile update नहीं हुआ'
-    );
-
-  }
-
-}
-
-
-/* =========================================
-   LOGOUT
-========================================= */
-
-async function logoutUser(){
-
-  try{
-
-    await auth.signOut();
-
-    closeModal();
-
-    toast(
-      'Logged out'
-    );
-
-  }catch(error){
-
-    console.error(error);
-
-    toast(
-      'Logout failed'
-    );
-
-  }
-
-}
-
-
-/* =========================================
-   NOTIFICATIONS
-========================================= */
-
-function openNotifications(){
-
-  openModal(`
-
-    <div
-      class="row"
-      style="justify-content:space-between">
-
-      <h2 style="margin:0">
-        Notifications
-      </h2>
-
-      <button
-        class="icon"
-        onclick="closeModal()">
-
-        ✕
-
-      </button>
-
-    </div>
-
-    ${
-      state.notifications.length
-
-        ? state.notifications
-            .map(n=>`
-
-              <div class="notice">
-
-                🔔
-                ${esc(n.text)}
-
-                <div class="small">
-
-                  ${esc(n.time)}
-
-                </div>
-
-              </div>
-
-            `)
-            .join('')
-
-        : `
-          <p class="small">
-            No notifications yet.
-          </p>
-        `
-    }
-
-    <div class="modal-actions">
-
-      <button
-        class="pill"
-        onclick="
-          state.notifications=[];
-          saveLocal();
-          render();
-          closeModal();
-        ">
-
-        Mark all read
-
-      </button>
-
-    </div>
-
-  `);
-
-}
-
-
-/* =========================================
-   MESSAGES
-========================================= */
-
-function openMessages(){
-
-  openModal(`
-
-    <div
-      class="row"
-      style="justify-content:space-between">
-
-      <h2 style="margin:0">
-        Messages
-      </h2>
-
-      <button
-        class="icon"
-        onclick="closeModal()">
-
-        ✕
-
-      </button>
-
-    </div>
-
-    <div class="notice">
-
-      💬 Real-time Messages अगला चरण है।
-      अभी Firebase Posts system तैयार है।
-
-    </div>
-
-  `);
-
-}
-
-
-/* =========================================
-   REELS
-========================================= */
-
-function openReels(){
-
-  const videos =
-    state.posts.filter(
-      p =>
-        p.type === 'video' &&
-        p.media
-    );
-
-  openModal(`
-
-    <div
-      class="row"
-      style="justify-content:space-between">
-
-      <h2 style="margin:0">
-        IB65 Reels
-      </h2>
-
-      <button
-        class="icon"
-        onclick="closeModal()">
-
-        ✕
-
-      </button>
-
-    </div>
-
-    ${
-      videos.length
-
-        ? videos
-            .map(p=>`
-
-              <div class="reel">
-
-                <video
-                  src="${esc(p.media)}"
-                  controls
-                  playsinline>
-                </video>
-
-                <div class="caption">
-
-                  ${esc(p.text)}
-
-                </div>
-
-              </div>
-
-            `)
-            .join('')
-
-        : `
-          <div class="notice">
-
-            अभी कोई Reel नहीं है।
-
-          </div>
-        `
-    }
-
-  `);
-
-}
-
-
-/* =========================================
-   EXPLORE
-========================================= */
-
-function openExplore(){
-
-  const tags = [
-
-    '#IB65',
-    '#Creators',
-    '#India',
-    '#Reels',
-    '#Gaming',
-    '#Photography'
-
-  ];
-
-  openModal(`
-
-    <div
-      class="row"
-      style="justify-content:space-between">
-
-      <h2 style="margin:0">
-        Explore
-      </h2>
-
-      <button
-        class="icon"
-        onclick="closeModal()">
-
-        ✕
-
-      </button>
-
-    </div>
-
-    <div class="notice">
-
-      Search bar से posts और creators खोजो।
-
-    </div>
-
-    <h3>
-      Trending
-    </h3>
-
-    ${tags.map(t=>`
-
-      <button
-        class="pill"
-        style="margin:4px"
-        onclick="
-          closeModal();
-          document.getElementById('search').value='${t.replace('#','')}';
-          renderFeed();
-        ">
-
-        ${t}
-
-      </button>
-
-    `).join('')}
-
-  `);
-
-}
-
-
-/* =========================================
-   SHARE
-========================================= */
-
-function sharePost(id){
-
-  const url =
-    location.href
-      .split('#')[0] +
-    '#post-' +
-    id;
-
-  if(navigator.share){
-
-    navigator.share({
-
-      title:'IB65',
-
-      text:'IB65 post देखें',
-
-      url:url
-
-    })
-    .catch(()=>{});
-
-  }else{
-
-    navigator.clipboard
-      ?.writeText(url)
-      .then(
-        () =>
-          toast(
-            'Post link copied ✓'
-          )
-      )
-      .catch(
-        () =>
-          toast(
-            'Link copy नहीं हुआ'
-          )
-      );
-
-  }
-
-}
-
-
-/* =========================================
-   MEDIA VIEWER
-========================================= */
-
-function openMediaViewer(url){
-
-  if(!url)
-    return;
-
-  const old =
-    document.getElementById(
-      'mediaViewer'
-    );
-
-  if(old)
-    old.remove();
-
-
-  const viewer =
-    document.createElement(
-      'div'
-    );
-
-  viewer.id =
-    'mediaViewer';
-
-
-  viewer.style.cssText = `
-
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.95);
-    z-index:99999;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    padding:20px;
-
-  `;
-
-
-  viewer.innerHTML = `
-
-    <button
-      onclick="
-        this.parentElement.remove()
-      "
-      style="
-        position:absolute;
-        top:20px;
-        right:20px;
-        border:0;
-        background:#fff;
-        color:#000;
-        width:42px;
-        height:42px;
-        border-radius:50%;
-        font-size:24px;
-      ">
-
-      ×
-
-    </button>
-
-    <img
-      src="${esc(url)}"
-      style="
-        max-width:100%;
-        max-height:90vh;
-        object-fit:contain;
-        border-radius:12px;
-      ">
-
-  `;
-
-
-  viewer.onclick =
-    function(e){
-
-      if(e.target === viewer)
-        viewer.remove();
-
-    };
-
-
-  document.body.appendChild(
-    viewer
-  );
-
-}
-
-
-/* =========================================
-   MODAL
-========================================= */
-
-function openModal(html){
-
-  const box =
-    document.getElementById(
-      'modalBox'
-    );
-
-  const modal =
-    document.getElementById(
-      'modal'
-    );
-
-  if(!box || !modal){
-
-    console.warn(
-      'Modal elements not found'
-    );
-
-    return;
-
-  }
-
-  box.innerHTML =
-    html;
-
-  modal.classList.add(
-    'show'
-  );
-
-}
-
-
-function closeModal(){
-
-  const modal =
-    document.getElementById(
-      'modal'
-    );
-
-  if(modal)
-    modal.classList.remove(
-      'show'
-    );
-
-}
-
-
-/* =========================================
-   NAVIGATION
-========================================= */
-
-function navigate(b,name){
-
-  document
-    .querySelectorAll(
-      '.nav button,.bottom button'
-    )
-    .forEach(
-      x =>
-        x.classList.remove(
-          'active'
-        )
-    );
-
-  if(b)
-    b.classList.add(
-      'active'
-    );
-
-
-  if(name === 'Home'){
-
-    const search =
-      document.getElementById(
-        'search'
-      );
-
-    if(search)
-      search.value='';
-
-    renderFeed();
-
-  }
-
-  else if(
-    name === 'Explore'
-  ){
-
-    openExplore();
-
-  }
-
-  else if(
-    name === 'Reels'
-  ){
-
-    openReels();
-
-  }
-
-  else if(
-    name === 'Messages'
-  ){
-
-    openMessages();
-
-  }
-
-}
-
-
-/* =========================================
-   TOAST
-========================================= */
-
-function toast(t){
-
-  const e =
-    document.getElementById(
-      'toast'
-    );
-
-  if(!e){
-
-    console.log(t);
-
-    return;
-
-  }
-
-  e.textContent =
-    t;
-
-  e.classList.add(
-    'show'
-  );
-
-  clearTimeout(
-    window.tt
-  );
-
-  window.tt =
-    setTimeout(
-      () =>
-        e.classList.remove(
-          'show'
-        ),
-      2200
-    );
-
-}
-
-
-/* =========================================
-   LOADING
-========================================= */
-
-function showLoading(
-  message='Loading...'
-){
-
-  let box =
-    document.getElementById(
-      'ib65Loading'
-    );
-
-
-  if(!box){
-
-    box =
-      document.createElement(
-        'div'
-      );
-
-    box.id =
-      'ib65Loading';
-
-
-    box.style.cssText = `
-
-      position:fixed;
-      inset:0;
-
-      background:rgba(0,0,0,.65);
-
-      z-index:100000;
-
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      color:white;
-
-      font-size:16px;
-      font-weight:600;
-
-    `;
-
-
-    document.body.appendChild(
-      box
-    );
-
-  }
-
-
-  box.innerHTML = `
-
-    <div
-      style="
-        background:#121620;
-        padding:22px 28px;
-        border-radius:16px;
-        text-align:center;
-        box-shadow:
-          0 10px 40px
-          rgba(0,0,0,.4);
-      ">
-
-      <div
-        style="
-          font-size:28px;
-          margin-bottom:10px;
-        ">
-
-        ⏳
-
-      </div>
-
-      ${esc(message)}
-
-    </div>
-
-  `;
-
-}
-
-
-function hideLoading(){
-
-  const box =
-    document.getElementById(
-      'ib65Loading'
-    );
-
-  if(box)
-    box.remove();
-
-}
-
-
-/* =========================================
-   PWA INSTALL
-========================================= */
-
-let deferredInstallPrompt =
-  null;
-
-
-window.addEventListener(
-  'beforeinstallprompt',
-  event => {
-
-    event.preventDefault();
-
-    deferredInstallPrompt =
-      event;
-
-    const install =
-      document.getElementById(
-        'installApp'
-      );
-
-    if(install)
-      install.classList.add(
-        'show'
-      );
-
-  }
-);
-
-
-async function installApp(){
-
-  if(!deferredInstallPrompt){
-
-    toast(
-      'Chrome ⋮ → Add to Home screen दबाएँ'
-    );
-
-    return;
-
-  }
-
-
-  deferredInstallPrompt.prompt();
-
-  await
-    deferredInstallPrompt
-      .userChoice;
-
-
-  deferredInstallPrompt =
-    null;
-
-
-  const install =
-    document.getElementById(
-      'installApp'
-    );
-
-  if(install)
-    install.classList.remove(
-      'show'
-    );
-
-}
-
-
-/* =========================================
-   KEYBOARD
-========================================= */
-
-document.addEventListener(
-  'keydown',
-  e => {
-
-    if(
-      (e.ctrlKey || e.metaKey) &&
-      e.key.toLowerCase() === 'k'
-    ){
-
-      e.preventDefault();
-
-      document
-        .getElementById(
-          'search'
-        )
-        ?.focus();
-
-    }
-
-
-    if(
-      e.key === 'Escape'
-    ){
-
-      closeModal();
-
-    }
-
-  }
-);
-
-
-/* =========================================
-   START
-========================================= */
-
-render();
-
-       </script>
+  </script>
+</body>
+</html>
