@@ -1,10 +1,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
 <script>
 /* =========================================
-   IB65 FIREBASE
+   IB65 FIREBASE — COMPLETE SYSTEM
+   Auth + Firestore + Storage
+   Posts + Photos + Videos + Likes
+   Comments + Follow + Profile
 ========================================= */
 
 const firebaseConfig = {
@@ -21,6 +25,7 @@ firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.firestore();
+const storage = firebase.storage();
 
 const KEY = 'ib65_v3_state';
 
@@ -43,7 +48,7 @@ const defaultState = {
     avatar:''
   },
 
-  following:['@arjun'],
+  following:[],
 
   saved:[],
 
@@ -70,7 +75,9 @@ function loadLocal(){
 
     return deepMerge(
       defaultState,
-      JSON.parse(localStorage.getItem(KEY) || '{}')
+      JSON.parse(
+        localStorage.getItem(KEY) || '{}'
+      )
     );
 
   }catch(e){
@@ -82,6 +89,7 @@ function loadLocal(){
   }
 
 }
+
 
 function deepMerge(base,extra){
 
@@ -109,14 +117,27 @@ function deepMerge(base,extra){
   });
 
   return out;
+
 }
+
 
 function saveLocal(){
 
-  localStorage.setItem(
-    KEY,
-    JSON.stringify(state)
-  );
+  try{
+
+    localStorage.setItem(
+      KEY,
+      JSON.stringify(state)
+    );
+
+  }catch(e){
+
+    console.warn(
+      'Local storage error',
+      e
+    );
+
+  }
 
 }
 
@@ -140,17 +161,24 @@ function esc(s){
 
 }
 
-function avatarHTML(initial,avatar,cls='avatar'){
+
+function avatarHTML(
+  initial,
+  avatar,
+  cls='avatar'
+){
 
   return avatar
 
-  ? `<div class="${cls}">
-       <img src="${esc(avatar)}" alt="">
-     </div>`
+    ? `<div class="${cls}">
+         <img
+           src="${esc(avatar)}"
+           alt="">
+       </div>`
 
-  : `<div class="${cls}">
-       ${esc(initial || '?')}
-     </div>`;
+    : `<div class="${cls}">
+         ${esc(initial || '?')}
+       </div>`;
 
 }
 
@@ -159,35 +187,50 @@ function avatarHTML(initial,avatar,cls='avatar'){
    FIREBASE AUTH
 ========================================= */
 
-auth.onAuthStateChanged(async user => {
+auth.onAuthStateChanged(
+  async user => {
 
-  currentUser = user;
+    currentUser = user;
 
-  if(user){
+    if(user){
 
-    firebaseReady = true;
+      firebaseReady = true;
 
-    await loadFirebaseUser();
+      try{
 
-    await loadFirebasePosts();
+        await loadFirebaseUser();
 
-    render();
+        await loadFirebasePosts();
 
-    toast('Firebase connected ✓');
+        await loadFollowing();
 
-  }else{
+        render();
 
-    firebaseReady = false;
+        toast('Firebase connected ✓');
 
-    showLogin();
+      }catch(error){
+
+        console.error(
+          'Firebase initialization error:',
+          error
+        );
+
+      }
+
+    }else{
+
+      firebaseReady = false;
+
+      showLogin();
+
+    }
 
   }
-
-});
+);
 
 
 /* =========================================
-   LOGIN / SIGNUP UI
+   LOGIN / SIGNUP
 ========================================= */
 
 function showLogin(){
@@ -196,8 +239,9 @@ function showLogin(){
 
     <div style="text-align:center;padding:10px">
 
-      <div class="logo"
-           style="margin:auto;width:58px;height:58px">
+      <div
+        class="logo"
+        style="margin:auto;width:58px;height:58px">
 
         <b>IB</b>
 
@@ -231,19 +275,26 @@ function showLogin(){
         <button
           class="pill"
           onclick="loginUser()">
+
           Login
+
         </button>
 
         <button
           class="primary"
           onclick="signupUser()">
+
           Sign up
+
         </button>
 
       </div>
 
       <div class="notice">
-        🔐 आपका account Firebase Authentication से सुरक्षित रहेगा।
+
+        🔐 आपका account Firebase Authentication
+        से सुरक्षित रहेगा।
+
       </div>
 
     </div>
@@ -252,19 +303,25 @@ function showLogin(){
 
 }
 
+
 async function signupUser(){
 
   const name =
-    document.getElementById('authName')
-    .value.trim();
+    document
+      .getElementById('authName')
+      ?.value
+      .trim();
 
   const email =
-    document.getElementById('authEmail')
-    .value.trim();
+    document
+      .getElementById('authEmail')
+      ?.value
+      .trim();
 
   const password =
-    document.getElementById('authPassword')
-    .value;
+    document
+      .getElementById('authPassword')
+      ?.value;
 
   if(!name)
     return toast('Name डालो');
@@ -273,24 +330,35 @@ async function signupUser(){
     return toast('Email डालो');
 
   if(password.length < 6)
-    return toast('Password कम से कम 6 characters का रखें');
+    return toast(
+      'Password कम से कम 6 characters का रखें'
+    );
 
   try{
 
+    showLoading(
+      'Account बनाया जा रहा है...'
+    );
+
     const result =
-      await auth.createUserWithEmailAndPassword(
-        email,
-        password
-      );
+      await auth
+        .createUserWithEmailAndPassword(
+          email,
+          password
+        );
 
     const user = result.user;
 
-    const handle =
-      '@' +
+    const cleanName =
       name
         .toLowerCase()
         .replace(/[^a-z0-9]/g,'')
-        .slice(0,18) +
+        .slice(0,18) ||
+      'user';
+
+    const handle =
+      '@' +
+      cleanName +
       Math.floor(Math.random()*1000);
 
     await db
@@ -304,9 +372,10 @@ async function signupUser(){
 
         handle:handle,
 
-        initial:name
-          .charAt(0)
-          .toUpperCase(),
+        initial:
+          name
+            .charAt(0)
+            .toUpperCase(),
 
         bio:'Building IB65 🚀',
 
@@ -319,17 +388,22 @@ async function signupUser(){
         email:user.email,
 
         createdAt:
-          firebase.firestore.FieldValue.serverTimestamp()
+          firebase.firestore.FieldValue
+            .serverTimestamp()
 
       });
 
-    toast('Account created ✓');
+    hideLoading();
 
     closeModal();
+
+    toast('Account created ✓');
 
   }catch(error){
 
     console.error(error);
+
+    hideLoading();
 
     toast(
       firebaseError(error)
@@ -343,23 +417,34 @@ async function signupUser(){
 async function loginUser(){
 
   const email =
-    document.getElementById('authEmail')
-    .value.trim();
+    document
+      .getElementById('authEmail')
+      ?.value
+      .trim();
 
   const password =
-    document.getElementById('authPassword')
-    .value;
+    document
+      .getElementById('authPassword')
+      ?.value;
 
   if(!email || !password)
-    return toast('Email और password डालो');
+    return toast(
+      'Email और password डालो'
+    );
 
   try{
+
+    showLoading(
+      'Login हो रहा है...'
+    );
 
     await auth
       .signInWithEmailAndPassword(
         email,
         password
       );
+
+    hideLoading();
 
     closeModal();
 
@@ -368,6 +453,8 @@ async function loginUser(){
   }catch(error){
 
     console.error(error);
+
+    hideLoading();
 
     toast(
       firebaseError(error)
@@ -380,22 +467,38 @@ async function loginUser(){
 
 function firebaseError(error){
 
-  const code = error?.code || '';
+  const code =
+    error?.code || '';
 
-  if(code.includes('invalid-credential'))
+  if(
+    code.includes('invalid-credential')
+  )
     return 'Email या password गलत है';
 
-  if(code.includes('email-already-in-use'))
+  if(
+    code.includes('email-already-in-use')
+  )
     return 'यह email पहले से registered है';
 
-  if(code.includes('invalid-email'))
+  if(
+    code.includes('invalid-email')
+  )
     return 'Email सही नहीं है';
 
-  if(code.includes('weak-password'))
+  if(
+    code.includes('weak-password')
+  )
     return 'Password बहुत छोटा है';
 
-  if(code.includes('network-request-failed'))
+  if(
+    code.includes('network-request-failed')
+  )
     return 'Internet connection check करो';
+
+  if(
+    code.includes('too-many-requests')
+  )
+    return 'बहुत ज्यादा कोशिश हुई है, थोड़ी देर बाद try करें';
 
   return 'Firebase error: ' + code;
 
@@ -412,7 +515,8 @@ async function loadFirebaseUser(){
     return;
 
   const ref =
-    db.collection('users')
+    db
+      .collection('users')
       .doc(currentUser.uid);
 
   const snap =
@@ -420,51 +524,67 @@ async function loadFirebaseUser(){
 
   if(snap.exists){
 
-    const data = snap.data();
+    const data =
+      snap.data();
 
     state.user = {
 
-      name:data.name || 'User',
+      name:
+        data.name ||
+        'User',
 
-      handle:data.handle || '@user',
+      handle:
+        data.handle ||
+        '@user',
 
-      initial:data.initial ||
-        (data.name || 'U')
+      initial:
+        data.initial ||
+        (
+          data.name ||
+          'U'
+        )
         .charAt(0)
         .toUpperCase(),
 
-      bio:data.bio ||
+      bio:
+        data.bio ||
         'Building IB65 🚀',
 
-      followers:data.followers || 0,
+      followers:
+        Number(data.followers || 0),
 
-      following:data.following || 0,
+      following:
+        Number(data.following || 0),
 
-      avatar:data.avatar || ''
+      avatar:
+        data.avatar || ''
 
     };
 
   }else{
 
+    const name =
+      currentUser
+        .email
+        ?.split('@')[0] ||
+      'User';
+
     await ref.set({
 
       uid:currentUser.uid,
 
-      name:currentUser.email
-        ?.split('@')[0] || 'User',
+      name:name,
 
       handle:
         '@' +
-        (
-          currentUser.email
-          ?.split('@')[0] || 'user'
-        ),
+        name
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g,''),
 
       initial:
-        (
-          currentUser.email
-          ?.charAt(0) || 'U'
-        ).toUpperCase(),
+        name
+          .charAt(0)
+          .toUpperCase(),
 
       bio:'Building IB65 🚀',
 
@@ -477,7 +597,8 @@ async function loadFirebaseUser(){
       email:currentUser.email,
 
       createdAt:
-        firebase.firestore.FieldValue.serverTimestamp()
+        firebase.firestore.FieldValue
+          .serverTimestamp()
 
     });
 
@@ -491,24 +612,36 @@ async function loadFirebaseUser(){
 
 
 /* =========================================
-   LOAD POSTS FROM FIRESTORE
+   LOAD POSTS
 ========================================= */
 
 async function loadFirebasePosts(){
+
+  if(!firebaseReady)
+    return;
 
   try{
 
     const snap =
       await db
         .collection('posts')
-        .orderBy('createdAt','desc')
+        .orderBy(
+          'createdAt',
+          'desc'
+        )
         .limit(50)
         .get();
 
-    state.posts =
+    const posts =
       snap.docs.map(doc => {
 
-        const p = doc.data();
+        const p =
+          doc.data();
+
+        const likedBy =
+          Array.isArray(p.likedBy)
+            ? p.likedBy
+            : [];
 
         return {
 
@@ -524,19 +657,80 @@ async function loadFirebasePosts(){
 
           text:p.text || '',
 
-          likes:p.likeCount || 0,
+          likes:
+            Number(p.likeCount || 0),
 
-          liked:false,
+          likedBy:likedBy,
 
-          comments:p.comments || [],
+          liked:
+            currentUser
+              ? likedBy.includes(
+                  currentUser.uid
+                )
+              : false,
+
+          comments:
+            Array.isArray(p.comments)
+              ? p.comments
+              : [],
 
           media:p.media || '',
 
-          type:p.type || 'text'
+          type:p.type || 'text',
+
+          createdAt:
+            p.createdAt || null
 
         };
 
       });
+
+    /* -----------------------------------------
+       LOAD REAL COMMENTS FROM SUBCOLLECTION
+    ----------------------------------------- */
+
+    await Promise.all(
+
+      posts.map(
+        async post => {
+
+          try{
+
+            const commentsSnap =
+              await db
+                .collection('posts')
+                .doc(post.id)
+                .collection('comments')
+                .orderBy(
+                  'createdAt',
+                  'asc'
+                )
+                .limit(100)
+                .get();
+
+            post.comments =
+              commentsSnap.docs.map(
+                d => ({
+                  id:d.id,
+                  ...d.data()
+                })
+              );
+
+          }catch(commentError){
+
+            console.warn(
+              'Comment loading error:',
+              commentError
+            );
+
+          }
+
+        }
+      )
+
+    );
+
+    state.posts = posts;
 
     saveLocal();
 
@@ -547,7 +741,63 @@ async function loadFirebasePosts(){
       error
     );
 
-    toast('Posts load नहीं हुए');
+    if(
+      error.code ===
+      'failed-precondition'
+    ){
+
+      toast(
+        'Firestore index की जरूरत है'
+      );
+
+    }else{
+
+      toast(
+        'Posts load नहीं हुए'
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =========================================
+   FOLLOWING LOAD
+========================================= */
+
+async function loadFollowing(){
+
+  if(!currentUser)
+    return;
+
+  try{
+
+    const snap =
+      await db
+        .collection('follows')
+        .where(
+          'followerId',
+          '==',
+          currentUser.uid
+        )
+        .get();
+
+    state.following =
+      snap.docs.map(
+        d =>
+          d.data().followingId
+      );
+
+    saveLocal();
+
+  }catch(error){
+
+    console.error(
+      'Following load error:',
+      error
+    );
 
   }
 
@@ -576,11 +826,13 @@ function render(){
     ca.innerHTML =
       state.user.avatar
 
-      ? `<img
-          src="${esc(state.user.avatar)}"
-          alt="">`
+        ? `<img
+             src="${esc(state.user.avatar)}"
+             alt="">`
 
-      : esc(state.user.initial);
+        : esc(
+            state.user.initial
+          );
 
   }
 
@@ -593,25 +845,43 @@ function render(){
 
     nc.textContent =
       state.notifications.length
-      ? `(${state.notifications.length})`
-      : '';
+        ? `(${state.notifications.length})`
+        : '';
 
   }
 
 }
 
 
+/* =========================================
+   FEED
+========================================= */
+
 function renderFeed(){
 
+  const feed =
+    document.getElementById(
+      'feed'
+    );
+
+  if(!feed)
+    return;
+
   const search =
-    document.getElementById('search');
+    document.getElementById(
+      'search'
+    );
 
   const q =
-    (search?.value || '')
+    (
+      search?.value ||
+      ''
+    )
     .toLowerCase();
 
   const f =
     state.posts.filter(p =>
+
       (
         p.text +
         p.user +
@@ -619,59 +889,98 @@ function renderFeed(){
       )
       .toLowerCase()
       .includes(q)
+
     );
 
-  document.getElementById('feed').innerHTML =
+  feed.innerHTML =
 
     f.map(postHTML).join('') ||
 
     `<div
       class="card"
-      style="padding:30px;text-align:center;color:var(--muted)">
+      style="
+        padding:30px;
+        text-align:center;
+        color:var(--muted)
+      ">
 
-      ${firebaseReady
-        ? 'अभी कोई post नहीं है। पहला post बनाओ 🚀'
-        : 'Firebase से connect हो रहा है...'}
+      ${
+        firebaseReady
+          ? 'अभी कोई post नहीं है। पहला post बनाओ 🚀'
+          : 'Firebase से connect हो रहा है...'
+      }
 
     </div>`;
 
 }
 
 
+/* =========================================
+   MEDIA HTML
+========================================= */
+
 function mediaHTML(p){
 
   if(!p.media)
-    return `<div class="media">IB65</div>`;
+    return '';
 
-  return `
+  if(p.type === 'video'){
 
-    <div class="media">
+    return `
 
-      ${
-        p.type === 'video'
+      <div class="media">
 
-        ? `<video
-            src="${esc(p.media)}"
-            controls
-            playsinline>
-           </video>`
+        <video
+          src="${esc(p.media)}"
+          controls
+          playsinline
+          preload="metadata">
+        </video>
 
-        : `<img
-            src="${esc(p.media)}"
-            alt="Post media">`
-      }
+      </div>
 
-    </div>
+    `;
 
-  `;
+  }
+
+  if(p.type === 'image'){
+
+    return `
+
+      <div class="media">
+
+        <img
+          src="${esc(p.media)}"
+          alt="IB65 post"
+          loading="lazy"
+          onclick="openMediaViewer('${esc(p.media)}')">
+
+      </div>
+
+    `;
+
+  }
+
+  return '';
 
 }
 
 
+/* =========================================
+   POST HTML
+========================================= */
+
 function postHTML(p){
 
   const isSaved =
-    state.saved.includes(p.id);
+    state.saved.includes(
+      p.id
+    );
+
+  const isFollowing =
+    state.following.includes(
+      p.uid
+    );
 
   return `
 
@@ -685,7 +994,9 @@ function postHTML(p){
 
         ${avatarHTML(
           p.initial,
-          p.handle === state.user.handle
+          (
+            p.uid === currentUser?.uid
+          )
             ? state.user.avatar
             : '',
           'avatar'
@@ -706,26 +1017,36 @@ function postHTML(p){
       </div>
 
       ${
-        p.handle !== state.user.handle
+        p.uid !== currentUser?.uid
 
         ? `<button
             class="follow"
             onclick="followUser('${esc(p.uid)}')">
 
-            Follow
+            ${
+              isFollowing
+                ? 'Following'
+                : 'Follow'
+            }
 
            </button>`
 
         : `<button
             class="icon"
             onclick="openProfile()">
+
             •••
+
            </button>`
       }
 
     </div>
 
-    <p>${esc(p.text)}</p>
+    ${
+      p.text
+        ? `<p>${esc(p.text)}</p>`
+        : ''
+    }
 
     ${mediaHTML(p)}
 
@@ -779,7 +1100,9 @@ function postHTML(p){
 
           <div class="comment-body">
 
-            <b>${esc(c.user || 'User')}</b>
+            <b>
+              ${esc(c.user || 'User')}
+            </b>
 
             <div>
               ${esc(c.text || '')}
@@ -821,7 +1144,7 @@ function postHTML(p){
 
 
 /* =========================================
-   REAL FIRESTORE LIKE
+   LIKE
 ========================================= */
 
 async function likePost(id){
@@ -829,26 +1152,41 @@ async function likePost(id){
   if(!currentUser)
     return showLogin();
 
+  const post =
+    state.posts.find(
+      p => p.id === id
+    );
+
+  if(!post)
+    return;
+
   const ref =
-    db.collection('posts').doc(id);
+    db.collection('posts')
+      .doc(id);
 
   try{
 
-    const liked =
-      state.posts
-        .find(p=>p.id===id)
-        ?.liked;
+    const alreadyLiked =
+      (
+        post.likedBy || []
+      )
+      .includes(
+        currentUser.uid
+      );
 
-    if(liked){
+    if(alreadyLiked){
 
       await ref.update({
 
         likedBy:
           firebase.firestore.FieldValue
-            .arrayRemove(currentUser.uid),
+            .arrayRemove(
+              currentUser.uid
+            ),
 
         likeCount:
-          firebase.firestore.FieldValue.increment(-1)
+          firebase.firestore.FieldValue
+            .increment(-1)
 
       });
 
@@ -858,10 +1196,13 @@ async function likePost(id){
 
         likedBy:
           firebase.firestore.FieldValue
-            .arrayUnion(currentUser.uid),
+            .arrayUnion(
+              currentUser.uid
+            ),
 
         likeCount:
-          firebase.firestore.FieldValue.increment(1)
+          firebase.firestore.FieldValue
+            .increment(1)
 
       });
 
@@ -869,24 +1210,18 @@ async function likePost(id){
 
     await loadFirebasePosts();
 
-    const p =
-      state.posts.find(x=>x.id===id);
-
-    if(p){
-
-      p.liked =
-        (p.likedBy || [])
-          .includes(currentUser.uid);
-
-    }
-
     render();
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      'Like error:',
+      error
+    );
 
-    toast('Like नहीं हो पाया');
+    toast(
+      'Like नहीं हो पाया'
+    );
 
   }
 
@@ -899,9 +1234,15 @@ async function likePost(id){
 
 function toggleComments(id){
 
-  document
-    .getElementById('comments-'+id)
-    ?.classList.toggle('hidden');
+  const box =
+    document.getElementById(
+      'comments-'+id
+    );
+
+  if(box)
+    box.classList.toggle(
+      'hidden'
+    );
 
 }
 
@@ -916,6 +1257,9 @@ async function addComment(id){
       'comment-'+id
     );
 
+  if(!input)
+    return;
+
   const text =
     input.value.trim();
 
@@ -923,10 +1267,6 @@ async function addComment(id){
     return;
 
   try{
-
-    const postRef =
-      db.collection('posts')
-        .doc(id);
 
     const comment = {
 
@@ -944,7 +1284,9 @@ async function addComment(id){
 
     };
 
-    await postRef
+    await db
+      .collection('posts')
+      .doc(id)
       .collection('comments')
       .add(comment);
 
@@ -957,18 +1299,29 @@ async function addComment(id){
     setTimeout(()=>{
 
       document
-        .getElementById('comments-'+id)
-        ?.classList.remove('hidden');
+        .getElementById(
+          'comments-'+id
+        )
+        ?.classList.remove(
+          'hidden'
+        );
 
     },50);
 
-    toast('Comment added ✓');
+    toast(
+      'Comment added ✓'
+    );
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      'Comment error:',
+      error
+    );
 
-    toast('Comment नहीं जुड़ा');
+    toast(
+      'Comment नहीं जुड़ा'
+    );
 
   }
 
@@ -977,29 +1330,50 @@ async function addComment(id){
 
 async function refreshPostComments(id){
 
-  const snap =
-    await db
-      .collection('posts')
-      .doc(id)
-      .collection('comments')
-      .orderBy('createdAt','asc')
-      .limit(100)
-      .get();
+  try{
 
-  const comments =
-    snap.docs.map(d=>d.data());
+    const snap =
+      await db
+        .collection('posts')
+        .doc(id)
+        .collection('comments')
+        .orderBy(
+          'createdAt',
+          'asc'
+        )
+        .limit(100)
+        .get();
 
-  const p =
-    state.posts.find(x=>x.id===id);
+    const comments =
+      snap.docs.map(
+        d => ({
+          id:d.id,
+          ...d.data()
+        })
+      );
 
-  if(p)
-    p.comments = comments;
+    const p =
+      state.posts.find(
+        x => x.id === id
+      );
+
+    if(p)
+      p.comments = comments;
+
+  }catch(error){
+
+    console.error(
+      'Refresh comments error:',
+      error
+    );
+
+  }
 
 }
 
 
 /* =========================================
-   CREATE POST
+   CREATE POST MODAL
 ========================================= */
 
 function openCreate(){
@@ -1009,8 +1383,9 @@ function openCreate(){
 
   openModal(`
 
-    <div class="row"
-         style="justify-content:space-between">
+    <div
+      class="row"
+      style="justify-content:space-between">
 
       <h2 style="margin:0">
         Create post
@@ -1019,7 +1394,9 @@ function openCreate(){
       <button
         class="icon"
         onclick="closeModal()">
+
         ✕
+
       </button>
 
     </div>
@@ -1029,8 +1406,9 @@ function openCreate(){
       placeholder="Share something with IB65...">
     </textarea>
 
-    <div class="row"
-         style="flex-wrap:wrap">
+    <div
+      class="row"
+      style="flex-wrap:wrap">
 
       <label class="upload-label">
 
@@ -1040,7 +1418,9 @@ function openCreate(){
           id="photoInput"
           type="file"
           accept="image/*"
-          onchange="previewUpload(this,'image')">
+          onchange="
+            previewUpload(this,'image')
+          ">
 
       </label>
 
@@ -1052,7 +1432,9 @@ function openCreate(){
           id="videoInput"
           type="file"
           accept="video/*"
-          onchange="previewUpload(this,'video')">
+          onchange="
+            previewUpload(this,'video')
+          ">
 
       </label>
 
@@ -1062,9 +1444,8 @@ function openCreate(){
 
     <div class="notice">
 
-      अभी text posts Firebase में save होंगे।
-      Photo/video का local preview रहेगा।
-      Cloud Storage बाद में जोड़ेंगे।
+      📸 Photo और 🎬 Video
+      Firebase Cloud Storage में upload होंगे।
 
     </div>
 
@@ -1073,26 +1454,31 @@ function openCreate(){
       <button
         class="pill"
         onclick="closeModal()">
+
         Cancel
+
       </button>
 
       <button
         class="primary"
         onclick="createPost()">
+
         Publish
+
       </button>
 
     </div>
 
   `);
 
-  window.pendingMedia={
-    data:'',
-    type:''
-  };
+  window.pendingMedia = null;
 
 }
 
+
+/* =========================================
+   MEDIA PREVIEW
+========================================= */
 
 function previewUpload(input,type){
 
@@ -1102,9 +1488,18 @@ function previewUpload(input,type){
   if(!file)
     return;
 
-  if(file.size > 8*1024*1024){
+  /* -----------------------------------------
+     TYPE CHECK
+  ----------------------------------------- */
 
-    toast('File 8MB से छोटी रखें');
+  if(
+    type === 'image' &&
+    !file.type.startsWith('image/')
+  ){
+
+    toast(
+      'कृपया केवल Photo चुनें'
+    );
 
     input.value='';
 
@@ -1112,31 +1507,117 @@ function previewUpload(input,type){
 
   }
 
+  if(
+    type === 'video' &&
+    !file.type.startsWith('video/')
+  ){
+
+    toast(
+      'कृपया केवल Video चुनें'
+    );
+
+    input.value='';
+
+    return;
+
+  }
+
+
+  /* -----------------------------------------
+     SIZE LIMIT
+  ----------------------------------------- */
+
+  const maxSize =
+    type === 'video'
+      ? 100 * 1024 * 1024
+      : 10 * 1024 * 1024;
+
+  if(file.size > maxSize){
+
+    toast(
+      type === 'video'
+        ? 'Video 100 MB से छोटी रखें'
+        : 'Photo 10 MB से छोटी रखें'
+    );
+
+    input.value='';
+
+    return;
+
+  }
+
+
+  /* -----------------------------------------
+     PREVIEW
+  ----------------------------------------- */
+
   const reader =
     new FileReader();
 
-  reader.onload=()=>{
+  reader.onload = function(e){
 
-    window.pendingMedia={
-      data:reader.result,
-      type:type
+    window.pendingMedia = {
+
+      file:file,
+
+      preview:e.target.result,
+
+      type:type,
+
+      name:file.name
+
     };
 
-    document
-      .getElementById('uploadPreview')
-      .innerHTML =
+    const preview =
+      document.getElementById(
+        'uploadPreview'
+      );
 
-      type === 'image'
+    if(!preview)
+      return;
 
-      ? `<img
+    if(type === 'video'){
+
+      preview.innerHTML = `
+
+        <video
           class="preview"
-          src="${reader.result}">`
+          src="${e.target.result}"
+          controls
+          playsinline
+          style="
+            width:100%;
+            max-height:300px;
+            border-radius:14px;
+            background:#000;
+          ">
+        </video>
 
-      : `<video
+      `;
+
+    }else{
+
+      preview.innerHTML = `
+
+        <img
           class="preview"
-          src="${reader.result}"
-          controls>
-         </video>`;
+          src="${e.target.result}"
+          style="
+            width:100%;
+            max-height:300px;
+            object-fit:contain;
+            border-radius:14px;
+          ">
+
+      `;
+
+    }
+
+    toast(
+      type === 'video'
+        ? 'Video तैयार है ✓'
+        : 'Photo तैयार है ✓'
+    );
 
   };
 
@@ -1145,52 +1626,146 @@ function previewUpload(input,type){
 }
 
 
+/* =========================================
+   CREATE POST + FIREBASE STORAGE
+========================================= */
+
 async function createPost(){
 
   if(!currentUser)
     return showLogin();
 
+  const textEl =
+    document.getElementById(
+      'postText'
+    );
+
   const text =
-    document
-      .getElementById('postText')
-      .value
-      .trim();
+    textEl
+      ?.value
+      .trim() || '';
+
+  const media =
+    window.pendingMedia;
 
   if(
     !text &&
-    !window.pendingMedia?.data
+    !media?.file
   ){
 
     return toast(
-      'Post में text या media जोड़ें'
+      'Post में text या Photo/Video जोड़ें'
     );
 
   }
 
   try{
 
+    showLoading(
+      'Post upload हो रही है...'
+    );
+
+
+    /* -----------------------------------------
+       MEDIA UPLOAD
+    ----------------------------------------- */
+
+    let mediaUrl = '';
+
+    let mediaType = 'text';
+
+
+    if(media?.file){
+
+      const file =
+        media.file;
+
+      mediaType =
+        media.type;
+
+
+      const extension =
+        file.name
+          .split('.')
+          .pop()
+          .toLowerCase();
+
+
+      const safeName =
+        Date.now() +
+        '_' +
+        Math.random()
+          .toString(36)
+          .substring(2,10) +
+        '.' +
+        extension;
+
+
+      const storagePath =
+        `posts/${currentUser.uid}/${safeName}`;
+
+
+      const storageRef =
+        storage
+          .ref()
+          .child(storagePath);
+
+
+      const uploadTask =
+        await storageRef.put(
+          file,
+          {
+            contentType:
+              file.type
+          }
+        );
+
+
+      mediaUrl =
+        await uploadTask
+          .ref
+          .getDownloadURL();
+
+    }
+
+
+    /* -----------------------------------------
+       FIRESTORE POST
+    ----------------------------------------- */
+
     const post = {
 
-      uid:currentUser.uid,
+      uid:
+        currentUser.uid,
 
-      user:state.user.name,
+      user:
+        state.user.name,
 
-      handle:state.user.handle,
+      handle:
+        state.user.handle,
 
-      initial:state.user.initial,
+      initial:
+        state.user.initial,
 
       text:
-        text || 'New post 🎬',
+        text ||
+        (
+          mediaType === 'video'
+            ? '🎬 New video'
+            : mediaType === 'image'
+              ? '📸 New photo'
+              : 'New post'
+        ),
 
       likeCount:0,
 
       likedBy:[],
 
       media:
-        window.pendingMedia?.data || '',
+        mediaUrl,
 
       type:
-        window.pendingMedia?.type || 'text',
+        mediaType,
 
       createdAt:
         firebase.firestore.FieldValue
@@ -1198,9 +1773,41 @@ async function createPost(){
 
     };
 
+
     await db
       .collection('posts')
       .add(post);
+
+
+    /* -----------------------------------------
+       RESET
+    ----------------------------------------- */
+
+    window.pendingMedia = null;
+
+
+    if(textEl)
+      textEl.value='';
+
+
+    const photo =
+      document.getElementById(
+        'photoInput'
+      );
+
+    const video =
+      document.getElementById(
+        'videoInput'
+      );
+
+    if(photo)
+      photo.value='';
+
+    if(video)
+      video.value='';
+
+
+    hideLoading();
 
     closeModal();
 
@@ -1208,15 +1815,27 @@ async function createPost(){
 
     render();
 
-    toast('Post published online ✓');
+    toast(
+      'Post published online ✓'
+    );
 
-    window.pendingMedia=null;
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      'CREATE POST ERROR:',
+      error
+    );
 
-    toast('Post publish नहीं हुआ');
+    hideLoading();
+
+    toast(
+      'Post upload नहीं हुआ: ' +
+      (
+        error.message ||
+        'Unknown error'
+      )
+    );
 
   }
 
@@ -1232,26 +1851,33 @@ function toggleSave(id){
   const i =
     state.saved.indexOf(id);
 
-  if(i >= 0)
+  if(i >= 0){
+
     state.saved.splice(i,1);
-  else
+
+    toast(
+      'Removed from saved'
+    );
+
+  }else{
+
     state.saved.push(id);
+
+    toast(
+      'Saved ✓'
+    );
+
+  }
 
   saveLocal();
 
   render();
 
-  toast(
-    i >= 0
-      ? 'Removed from saved'
-      : 'Saved ✓'
-  );
-
 }
 
 
 /* =========================================
-   FOLLOW
+   FOLLOW / UNFOLLOW
 ========================================= */
 
 async function followUser(targetUid){
@@ -1260,36 +1886,128 @@ async function followUser(targetUid){
     return showLogin();
 
   if(!targetUid)
-    return toast('User profile उपलब्ध नहीं है');
+    return toast(
+      'User profile उपलब्ध नहीं है'
+    );
 
-  if(targetUid === currentUser.uid)
+  if(
+    targetUid === currentUser.uid
+  )
     return;
+
 
   try{
 
-    const followId =
-      currentUser.uid + '_' + targetUid;
+    showLoading(
+      'Follow update हो रहा है...'
+    );
 
-    const ref =
-      db.collection('follows')
+
+    const followId =
+      currentUser.uid +
+      '_' +
+      targetUid;
+
+
+    const followRef =
+      db
+        .collection('follows')
         .doc(followId);
 
-    const snap =
-      await ref.get();
 
-    if(snap.exists){
+    const currentUserRef =
+      db
+        .collection('users')
+        .doc(currentUser.uid);
 
-      await ref.delete();
 
-      toast('Unfollowed');
+    const targetUserRef =
+      db
+        .collection('users')
+        .doc(targetUid);
+
+
+    const followSnap =
+      await followRef.get();
+
+
+    if(followSnap.exists){
+
+      await followRef.delete();
+
+
+      await db.runTransaction(
+        async transaction => {
+
+          const targetSnap =
+            await transaction.get(
+              targetUserRef
+            );
+
+          const currentSnap =
+            await transaction.get(
+              currentUserRef
+            );
+
+          const targetData =
+            targetSnap.exists
+              ? targetSnap.data()
+              : {};
+
+          const currentData =
+            currentSnap.exists
+              ? currentSnap.data()
+              : {};
+
+          transaction.update(
+            targetUserRef,
+            {
+              followers:
+                Math.max(
+                  0,
+                  Number(
+                    targetData.followers || 0
+                  ) - 1
+                )
+            }
+          );
+
+          transaction.update(
+            currentUserRef,
+            {
+              following:
+                Math.max(
+                  0,
+                  Number(
+                    currentData.following || 0
+                  ) - 1
+                )
+            }
+          );
+
+        }
+      );
+
+
+      state.following =
+        state.following.filter(
+          id => id !== targetUid
+        );
+
+      toast(
+        'Unfollowed'
+      );
+
 
     }else{
 
-      await ref.set({
+      await followRef.set({
 
-        followerId:currentUser.uid,
+        followerId:
+          currentUser.uid,
 
-        followingId:targetUid,
+        followingId:
+          targetUid,
 
         createdAt:
           firebase.firestore.FieldValue
@@ -1297,15 +2015,94 @@ async function followUser(targetUid){
 
       });
 
-      toast('Following ✓');
+
+      await db.runTransaction(
+        async transaction => {
+
+          const targetSnap =
+            await transaction.get(
+              targetUserRef
+            );
+
+          const currentSnap =
+            await transaction.get(
+              currentUserRef
+            );
+
+          const targetData =
+            targetSnap.exists
+              ? targetSnap.data()
+              : {};
+
+          const currentData =
+            currentSnap.exists
+              ? currentSnap.data()
+              : {};
+
+          transaction.update(
+            targetUserRef,
+            {
+              followers:
+                Number(
+                  targetData.followers || 0
+                ) + 1
+            }
+          );
+
+          transaction.update(
+            currentUserRef,
+            {
+              following:
+                Number(
+                  currentData.following || 0
+                ) + 1
+            }
+          );
+
+        }
+      );
+
+
+      if(
+        !state.following.includes(
+          targetUid
+        )
+      ){
+
+        state.following.push(
+          targetUid
+        );
+
+      }
+
+      toast(
+        'Following ✓'
+      );
 
     }
 
+
+    await loadFirebaseUser();
+
+    saveLocal();
+
+    hideLoading();
+
+    render();
+
+
   }catch(error){
 
-    console.error(error);
+    console.error(
+      'Follow error:',
+      error
+    );
 
-    toast('Follow नहीं हो पाया');
+    hideLoading();
+
+    toast(
+      'Follow नहीं हो पाया'
+    );
 
   }
 
@@ -1313,7 +2110,7 @@ async function followUser(targetUid){
 
 
 /* =========================================
-   PROFILE
+   PROFILE CARD
 ========================================= */
 
 function renderProfileCard(){
@@ -1326,7 +2123,16 @@ function renderProfileCard(){
   if(!card)
     return;
 
-  card.innerHTML=`
+
+  const myPosts =
+    state.posts.filter(
+      p =>
+        p.uid ===
+        currentUser?.uid
+    ).length;
+
+
+  card.innerHTML = `
 
     ${avatarHTML(
       state.user.initial,
@@ -1334,36 +2140,65 @@ function renderProfileCard(){
     )}
 
     <h3 style="margin:4px 0">
-      ${esc(state.user.name)}
+
+      ${esc(
+        state.user.name
+      )}
+
     </h3>
 
     <div class="small">
-      ${esc(state.user.handle)}
+
+      ${esc(
+        state.user.handle
+      )}
+
     </div>
 
     <p class="small">
-      ${esc(state.user.bio)}
+
+      ${esc(
+        state.user.bio
+      )}
+
     </p>
 
     <div class="stats">
 
       <div class="stat">
+
         <b>
-          ${state.posts.filter(
-            p=>p.uid===currentUser?.uid
-          ).length}
+          ${myPosts}
         </b>
-        <span>Posts</span>
+
+        <span>
+          Posts
+        </span>
+
       </div>
 
       <div class="stat">
-        <b>${state.user.followers}</b>
-        <span>Followers</span>
+
+        <b>
+          ${state.user.followers}
+        </b>
+
+        <span>
+          Followers
+        </span>
+
       </div>
 
       <div class="stat">
-        <b>${state.user.following}</b>
-        <span>Following</span>
+
+        <b>
+          ${state.user.following}
+        </b>
+
+        <span>
+          Following
+        </span>
+
       </div>
 
     </div>
@@ -1371,13 +2206,19 @@ function renderProfileCard(){
     <button
       class="pill"
       onclick="openProfile()">
+
       View profile
+
     </button>
 
   `;
 
 }
 
+
+/* =========================================
+   SUGGESTIONS
+========================================= */
 
 function renderSuggestions(){
 
@@ -1405,7 +2246,7 @@ function renderSuggestions(){
 
 
 /* =========================================
-   EDIT PROFILE
+   PROFILE
 ========================================= */
 
 function openProfile(){
@@ -1415,8 +2256,9 @@ function openProfile(){
 
   openModal(`
 
-    <div class="row"
-         style="justify-content:space-between">
+    <div
+      class="row"
+      style="justify-content:space-between">
 
       <h2 style="margin:0">
         My Profile
@@ -1425,37 +2267,57 @@ function openProfile(){
       <button
         class="icon"
         onclick="closeModal()">
+
         ✕
+
       </button>
 
     </div>
 
-    <div class="profile-card"
-         style="background:transparent;border:0">
+    <div
+      class="profile-card"
+      style="
+        background:transparent;
+        border:0
+      ">
 
       <div class="profile-big">
 
         ${
           state.user.avatar
 
-          ? `<img
-              src="${esc(state.user.avatar)}">`
+            ? `<img
+                 src="${esc(
+                   state.user.avatar
+                 )}">`
 
-          : esc(state.user.initial)
+            : esc(
+                state.user.initial
+              )
         }
 
       </div>
 
       <h2>
-        ${esc(state.user.name)}
+        ${esc(
+          state.user.name
+        )}
       </h2>
 
       <div class="small">
-        ${esc(state.user.handle)}
+
+        ${esc(
+          state.user.handle
+        )}
+
       </div>
 
       <p>
-        ${esc(state.user.bio)}
+
+        ${esc(
+          state.user.bio
+        )}
+
       </p>
 
       <button
@@ -1482,12 +2344,17 @@ function openProfile(){
 }
 
 
+/* =========================================
+   EDIT PROFILE
+========================================= */
+
 function openEditProfile(){
 
   openModal(`
 
-    <div class="row"
-         style="justify-content:space-between">
+    <div
+      class="row"
+      style="justify-content:space-between">
 
       <h2 style="margin:0">
         Edit profile
@@ -1496,41 +2363,59 @@ function openEditProfile(){
       <button
         class="icon"
         onclick="closeModal()">
+
         ✕
+
       </button>
 
     </div>
 
-    <label>Name</label>
+    <label>
+      Name
+    </label>
 
     <input
       id="editName"
-      value="${esc(state.user.name)}">
+      value="${esc(
+        state.user.name
+      )}">
 
-    <label>Username</label>
+    <label>
+      Username
+    </label>
 
     <input
       id="editHandle"
-      value="${esc(state.user.handle)}">
+      value="${esc(
+        state.user.handle
+      )}">
 
-    <label>Bio</label>
+    <label>
+      Bio
+    </label>
 
     <input
       id="editBio"
-      value="${esc(state.user.bio)}">
+      value="${esc(
+        state.user.bio
+      )}">
 
     <div class="modal-actions">
 
       <button
         class="pill"
         onclick="openProfile()">
+
         Cancel
+
       </button>
 
       <button
         class="primary"
         onclick="saveProfile()">
+
         Save
+
       </button>
 
     </div>
@@ -1542,29 +2427,47 @@ function openEditProfile(){
 
 async function saveProfile(){
 
+  if(!currentUser)
+    return;
+
   const name =
     document
       .getElementById('editName')
-      .value.trim() ||
+      ?.value
+      .trim() ||
     state.user.name;
 
   let handle =
     document
       .getElementById('editHandle')
-      .value.trim();
+      ?.value
+      .trim() ||
+    state.user.handle;
 
   const bio =
     document
       .getElementById('editBio')
-      .value.trim();
+      ?.value
+      .trim() ||
+    '';
+
 
   if(!handle.startsWith('@'))
-    handle='@'+handle;
+    handle = '@' + handle;
+
 
   const initial =
-    name.charAt(0).toUpperCase();
+    name
+      .charAt(0)
+      .toUpperCase();
+
 
   try{
+
+    showLoading(
+      'Profile save हो रही है...'
+    );
+
 
     await db
       .collection('users')
@@ -1581,10 +2484,19 @@ async function saveProfile(){
 
       });
 
-    state.user.name=name;
-    state.user.handle=handle;
-    state.user.initial=initial;
-    state.user.bio=bio;
+
+    state.user.name =
+      name;
+
+    state.user.handle =
+      handle;
+
+    state.user.initial =
+      initial;
+
+    state.user.bio =
+      bio;
+
 
     saveLocal();
 
@@ -1592,15 +2504,24 @@ async function saveProfile(){
 
     render();
 
+    hideLoading();
+
     openProfile();
 
-    toast('Profile updated ✓');
+    toast(
+      'Profile updated ✓'
+    );
+
 
   }catch(error){
 
     console.error(error);
 
-    toast('Profile update नहीं हुआ');
+    hideLoading();
+
+    toast(
+      'Profile update नहीं हुआ'
+    );
 
   }
 
@@ -1619,11 +2540,17 @@ async function logoutUser(){
 
     closeModal();
 
-    toast('Logged out');
+    toast(
+      'Logged out'
+    );
 
   }catch(error){
 
-    toast('Logout failed');
+    console.error(error);
+
+    toast(
+      'Logout failed'
+    );
 
   }
 
@@ -1638,8 +2565,9 @@ function openNotifications(){
 
   openModal(`
 
-    <div class="row"
-         style="justify-content:space-between">
+    <div
+      class="row"
+      style="justify-content:space-between">
 
       <h2 style="margin:0">
         Notifications
@@ -1648,7 +2576,9 @@ function openNotifications(){
       <button
         class="icon"
         onclick="closeModal()">
+
         ✕
+
       </button>
 
     </div>
@@ -1656,21 +2586,30 @@ function openNotifications(){
     ${
       state.notifications.length
 
-      ? state.notifications.map(n=>`
+        ? state.notifications
+            .map(n=>`
 
-        <div class="notice">
+              <div class="notice">
 
-          🔔 ${esc(n.text)}
+                🔔
+                ${esc(n.text)}
 
-          <div class="small">
-            ${esc(n.time)}
-          </div>
+                <div class="small">
 
-        </div>
+                  ${esc(n.time)}
 
-      `).join('')
+                </div>
 
-      : '<p class="small">No notifications yet.</p>'
+              </div>
+
+            `)
+            .join('')
+
+        : `
+          <p class="small">
+            No notifications yet.
+          </p>
+        `
     }
 
     <div class="modal-actions">
@@ -1703,8 +2642,9 @@ function openMessages(){
 
   openModal(`
 
-    <div class="row"
-         style="justify-content:space-between">
+    <div
+      class="row"
+      style="justify-content:space-between">
 
       <h2 style="margin:0">
         Messages
@@ -1713,7 +2653,9 @@ function openMessages(){
       <button
         class="icon"
         onclick="closeModal()">
+
         ✕
+
       </button>
 
     </div>
@@ -1737,13 +2679,17 @@ function openMessages(){
 function openReels(){
 
   const videos =
-    state.posts
-      .filter(p=>p.type==='video' && p.media);
+    state.posts.filter(
+      p =>
+        p.type === 'video' &&
+        p.media
+    );
 
   openModal(`
 
-    <div class="row"
-         style="justify-content:space-between">
+    <div
+      class="row"
+      style="justify-content:space-between">
 
       <h2 style="margin:0">
         IB65 Reels
@@ -1752,7 +2698,9 @@ function openReels(){
       <button
         class="icon"
         onclick="closeModal()">
+
         ✕
+
       </button>
 
     </div>
@@ -1760,27 +2708,35 @@ function openReels(){
     ${
       videos.length
 
-      ? videos.map(p=>`
+        ? videos
+            .map(p=>`
 
-        <div class="reel">
+              <div class="reel">
 
-          <video
-            src="${esc(p.media)}"
-            controls
-            playsinline>
-          </video>
+                <video
+                  src="${esc(p.media)}"
+                  controls
+                  playsinline>
+                </video>
 
-          <div class="caption">
-            ${esc(p.text)}
+                <div class="caption">
+
+                  ${esc(p.text)}
+
+                </div>
+
+              </div>
+
+            `)
+            .join('')
+
+        : `
+          <div class="notice">
+
+            अभी कोई Reel नहीं है।
+
           </div>
-
-        </div>
-
-      `).join('')
-
-      : `<div class="notice">
-          अभी कोई Reel नहीं है।
-         </div>`
+        `
     }
 
   `);
@@ -1794,19 +2750,22 @@ function openReels(){
 
 function openExplore(){
 
-  const tags=[
+  const tags = [
+
     '#IB65',
     '#Creators',
     '#India',
     '#Reels',
     '#Gaming',
     '#Photography'
+
   ];
 
   openModal(`
 
-    <div class="row"
-         style="justify-content:space-between">
+    <div
+      class="row"
+      style="justify-content:space-between">
 
       <h2 style="margin:0">
         Explore
@@ -1815,16 +2774,22 @@ function openExplore(){
       <button
         class="icon"
         onclick="closeModal()">
+
         ✕
+
       </button>
 
     </div>
 
     <div class="notice">
+
       Search bar से posts और creators खोजो।
+
     </div>
 
-    <h3>Trending</h3>
+    <h3>
+      Trending
+    </h3>
 
     ${tags.map(t=>`
 
@@ -1857,7 +2822,8 @@ function sharePost(id){
   const url =
     location.href
       .split('#')[0] +
-    '#post-' + id;
+    '#post-' +
+    id;
 
   if(navigator.share){
 
@@ -1869,16 +2835,121 @@ function sharePost(id){
 
       url:url
 
-    }).catch(()=>{});
+    })
+    .catch(()=>{});
 
   }else{
 
     navigator.clipboard
       ?.writeText(url)
-      .then(()=>toast('Post link copied ✓'))
-      .catch(()=>toast('Link copy नहीं हुआ'));
+      .then(
+        () =>
+          toast(
+            'Post link copied ✓'
+          )
+      )
+      .catch(
+        () =>
+          toast(
+            'Link copy नहीं हुआ'
+          )
+      );
 
   }
+
+}
+
+
+/* =========================================
+   MEDIA VIEWER
+========================================= */
+
+function openMediaViewer(url){
+
+  if(!url)
+    return;
+
+  const old =
+    document.getElementById(
+      'mediaViewer'
+    );
+
+  if(old)
+    old.remove();
+
+
+  const viewer =
+    document.createElement(
+      'div'
+    );
+
+  viewer.id =
+    'mediaViewer';
+
+
+  viewer.style.cssText = `
+
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.95);
+    z-index:99999;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+
+  `;
+
+
+  viewer.innerHTML = `
+
+    <button
+      onclick="
+        this.parentElement.remove()
+      "
+      style="
+        position:absolute;
+        top:20px;
+        right:20px;
+        border:0;
+        background:#fff;
+        color:#000;
+        width:42px;
+        height:42px;
+        border-radius:50%;
+        font-size:24px;
+      ">
+
+      ×
+
+    </button>
+
+    <img
+      src="${esc(url)}"
+      style="
+        max-width:100%;
+        max-height:90vh;
+        object-fit:contain;
+        border-radius:12px;
+      ">
+
+  `;
+
+
+  viewer.onclick =
+    function(e){
+
+      if(e.target === viewer)
+        viewer.remove();
+
+    };
+
+
+  document.body.appendChild(
+    viewer
+  );
 
 }
 
@@ -1889,22 +2960,47 @@ function sharePost(id){
 
 function openModal(html){
 
-  document
-    .getElementById('modalBox')
-    .innerHTML=html;
+  const box =
+    document.getElementById(
+      'modalBox'
+    );
 
-  document
-    .getElementById('modal')
-    .classList.add('show');
+  const modal =
+    document.getElementById(
+      'modal'
+    );
+
+  if(!box || !modal){
+
+    console.warn(
+      'Modal elements not found'
+    );
+
+    return;
+
+  }
+
+  box.innerHTML =
+    html;
+
+  modal.classList.add(
+    'show'
+  );
 
 }
 
 
 function closeModal(){
 
-  document
-    .getElementById('modal')
-    .classList.remove('show');
+  const modal =
+    document.getElementById(
+      'modal'
+    );
+
+  if(modal)
+    modal.classList.remove(
+      'show'
+    );
 
 }
 
@@ -1919,30 +3015,56 @@ function navigate(b,name){
     .querySelectorAll(
       '.nav button,.bottom button'
     )
-    .forEach(x =>
-      x.classList.remove('active')
+    .forEach(
+      x =>
+        x.classList.remove(
+          'active'
+        )
     );
 
-  b.classList.add('active');
+  if(b)
+    b.classList.add(
+      'active'
+    );
 
-  if(name==='Home'){
 
-    document
-      .getElementById('search')
-      .value='';
+  if(name === 'Home'){
+
+    const search =
+      document.getElementById(
+        'search'
+      );
+
+    if(search)
+      search.value='';
 
     renderFeed();
 
   }
 
-  else if(name==='Explore')
+  else if(
+    name === 'Explore'
+  ){
+
     openExplore();
 
-  else if(name==='Reels')
+  }
+
+  else if(
+    name === 'Reels'
+  ){
+
     openReels();
 
-  else if(name==='Messages')
+  }
+
+  else if(
+    name === 'Messages'
+  ){
+
     openMessages();
+
+  }
 
 }
 
@@ -1954,22 +3076,135 @@ function navigate(b,name){
 function toast(t){
 
   const e =
-    document.getElementById('toast');
+    document.getElementById(
+      'toast'
+    );
 
-  if(!e)
+  if(!e){
+
+    console.log(t);
+
     return;
 
-  e.textContent=t;
+  }
 
-  e.classList.add('show');
+  e.textContent =
+    t;
 
-  clearTimeout(window.tt);
+  e.classList.add(
+    'show'
+  );
+
+  clearTimeout(
+    window.tt
+  );
 
   window.tt =
     setTimeout(
-      ()=>e.classList.remove('show'),
+      () =>
+        e.classList.remove(
+          'show'
+        ),
       2200
     );
+
+}
+
+
+/* =========================================
+   LOADING
+========================================= */
+
+function showLoading(
+  message='Loading...'
+){
+
+  let box =
+    document.getElementById(
+      'ib65Loading'
+    );
+
+
+  if(!box){
+
+    box =
+      document.createElement(
+        'div'
+      );
+
+    box.id =
+      'ib65Loading';
+
+
+    box.style.cssText = `
+
+      position:fixed;
+      inset:0;
+
+      background:rgba(0,0,0,.65);
+
+      z-index:100000;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      color:white;
+
+      font-size:16px;
+      font-weight:600;
+
+    `;
+
+
+    document.body.appendChild(
+      box
+    );
+
+  }
+
+
+  box.innerHTML = `
+
+    <div
+      style="
+        background:#121620;
+        padding:22px 28px;
+        border-radius:16px;
+        text-align:center;
+        box-shadow:
+          0 10px 40px
+          rgba(0,0,0,.4);
+      ">
+
+      <div
+        style="
+          font-size:28px;
+          margin-bottom:10px;
+        ">
+
+        ⏳
+
+      </div>
+
+      ${esc(message)}
+
+    </div>
+
+  `;
+
+}
+
+
+function hideLoading(){
+
+  const box =
+    document.getElementById(
+      'ib65Loading'
+    );
+
+  if(box)
+    box.remove();
 
 }
 
@@ -1978,19 +3213,28 @@ function toast(t){
    PWA INSTALL
 ========================================= */
 
-let deferredInstallPrompt=null;
+let deferredInstallPrompt =
+  null;
+
 
 window.addEventListener(
   'beforeinstallprompt',
-  event=>{
+  event => {
 
     event.preventDefault();
 
-    deferredInstallPrompt=event;
+    deferredInstallPrompt =
+      event;
 
-    document
-      .getElementById('installApp')
-      .classList.add('show');
+    const install =
+      document.getElementById(
+        'installApp'
+      );
+
+    if(install)
+      install.classList.add(
+        'show'
+      );
 
   }
 );
@@ -2008,15 +3252,27 @@ async function installApp(){
 
   }
 
+
   deferredInstallPrompt.prompt();
 
-  await deferredInstallPrompt.userChoice;
+  await
+    deferredInstallPrompt
+      .userChoice;
 
-  deferredInstallPrompt=null;
 
-  document
-    .getElementById('installApp')
-    .classList.remove('show');
+  deferredInstallPrompt =
+    null;
+
+
+  const install =
+    document.getElementById(
+      'installApp'
+    );
+
+  if(install)
+    install.classList.remove(
+      'show'
+    );
 
 }
 
@@ -2027,23 +3283,31 @@ async function installApp(){
 
 document.addEventListener(
   'keydown',
-  e=>{
+  e => {
 
     if(
       (e.ctrlKey || e.metaKey) &&
-      e.key.toLowerCase()==='k'
+      e.key.toLowerCase() === 'k'
     ){
 
       e.preventDefault();
 
       document
-        .getElementById('search')
-        .focus();
+        .getElementById(
+          'search'
+        )
+        ?.focus();
 
     }
 
-    if(e.key==='Escape')
+
+    if(
+      e.key === 'Escape'
+    ){
+
       closeModal();
+
+    }
 
   }
 );
@@ -2055,4 +3319,4 @@ document.addEventListener(
 
 render();
 
-   </script>
+       </script>
