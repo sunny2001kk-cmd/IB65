@@ -22,7 +22,15 @@
 @media(max-width:560px){.brand span{display:none}.top{gap:8px}.search{max-width:none}.primary{padding:10px 11px}.layout{padding:12px 9px 82px}.media{height:250px}.composer-tools .tool:nth-child(n+4){display:none}.post-actions button{padding:8px 7px;font-size:13px}}
 </style>
 </head>
-<body>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(() => console.log("IB65 Service Worker registered"))
+      .catch(err => console.log("Service Worker error:", err));
+  });
+}
+</script><body>
 <div class="app">
 <header class="top">
 <div class="brand"><div class="logo"><b>IB</b></div><span>IB65</span></div>
