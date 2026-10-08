@@ -11,7 +11,567 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
+  <style><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IB65 — Social Platform</title>
+
+  <!-- Firebase Compat Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
   <style>
+    :root {
+      --bg: #0b0e14;
+      --card: #151a24;
+      --card-hover: #1c2230;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --border: #262f40;
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 75px; }
+
+    .app-container { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 240px 1fr 280px; gap: 20px; padding: 20px 12px; }
+    @media (max-width: 900px) { 
+      .app-container { grid-template-columns: 1fr; padding-top: 10px; } 
+      .sidebar-left, .sidebar-right { display: none; } 
+    }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+    .row { display: flex; align-items: center; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; flex-shrink: 0; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .logo { width: 44px; height: 44px; border-radius: 12px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #fff; }
+
+    input, textarea { width: 100%; background: #0e121a; border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 10px 14px; margin-top: 6px; margin-bottom: 12px; outline: none; }
+    input:focus, textarea:focus { border-color: var(--primary); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    button { cursor: pointer; border: 0; border-radius: 10px; padding: 8px 16px; font-weight: 600; transition: 0.2s; }
+    button.primary { background: var(--primary); color: #fff; }
+    button.primary:hover { background: var(--primary-hover); }
+    button.pill { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border); }
+    button.pill:hover { background: rgba(255, 255, 255, 0.15); }
+    button.icon { background: transparent; color: var(--muted); font-size: 20px; padding: 6px 12px; }
+    button.liked { color: #ef4444; }
+    button.saved { color: #f59e0b; }
+
+    .nav-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px; text-align: left; background: transparent; color: var(--text); border-radius: 10px; margin-bottom: 4px; border: 0; font-size: 15px; }
+    .nav-btn:hover, .nav-btn.active { background: var(--card); color: var(--primary); }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0; z-index: 1000; }
+    @media (min-width: 901px) { .bottom-nav { display: none; } }
+
+    .post-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .post-head .user { display: flex; align-items: center; gap: 10px; }
+    .name { font-weight: 600; font-size: 15px; }
+    .handle { font-size: 13px; color: var(--muted); }
+    .post-actions { display: flex; justify-content: space-around; border-top: 1px solid var(--border); margin-top: 12px; padding-top: 8px; }
+    .media img, .media video { width: 100%; border-radius: 10px; margin-top: 10px; max-height: 480px; object-fit: cover; }
+
+    .comments { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .comment { display: flex; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+    .hidden { display: none !important; }
+    .notice { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 10px; border-radius: 8px; font-size: 13px; margin: 10px 0; }
+    .upload-label { cursor: pointer; padding: 8px 12px; background: rgba(255,255,255,0.06); border-radius: 8px; font-size: 13px; margin-right: 8px; display: inline-flex; align-items: center; gap: 6px; }
+    .upload-label input { display: none; }
+
+    #modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); z-index: 9999; align-items: center; justify-content: center; padding: 16px; }
+    #modal.show { display: flex; }
+    #modalBox { background: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 480px; padding: 20px; max-height: 90vh; overflow-y: auto; }
+    #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 8px 18px; border-radius: 20px; font-weight: 600; display: none; z-index: 100001; font-size: 14px; }
+    #toast.show { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <aside class="sidebar-left">
+      <div class="logo" style="margin-bottom:20px;">IB</div>
+      <button class="nav-btn active" onclick="navigate(this, 'Home')">🏠 Home</button>
+      <button class="nav-btn" onclick="navigate(this, 'Explore')">🔍 Explore</button>
+      <button class="nav-btn" onclick="navigate(this, 'Messages')">💬 Messages</button>
+      <button class="nav-btn" onclick="openNotifications()">🔔 Notifications <span id="notifCount"></span></button>
+      <button class="nav-btn" onclick="openProfile()">👤 Profile</button>
+      <button class="primary" style="width:100%; margin-top: 15px;" onclick="openCreate()">+ New Post</button>
+    </aside>
+
+    <main>
+      <div class="card row" style="gap: 12px; cursor:pointer;" onclick="openCreate()">
+        <div id="composerAvatar" class="avatar">M</div>
+        <div style="color:var(--muted); flex:1;">What's on your mind?</div>
+        <button class="primary" style="padding:6px 12px;">Post</button>
+      </div>
+
+      <input id="search" placeholder="Search posts... (Ctrl+K)" oninput="renderFeed()" />
+      <div id="feed">
+        <div class="card" style="text-align:center; padding:30px; color:var(--muted)">Loading IB65...</div>
+      </div>
+    </main>
+
+    <aside class="sidebar-right">
+      <div id="profileCard" class="card" style="text-align:center;"></div>
+    </aside>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="icon" onclick="navigate(this, 'Home')">🏠</button>
+    <button class="icon" onclick="navigate(this, 'Explore')">🔍</button>
+    <button class="primary" style="padding: 4px 14px; border-radius: 50%;" onclick="openCreate()">+</button>
+    <button class="icon" onclick="navigate(this, 'Messages')">💬</button>
+    <button class="icon" onclick="openProfile()">👤</button>
+  </div>
+
+  <div id="modal"><div id="modalBox"></div></div>
+  <div id="toast"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlM05NZl4bKjRsrZ0ZUDpjYi0fdPP2-X4",
+      authDomain: "ib65-67f62.firebaseapp.com",
+      projectId: "ib65-67f62",
+      storageBucket: "ib65-67f62.firebasestorage.app",
+      messagingSenderId: "323877271127",
+      appId: "1:323877271127:web:8318d8904784503b061512",
+      measurementId: "G-GZKXSWQGRV"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    let currentUser = null;
+    let firebaseReady = false;
+    let activeChatUnsubscribe = null;
+    window.pendingMedia = null;
+
+    let state = {
+      user: { name: 'User', handle: '@user', initial: 'U', bio: 'Welcome to IB65', followers: 0, following: 0, avatar: '' },
+      following: [],
+      saved: [],
+      notifications: [{ text: 'Welcome to IB65! 🎉', time: 'Now' }],
+      posts: []
+    };
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+    }
+
+    function avatarHTML(initial, avatar, cls = 'avatar') {
+      return avatar
+        ? `<div class="${cls}"><img src="${esc(avatar)}" alt=""></div>`
+        : `<div class="${cls}">${esc(initial || '?')}</div>`;
+    }
+
+    function openModal(html) {
+      const b = document.getElementById('modalBox');
+      const m = document.getElementById('modal');
+      if (b && m) {
+        b.innerHTML = html;
+        m.classList.add('show');
+      }
+    }
+
+    function closeModal() {
+      if (activeChatUnsubscribe) { activeChatUnsubscribe(); activeChatUnsubscribe = null; }
+      document.getElementById('modal')?.classList.remove('show');
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      if (t) {
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2200);
+      }
+    }
+
+    function showLoading(msg) {
+      let b = document.getElementById('ibLoader');
+      if (!b) {
+        b = document.createElement('div');
+        b.id = 'ibLoader';
+        b.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;display:flex;align-items:center;justify-content:center;color:#fff;';
+        document.body.appendChild(b);
+      }
+      b.innerHTML = `<div class="card" style="padding:20px;text-align:center;">⏳ ${esc(msg)}</div>`;
+    }
+
+    function hideLoading() { document.getElementById('ibLoader')?.remove(); }
+
+    function showLogin() {
+      openModal(`
+        <div style="text-align:center;padding:10px">
+          <div class="logo" style="margin:auto;width:58px;height:58px"><b>IB</b></div>
+          <h2 style="margin-top:10px;">Welcome to IB65</h2>
+          <p class="small" style="color:var(--muted); margin-bottom:14px;">Login ya naya account banayein</p>
+          <input id="authName" placeholder="Your name" autocomplete="name">
+          <input id="authEmail" type="email" placeholder="Email" autocomplete="email">
+          <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password">
+          <div class="row" style="gap:10px; margin-top:10px;">
+            <button class="pill" style="flex:1" onclick="loginUser()">Login</button>
+            <button class="primary" style="flex:1" onclick="signupUser()">Sign up</button>
+          </div>
+        </div>
+      `);
+    }
+
+    async function signupUser() {
+      const name = document.getElementById('authName')?.value.trim();
+      const email = document.getElementById('authEmail')?.value.trim();
+      const password = document.getElementById('authPassword')?.value;
+      if (!name || !email || password.length < 6) return toast('Valid detail dalein (Password min 6 chars)');
+
+      try {
+        showLoading('Creating account...');
+        const res = await auth.createUserWithEmailAndPassword(email, password);
+        const handle = '@' + name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) + Math.floor(Math.random() * 1000);
+        await db.collection('users').doc(res.user.uid).set({
+          uid: res.user.uid, name: name, handle: handle, initial: name.charAt(0).toUpperCase(),
+          bio: 'Building IB65 🚀', avatar: '', followers: 0, following: 0, email: email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        hideLoading();
+        closeModal();
+      } catch (e) {
+        hideLoading();
+        toast(e.message);
+      }
+    }
+
+    async function loginUser() {
+      const email = document.getElementById('authEmail')?.value.trim();
+      const password = document.getElementById('authPassword')?.value;
+      if (!email || !password) return toast('Email aur Password dalein');
+      try {
+        showLoading('Logging in...');
+        await auth.signInWithEmailAndPassword(email, password);
+        hideLoading();
+        closeModal();
+      } catch (e) {
+        hideLoading();
+        toast(e.message);
+      }
+    }
+
+    async function loadUserData() {
+      if (!currentUser) return;
+      const doc = await db.collection('users').doc(currentUser.uid).get();
+      if (doc.exists) {
+        const d = doc.data();
+        state.user = {
+          name: d.name || 'User', handle: d.handle || '@user',
+          initial: d.initial || 'U', bio: d.bio || '',
+          followers: Number(d.followers || 0), following: Number(d.following || 0),
+          avatar: d.avatar || ''
+        };
+      }
+    }
+
+    async function loadPosts() {
+      try {
+        const snap = await db.collection('posts').orderBy('createdAt', 'desc').limit(40).get();
+        state.posts = snap.docs.map(doc => {
+          const p = doc.data();
+          const likedBy = Array.isArray(p.likedBy) ? p.likedBy : [];
+          return {
+            id: doc.id, uid: p.uid || '', user: p.user || 'User', handle: p.handle || '@user',
+            initial: p.initial || 'U', text: p.text || '', likes: Number(p.likeCount || 0),
+            likedBy: likedBy, liked: currentUser ? likedBy.includes(currentUser.uid) : false,
+            comments: Array.isArray(p.comments) ? p.comments : [], media: p.media || '',
+            type: p.type || 'text'
+          };
+        });
+      } catch (e) {
+        console.warn('Post fetch notice:', e);
+      }
+    }
+
+    function renderFeed() {
+      const feed = document.getElementById('feed');
+      if (!feed) return;
+      const q = (document.getElementById('search')?.value || '').toLowerCase();
+      const filtered = state.posts.filter(p => (p.text + p.user + p.handle).toLowerCase().includes(q));
+
+      if (!filtered.length) {
+        feed.innerHTML = `
+          <div class="card" style="text-align:center; color:var(--muted); padding:30px;">
+            ${firebaseReady ? 'Koi post nahi hai abhi. Pehla post karein! 🚀' : 'Loading posts...'}
+          </div>`;
+        return;
+      }
+
+      feed.innerHTML = filtered.map(p => `
+        <article class="card post" id="post-${esc(p.id)}">
+          <div class="post-head">
+            <div class="user">
+              ${avatarHTML(p.initial, p.uid === currentUser?.uid ? state.user.avatar : '', 'avatar')}
+              <div>
+                <div class="name">${esc(p.user)}</div>
+                <div class="handle">${esc(p.handle)}</div>
+              </div>
+            </div>
+          </div>
+          ${p.text ? `<p style="margin:8px 0; line-height:1.4;">${esc(p.text)}</p>` : ''}
+          ${p.media ? `<div class="media">${p.type === 'video' ? `<video src="${esc(p.media)}" controls playsinline></video>` : `<img src="${esc(p.media)}" loading="lazy">`}</div>` : ''}
+          <div class="post-actions">
+            <button class="${p.liked ? 'liked' : ''}" onclick="likePost('${esc(p.id)}')">♥ ${p.likes}</button>
+            <button onclick="toggleComments('${esc(p.id)}')">💬 Comments</button>
+            <button onclick="navigator.clipboard?.writeText(location.href); toast('Link copied ✓');">↗ Share</button>
+          </div>
+          <div id="comments-${esc(p.id)}" class="comments hidden">
+            <div id="commentList-${esc(p.id)}"></div>
+            <div class="row" style="gap:6px; margin-top:8px;">
+              <input id="comment-input-${esc(p.id)}" placeholder="Write comment..." style="margin:0;" onkeydown="if(event.key==='Enter') addComment('${esc(p.id)}')">
+              <button class="primary" onclick="addComment('${esc(p.id)}')">Send</button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    async function likePost(id) {
+      if (!currentUser) return showLogin();
+      const post = state.posts.find(p => p.id === id);
+      if (!post) return;
+      const ref = db.collection('posts').doc(id);
+      const isLiked = (post.likedBy || []).includes(currentUser.uid);
+
+      await ref.update({
+        likedBy: isLiked ? firebase.firestore.FieldValue.arrayRemove(currentUser.uid) : firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+        likeCount: firebase.firestore.FieldValue.increment(isLiked ? -1 : 1)
+      });
+      await loadPosts();
+      renderFeed();
+    }
+
+    function toggleComments(id) {
+      const box = document.getElementById('comments-' + id);
+      if (!box) return;
+      box.classList.toggle('hidden');
+      if (!box.classList.contains('hidden')) loadComments(id);
+    }
+
+    async function loadComments(postId) {
+      const list = document.getElementById('commentList-' + postId);
+      if (!list) return;
+      const snap = await db.collection('posts').doc(postId).collection('comments').orderBy('createdAt', 'asc').get();
+      list.innerHTML = snap.docs.map(d => `<div class="comment"><b>${esc(d.data().user)}:</b> <span>${esc(d.data().text)}</span></div>`).join('') || '<p class="small" style="color:var(--muted)">No comments yet.</p>';
+    }
+
+    async function addComment(postId) {
+      if (!currentUser) return showLogin();
+      const input = document.getElementById('comment-input-' + postId);
+      const text = input?.value.trim();
+      if (!text) return;
+      input.value = '';
+      await db.collection('posts').doc(postId).collection('comments').add({
+        uid: currentUser.uid, user: state.user.name, text: text, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      loadComments(postId);
+    }
+
+    function openCreate() {
+      if (!currentUser) return showLogin();
+      openModal(`
+        <div class="row" style="justify-content:space-between;">
+          <h2>Create Post</h2>
+          <button class="icon" onclick="closeModal()">✕</button>
+        </div>
+        <textarea id="postText" placeholder="Share something with IB65..."></textarea>
+        <div class="row" style="margin-bottom:10px;">
+          <label class="upload-label">🖼 Photo <input id="photoInput" type="file" accept="image/*" onchange="previewUpload(this,'image')"></label>
+          <label class="upload-label">🎬 Video <input id="videoInput" type="file" accept="video/*" onchange="previewUpload(this,'video')"></label>
+        </div>
+        <div id="uploadPreview"></div>
+        <div class="row" style="justify-content:flex-end; gap:8px; margin-top:14px;">
+          <button class="pill" onclick="closeModal()">Cancel</button>
+          <button class="primary" onclick="createPost()">Publish</button>
+        </div>
+      `);
+      window.pendingMedia = null;
+    }
+
+    function previewUpload(input, type) {
+      const file = input.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        window.pendingMedia = { file: file, type: type };
+        document.getElementById('uploadPreview').innerHTML = `<p class="small" style="color:#22c55e">✓ ${file.name} ready</p>`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function createPost() {
+      const text = document.getElementById('postText')?.value.trim() || '';
+      const media = window.pendingMedia;
+      if (!text && !media) return toast('Post content dalein');
+
+      try {
+        showLoading('Uploading...');
+        let mediaUrl = '';
+        if (media?.file) {
+          const path = `posts/${currentUser.uid}/${Date.now()}_${media.file.name}`;
+          const snap = await storage.ref().child(path).put(media.file);
+          mediaUrl = await snap.ref.getDownloadURL();
+        }
+        await db.collection('posts').add({
+          uid: currentUser.uid, user: state.user.name, handle: state.user.handle,
+          initial: state.user.initial, text: text, likeCount: 0, likedBy: [],
+          media: mediaUrl, type: media ? media.type : 'text',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        hideLoading();
+        closeModal();
+        await loadPosts();
+        renderFeed();
+        toast('Post published ✓');
+      } catch (e) {
+        hideLoading();
+        toast('Upload failed: ' + e.message);
+      }
+    }
+
+    async function openMessages() {
+      if (!currentUser) return showLogin();
+      openModal(`
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <h2 style="margin:0">Messages</h2>
+          <button class="icon" onclick="closeModal()">✕</button>
+        </div>
+        <div id="chatContainer" style="margin-top:14px; min-height:300px;">
+          <div id="chatUsersList"><p class="small" style="color:var(--muted)">Users load ho rahe hain...</p></div>
+          <div id="activeChatBox" class="hidden"></div>
+        </div>
+      `);
+      try {
+        const snap = await db.collection('users').limit(20).get();
+        const users = snap.docs.map(d => d.data()).filter(u => u.uid !== currentUser.uid);
+        const ul = document.getElementById('chatUsersList');
+        if (!ul) return;
+        ul.innerHTML = users.length ? users.map(u => `
+          <div class="card row" style="justify-content:space-between; padding:10px; margin-bottom:8px; cursor:pointer;" onclick="openChatWith('${esc(u.uid)}', '${esc(u.name)}')">
+            <b>${esc(u.name)}</b>
+            <button class="pill" style="font-size:12px;">Chat</button>
+          </div>
+        `).join('') : '<p class="small" style="color:var(--muted)">Koi doosra user nahi mila.</p>';
+      } catch (e) {}
+    }
+
+    function openChatWith(targetUid, targetName) {
+      const chatId = [currentUser.uid, targetUid].sort().join('_');
+      document.getElementById('chatUsersList')?.classList.add('hidden');
+      const chatBox = document.getElementById('activeChatBox');
+      if (!chatBox) return;
+
+      chatBox.classList.remove('hidden');
+      chatBox.innerHTML = `
+        <div class="row" style="justify-content:space-between; margin-bottom:8px; border-bottom:1px solid var(--border); padding-bottom:6px;">
+          <button class="pill" style="font-size:12px;" onclick="openMessages()">← Back</button>
+          <b>${esc(targetName)}</b>
+          <div></div>
+        </div>
+        <div id="messageStream" style="height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;"></div>
+        <div class="row" style="margin-top:8px; gap:6px;">
+          <input id="chatInputMsg" placeholder="Type..." style="margin:0; flex:1;" onkeydown="if(event.key==='Enter') sendChatMessage('${chatId}')">
+          <button class="primary" onclick="sendChatMessage('${chatId}')">Send</button>
+        </div>
+      `;
+
+      if (activeChatUnsubscribe) activeChatUnsubscribe();
+      activeChatUnsubscribe = db.collection('chats').doc(chatId).collection('messages').orderBy('createdAt', 'asc').limitToLast(50)
+        .onSnapshot(snap => {
+          const stream = document.getElementById('messageStream');
+          if (!stream) return;
+          stream.innerHTML = snap.docs.map(d => {
+            const m = d.data();
+            const isMe = m.senderId === currentUser.uid;
+            return `<div style="align-self:${isMe ? 'flex-end' : 'flex-start'}; background:${isMe ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}; padding:6px 12px; border-radius:10px; max-width:80%; font-size:13px;">${esc(m.text)}</div>`;
+          }).join('') || '<p class="small" style="text-align:center; color:var(--muted);">Start conversation!</p>';
+          stream.scrollTop = stream.scrollHeight;
+        });
+    }
+
+    async function sendChatMessage(chatId) {
+      const input = document.getElementById('chatInputMsg');
+      const text = input?.value.trim();
+      if (!text || !currentUser) return;
+      input.value = '';
+      await db.collection('chats').doc(chatId).collection('messages').add({
+        senderId: currentUser.uid, text: text, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    function renderUI() {
+      renderFeed();
+      const pc = document.getElementById('profileCard');
+      if (pc) {
+        pc.innerHTML = `
+          ${avatarHTML(state.user.initial, state.user.avatar)}
+          <h3 style="margin-top:8px;">${esc(state.user.name)}</h3>
+          <div class="small" style="color:var(--muted);">${esc(state.user.handle)}</div>
+          <button class="pill" style="width:100%; margin-top:10px;" onclick="openProfile()">My Profile</button>
+        `;
+      }
+      const ca = document.getElementById('composerAvatar');
+      if (ca) ca.innerHTML = esc(state.user.initial);
+    }
+
+    function openProfile() {
+      openModal(`
+        <div style="text-align:center;">
+          ${avatarHTML(state.user.initial, state.user.avatar)}
+          <h2 style="margin-top:10px;">${esc(state.user.name)}</h2>
+          <div style="color:var(--muted); margin-bottom:14px;">${esc(state.user.handle)}</div>
+          <button class="pill" onclick="auth.signOut(); closeModal();">Logout</button>
+        </div>
+      `);
+    }
+
+    function openNotifications() { openModal('<h2>Notifications</h2><div class="notice">Welcome to IB65! 🎉</div>'); }
+
+    function navigate(btn, name) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      if (name === 'Home') renderFeed();
+      if (name === 'Messages') openMessages();
+      if (name === 'Explore') renderFeed();
+    }
+
+    /* SAFE INITIALIZATION */
+    window.addEventListener('DOMContentLoaded', () => {
+      renderUI();
+      auth.onAuthStateChanged(async user => {
+        currentUser = user;
+        if (user) {
+          firebaseReady = true;
+          await loadUserData();
+          await loadPosts();
+          renderUI();
+          toast('Logged in ✓');
+        } else {
+          firebaseReady = false;
+          renderUI();
+          setTimeout(() => showLogin(), 300);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
     :root {
       --bg: #0b0e14;
       --card: #151a24;
