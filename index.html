@@ -1,2247 +1,2054 @@
-<!doctype html>
-<html lang="hi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#080a0f">
-
-<title>IB65 — Social Platform</title>
-
-<!-- IB65 App Icon -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23080a0f'/%3E%3Crect x='18' y='18' width='476' height='476' rx='105' fill='none' stroke='%23ff1744' stroke-width='28'/%3E%3Ctext x='256' y='320' text-anchor='middle' font-family='Arial' font-size='175' font-weight='900' fill='white'%3EIB%3C/text%3E%3C/svg%3E">
-
-<style>
-:root{
- color-scheme:dark;
- --bg:#080a0f;
- --card:#121620;
- --card2:#191e29;
- --line:#282e3b;
- --text:#f7f8fc;
- --muted:#9da5b5;
- --red:#ff1744;
- --purple:#8a2be2;
- --green:#35d07f;
-}
-
-*{box-sizing:border-box}
-
-body{
- margin:0;
- background:var(--bg);
- color:var(--text);
- font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;
-}
-
-button,input,textarea{font:inherit}
-
-button{
- cursor:pointer;
- border:0;
- color:inherit;
-}
-
-.app{min-height:100vh}
-
-.top{
- position:sticky;
- top:0;
- z-index:30;
- background:rgba(8,10,15,.94);
- backdrop-filter:blur(16px);
- border-bottom:1px solid var(--line);
- height:64px;
- display:flex;
- align-items:center;
- gap:16px;
- padding:0 18px;
-}
-
-.brand{
- display:flex;
- align-items:center;
- gap:9px;
- font-weight:950;
- font-size:24px;
- letter-spacing:-1px;
-}
-
-.logo{
- width:38px;
- height:38px;
- border-radius:12px;
- padding:2px;
- background:linear-gradient(135deg,var(--red),var(--purple));
- display:grid;
- place-items:center;
-}
-
-.logo b{
- width:100%;
- height:100%;
- border-radius:10px;
- background:var(--bg);
- display:grid;
- place-items:center;
- font-size:15px;
-}
-
-.search{
- flex:1;
- max-width:550px;
- margin:auto;
- position:relative;
-}
-
-.search input{
- width:100%;
- background:var(--card);
- border:1px solid var(--line);
- color:var(--text);
- border-radius:99px;
- padding:11px 16px 11px 42px;
- outline:none;
-}
-
-.search input:focus{border-color:#5a6070}
-
-.search span{
- position:absolute;
- left:15px;
- top:8px;
- color:var(--muted);
- font-size:20px;
-}
-
-.actions{
- display:flex;
- gap:8px;
-}
-
-.pill,.icon{
- background:var(--card);
- border:1px solid var(--line);
- border-radius:12px;
- padding:10px 13px;
-}
-
-.primary{
- background:linear-gradient(100deg,var(--red),var(--purple));
- border-radius:12px;
- padding:10px 15px;
- font-weight:850;
-}
-
-.layout{
- max-width:1220px;
- margin:auto;
- display:grid;
- grid-template-columns:210px minmax(0,650px) 270px;
- gap:22px;
- padding:22px 16px 95px;
-}
-
-.side{
- position:sticky;
- top:86px;
- height:max-content;
-}
-
-.nav button{
- width:100%;
- background:transparent;
- text-align:left;
- padding:12px;
- border-radius:12px;
- color:var(--muted);
- margin-bottom:4px;
-}
-
-.nav button.active,
-.nav button:hover{
- background:var(--card);
- color:var(--text);
-}
-
-.card{
- background:var(--card);
- border:1px solid var(--line);
- border-radius:18px;
-}
-
-.composer{
- padding:15px;
- margin-bottom:14px;
-}
-
-.row{
- display:flex;
- align-items:center;
- gap:10px;
-}
-
-.avatar{
- width:42px;
- height:42px;
- border-radius:50%;
- background:linear-gradient(135deg,#ff6b8a,#8a2be2);
- display:grid;
- place-items:center;
- font-weight:900;
- flex:0 0 auto;
- overflow:hidden;
-}
-
-.avatar img{
- width:100%;
- height:100%;
- object-fit:cover;
-}
-
-.composer input{
- flex:1;
- background:var(--card2);
- border:1px solid var(--line);
- border-radius:99px;
- padding:11px 15px;
- color:var(--text);
-}
-
-.composer-tools{
- display:flex;
- gap:8px;
- margin-top:12px;
-}
-
-.tool{
- background:var(--card2);
- padding:9px 12px;
- border-radius:10px;
- color:var(--muted);
-}
-
-.post{
- padding:16px;
- margin-bottom:14px;
-}
-
-.post-head{
- display:flex;
- align-items:center;
- justify-content:space-between;
-}
-
-.user{
- display:flex;
- align-items:center;
- gap:10px;
-}
-
-.name{font-weight:850}
-
-.handle{
- font-size:12px;
- color:var(--muted);
-}
-
-.follow{
- background:transparent;
- border:1px solid var(--line);
- padding:7px 11px;
- border-radius:9px;
- color:#ddd;
-}
-
-.following{
- background:var(--card2);
- color:#fff;
-}
-
-.post p{
- line-height:1.55;
- color:#e5e8ef;
- white-space:pre-wrap;
-}
-
-.media{
- min-height:220px;
- max-height:520px;
- border-radius:15px;
- background:
- radial-gradient(circle at 25% 20%,#ff1744 0,transparent 30%),
- radial-gradient(circle at 75% 75%,#8a2be2 0,transparent 35%),
- linear-gradient(135deg,#181c28,#08090c);
- display:grid;
- place-items:center;
- font-size:48px;
- font-weight:1000;
- letter-spacing:-3px;
- margin:12px 0;
- overflow:hidden;
-}
-
-.media img,
-.media video{
- width:100%;
- height:100%;
- max-height:520px;
- object-fit:cover;
- display:block;
-}
-
-.post-actions{
- display:flex;
- gap:4px;
- border-top:1px solid var(--line);
- padding-top:10px;
-}
-
-.post-actions button{
- background:transparent;
- color:var(--muted);
- padding:8px 10px;
- border-radius:9px;
-}
-
-.post-actions button:hover{
- background:var(--card2);
- color:var(--text);
-}
-
-.liked{color:#ff4267!important}
-.saved{color:#f3c84b!important}
-
-.comments{
- margin-top:12px;
- border-top:1px solid var(--line);
- padding-top:10px;
-}
-
-.comment{
- display:flex;
- gap:8px;
- padding:8px 0;
-}
-
-.comment .avatar{
- width:30px;
- height:30px;
- font-size:12px;
-}
-
-.comment-body{
- background:var(--card2);
- border-radius:12px;
- padding:8px 10px;
- flex:1;
-}
-
-.comment-input{
- display:flex;
- gap:7px;
- margin-top:8px;
-}
-
-.comment-input input{
- flex:1;
- background:var(--card2);
- border:1px solid var(--line);
- border-radius:10px;
- padding:9px;
- color:var(--text);
-}
-
-.right .card{
- padding:15px;
- margin-bottom:14px;
-}
-
-.trend{
- padding:10px 0;
- border-bottom:1px solid var(--line);
-}
-
-.trend:last-child{border:0}
-
-.small{
- font-size:12px;
- color:var(--muted);
-}
-
-.profile-card{
- text-align:center;
- padding:20px;
-}
-
-.profile-card .avatar{
- width:74px;
- height:74px;
- margin:0 auto 10px;
- font-size:25px;
-}
-
-.stats{
- display:flex;
- justify-content:space-around;
- border-top:1px solid var(--line);
- border-bottom:1px solid var(--line);
- padding:12px 0;
- margin:15px 0;
-}
-
-.stat b{display:block}
-
-.stat span{
- font-size:12px;
- color:var(--muted);
-}
-
-.bottom{
- display:none;
-}
-
-.modal{
- position:fixed;
- inset:0;
- background:rgba(0,0,0,.74);
- display:none;
- place-items:center;
- z-index:60;
- padding:18px;
-}
-
-.modal.show{display:grid}
-
-.modal-box{
- width:min(540px,100%);
- max-height:90vh;
- overflow:auto;
- background:var(--card);
- border:1px solid var(--line);
- border-radius:20px;
- padding:18px;
-}
-
-.modal textarea{
- width:100%;
- min-height:130px;
- resize:vertical;
- background:var(--card2);
- border:1px solid var(--line);
- color:var(--text);
- border-radius:13px;
- padding:12px;
- outline:none;
- margin:14px 0;
-}
-
-.modal input{
- width:100%;
- background:var(--card2);
- border:1px solid var(--line);
- color:var(--text);
- border-radius:11px;
- padding:11px;
- margin:7px 0;
- outline:none;
-}
-
-.modal-actions{
- display:flex;
- justify-content:flex-end;
- gap:8px;
- margin-top:12px;
-}
-
-.notice{
- padding:11px 12px;
- border:1px solid #3b4150;
- border-radius:12px;
- background:var(--card2);
- font-size:13px;
- color:#dfe3eb;
- margin:10px 0;
-}
-
-.toast{
- position:fixed;
- bottom:25px;
- left:50%;
- transform:translateX(-50%) translateY(20px);
- opacity:0;
- background:#fff;
- color:#111;
- padding:10px 16px;
- border-radius:99px;
- font-weight:750;
- transition:.25s;
- z-index:90;
-}
-
-.toast.show{
- opacity:1;
- transform:translateX(-50%) translateY(0);
-}
-
-.hidden{display:none!important}
-
-.preview{
- width:100%;
- max-height:300px;
- object-fit:cover;
- border-radius:14px;
- margin:8px 0;
-}
-
-.upload-label{
- display:inline-flex;
- align-items:center;
- gap:7px;
- background:var(--card2);
- padding:10px 13px;
- border-radius:11px;
- cursor:pointer;
-}
-
-.upload-label input{display:none}
-
-.profile-big{
- width:96px;
- height:96px;
- margin:auto;
- border-radius:50%;
- overflow:hidden;
- background:linear-gradient(135deg,#ff6b8a,#8a2be2);
- display:grid;
- place-items:center;
- font-size:30px;
- font-weight:900;
-}
-
-.profile-big img{
- width:100%;
- height:100%;
- object-fit:cover;
-}
-
-.message{
- padding:12px;
- border-bottom:1px solid var(--line);
- display:flex;
- gap:10px;
-}
-
-.message:last-child{border:0}
-
-.reel{
- position:relative;
- height:420px;
- border-radius:18px;
- overflow:hidden;
- margin-bottom:14px;
- background:linear-gradient(135deg,#161b28,#090a0e);
- display:grid;
- place-items:center;
-}
-
-.reel video{
- width:100%;
- height:100%;
- object-fit:cover;
-}
-
-.reel .caption{
- position:absolute;
- left:14px;
- bottom:14px;
- right:14px;
- background:linear-gradient(transparent,rgba(0,0,0,.8));
- padding:35px 8px 8px;
- font-weight:700;
-}
-
-/* INSTALL BUTTON */
-.install-app{
- display:none;
- position:fixed;
- right:15px;
- bottom:80px;
- z-index:50;
- background:linear-gradient(100deg,var(--red),var(--purple));
- color:#fff;
- border-radius:99px;
- padding:12px 17px;
- font-weight:800;
- box-shadow:0 8px 30px rgba(0,0,0,.4);
-}
-
-.install-app.show{display:block}
-
-@media(max-width:920px){
-
- .layout{
-  grid-template-columns:1fr;
-  max-width:700px;
- }
-
- .side,.right{display:none}
-
- .top{padding:0 12px}
-
- .search{display:block}
-
- .bottom{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  z-index:40;
-  display:flex;
-  justify-content:space-around;
-  background:rgba(8,10,15,.97);
-  border-top:1px solid var(--line);
-  padding:8px;
- }
-
- .bottom button{
-  background:transparent;
-  color:var(--muted);
-  padding:5px 12px;
- }
-
- .bottom button.active{color:#fff}
-
- .actions .pill{display:none}
-}
-
-@media(max-width:560px){
-
- .brand span{display:none}
-
- .top{gap:8px}
-
- .search{max-width:none}
-
- .primary{padding:10px 11px}
-
- .layout{
-  padding:12px 9px 82px;
- }
-
- .media{height:250px}
-
- .composer-tools .tool:nth-child(n+4){
-  display:none;
- }
-
- .post-actions button{
-  padding:8px 7px;
-  font-size:13px;
- }
-}
-</style>
-</head>
-
-<body>
-
-<div class="app">
-
-<header class="top">
-
-<div class="brand">
- <div class="logo"><b>IB</b></div>
- <span>IB65</span>
-</div>
-
-<div class="search">
- <span>⌕</span>
- <input id="search"
- placeholder="Search creators, posts..."
- oninput="renderFeed()">
-</div>
-
-<div class="actions">
- <button class="pill" onclick="openNotifications()">
- 🔔 <span id="notifCount"></span>
- </button>
-
- <button class="primary" onclick="openCreate()">
- ＋ Create
- </button>
-</div>
-
-</header>
-
-<div class="layout">
-
-<aside class="side">
-<nav class="nav">
-
-<button class="active" onclick="navigate(this,'Home')">
-⌂ &nbsp; Home
-</button>
-
-<button onclick="navigate(this,'Explore')">
-◉ &nbsp; Explore
-</button>
-
-<button onclick="navigate(this,'Reels')">
-▶ &nbsp; Reels
-</button>
-
-<button onclick="navigate(this,'Messages')">
-✉ &nbsp; Messages
-</button>
-
-<button onclick="openProfile()">
-● &nbsp; Profile
-</button>
-
-</nav>
-</aside>
-
-<main>
-
-<section class="card composer">
-
-<div class="row">
-
-<div class="avatar" id="composerAvatar">M</div>
-
-<input
-readonly
-onclick="openCreate()"
-placeholder="What's happening on IB65?">
-
-</div>
-
-<div class="composer-tools">
-
-<button class="tool" onclick="openCreate()">
-🖼 Photo
-</button>
-
-<button class="tool" onclick="openCreate()">
-🎬 Video
-</button>
-
-<button class="tool" onclick="openCreate()">
-😊 Feeling
-</button>
-
-</div>
-
-</section>
-
-<div id="feed"></div>
-
-</main>
-
-<aside class="right">
-
-<div id="profileCard" class="card profile-card"></div>
-
-<div class="card">
-
-<h3 style="margin:0 0 8px">
-Trending on IB65
-</h3>
-
-<div class="trend">
-<b>#IB65</b>
-<div class="small">12.4K posts</div>
-</div>
-
-<div class="trend">
-<b>#Creators</b>
-<div class="small">8.7K posts</div>
-</div>
-
-<div class="trend">
-<b>#India</b>
-<div class="small">6.1K posts</div>
-</div>
-
-<div class="trend">
-<b>#Reels</b>
-<div class="small">4.8K posts</div>
-</div>
-
-</div>
-
-<div class="card">
-
-<h3 style="margin-top:0">
-Suggested creators
-</h3>
-
-<div id="suggestions"></div>
-
-</div>
-
-</aside>
-
-</div>
-
-<nav class="bottom">
-
-<button class="active" onclick="navigate(this,'Home')">
-⌂<br><small>Home</small>
-</button>
-
-<button onclick="navigate(this,'Explore')">
-◉<br><small>Explore</small>
-</button>
-
-<button onclick="openCreate()">
-＋<br><small>Create</small>
-</button>
-
-<button onclick="navigate(this,'Reels')">
-▶<br><small>Reels</small>
-</button>
-
-<button onclick="openProfile()">
-●<br><small>Profile</small>
-</button>
-
-</nav>
-
-</div>
-
-<button id="installApp" class="install-app" onclick="installApp()">
-📲 Install IB65
-</button>
-
-<div
-class="modal"
-id="modal"
-onclick="if(event.target===this)closeModal()">
-
-<div class="modal-box" id="modalBox"></div>
-
-</div>
-
-<div class="toast" id="toast"></div>
-
 <script>
+/* =========================================
+   IB65 FIREBASE
+========================================= */
 
-const KEY='ib65_v3_state';
-
-const defaultState={
-
-user:{
- name:'Manish',
- handle:'@manish',
- initial:'M',
- bio:'Building IB65 🚀',
- followers:128,
- following:64,
- avatar:''
-},
-
-following:['@arjun'],
-
-saved:[],
-
-notifications:[
- {
-  text:'Welcome to IB65 V3! 🎉',
-  time:'Now'
- }
-],
-
-posts:[
-
-{
- id:1,
- user:'Manish',
- handle:'@manish',
- initial:'M',
- text:'IB65 का नया V3 look कैसा लग रहा है? 🚀',
- likes:128,
- comments:[
-  {
-   user:'Riya',
-   initial:'R',
-   text:'बहुत बढ़िया! 🔥'
-  }
- ],
- liked:false,
- media:'',
- type:'text'
-},
-
-{
- id:2,
- user:'Aarav',
- handle:'@aarav',
- initial:'A',
- text:'आज का creator tip: छोटी शुरुआत करो, लेकिन लगातार बनाते रहो।',
- likes:94,
- comments:[
-  {
-   user:'Manish',
-   initial:'M',
-   text:'सही बात!'
-  }
- ],
- liked:false,
- media:'',
- type:'text'
-},
-
-{
- id:3,
- user:'Riya',
- handle:'@riya',
- initial:'R',
- text:'Reels और short videos के लिए नया idea तैयार है! 🎬',
- likes:207,
- comments:[],
- liked:false,
- media:'',
- type:'text'
-}
-
-],
-
-creators:[
- {name:'Arjun',handle:'@arjun',initial:'A'},
- {name:'Riya',handle:'@riya',initial:'R'},
- {name:'Aarav',handle:'@aarav',initial:'A'}
-]
-
+const firebaseConfig = {
+  apiKey: "AIzaSyBlM05NZl4bKjRsrZ0ZUDpjYi0fdPP2-X4",
+  authDomain: "ib65-67f62.firebaseapp.com",
+  projectId: "ib65-67f62",
+  storageBucket: "ib65-67f62.firebasestorage.app",
+  messagingSenderId: "323877271127",
+  appId: "1:323877271127:web:8318d8904784503b061512",
+  measurementId: "G-GZKXSWQGRV"
 };
 
-let state=load();
+firebase.initializeApp(firebaseConfig);
 
-function load(){
+const auth = firebase.auth();
+const db = firebase.firestore();
 
- try{
+const KEY = 'ib65_v3_state';
 
-  return deepMerge(
-   defaultState,
-   JSON.parse(localStorage.getItem(KEY)||'{}')
-  );
+let currentUser = null;
+let firebaseReady = false;
 
- }catch(e){
 
-  return JSON.parse(JSON.stringify(defaultState));
+/* =========================================
+   DEFAULT LOCAL DATA
+========================================= */
 
- }
+const defaultState = {
+  user:{
+    name:'Manish',
+    handle:'@manish',
+    initial:'M',
+    bio:'Building IB65 🚀',
+    followers:128,
+    following:64,
+    avatar:''
+  },
+
+  following:['@arjun'],
+
+  saved:[],
+
+  notifications:[
+    {
+      text:'Welcome to IB65! 🎉',
+      time:'Now'
+    }
+  ],
+
+  posts:[]
+};
+
+let state = loadLocal();
+
+
+/* =========================================
+   LOCAL STORAGE
+========================================= */
+
+function loadLocal(){
+
+  try{
+
+    return deepMerge(
+      defaultState,
+      JSON.parse(localStorage.getItem(KEY) || '{}')
+    );
+
+  }catch(e){
+
+    return JSON.parse(
+      JSON.stringify(defaultState)
+    );
+
+  }
 
 }
 
 function deepMerge(base,extra){
 
- const out=JSON.parse(JSON.stringify(base));
+  const out =
+    JSON.parse(JSON.stringify(base));
 
- Object.keys(extra||{}).forEach(k=>{
+  Object.keys(extra || {}).forEach(k=>{
 
-  if(
-   extra[k] &&
-   typeof extra[k]==='object' &&
-   !Array.isArray(extra[k]) &&
-   out[k]
-  ){
+    if(
+      extra[k] &&
+      typeof extra[k] === 'object' &&
+      !Array.isArray(extra[k]) &&
+      out[k]
+    ){
 
-   out[k]=Object.assign(out[k],extra[k]);
+      out[k] =
+        Object.assign(out[k],extra[k]);
 
-  }else{
+    }else{
 
-   out[k]=extra[k];
+      out[k] = extra[k];
 
-  }
+    }
 
- });
+  });
 
- return out;
+  return out;
+}
+
+function saveLocal(){
+
+  localStorage.setItem(
+    KEY,
+    JSON.stringify(state)
+  );
 
 }
 
-function save(){
- localStorage.setItem(KEY,JSON.stringify(state));
-}
+
+/* =========================================
+   HTML HELPERS
+========================================= */
 
 function esc(s){
 
- return String(s??'').replace(
-  /[&<>'"]/g,
-  c=>({
-   '&':'&amp;',
-   '<':'&lt;',
-   '>':'&gt;',
-   "'":'&#39;',
-   '"':'&quot;'
-  }[c])
- );
+  return String(s ?? '').replace(
+    /[&<>'"]/g,
+    c => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      "'":'&#39;',
+      '"':'&quot;'
+    }[c])
+  );
 
 }
 
 function avatarHTML(initial,avatar,cls='avatar'){
 
- return avatar
+  return avatar
 
- ? `<div class="${cls}">
-     <img src="${esc(avatar)}" alt="">
-   </div>`
+  ? `<div class="${cls}">
+       <img src="${esc(avatar)}" alt="">
+     </div>`
 
- : `<div class="${cls}">
-     ${esc(initial)}
-   </div>`;
-
-}
-
-function render(){
-
- renderFeed();
- renderProfileCard();
- renderSuggestions();
-
- document.getElementById('composerAvatar').innerHTML=
- state.user.avatar
- ? `<img src="${esc(state.user.avatar)}" alt="">`
- : esc(state.user.initial);
-
- document.getElementById('notifCount').textContent=
- state.notifications.length
- ? `(${state.notifications.length})`
- : '';
+  : `<div class="${cls}">
+       ${esc(initial || '?')}
+     </div>`;
 
 }
 
-function renderFeed(){
 
- const q=
- (document.getElementById('search').value||'')
- .toLowerCase();
+/* =========================================
+   FIREBASE AUTH
+========================================= */
 
- const f=state.posts.filter(
- p=>(p.text+p.user+p.handle)
- .toLowerCase()
- .includes(q)
- );
+auth.onAuthStateChanged(async user => {
 
- document.getElementById('feed').innerHTML=
- f.map(postHTML).join('')||
+  currentUser = user;
 
- `<div class="card"
- style="padding:30px;text-align:center;color:var(--muted)">
- No posts found
- </div>`;
+  if(user){
 
-}
+    firebaseReady = true;
 
-function mediaHTML(p){
+    await loadFirebaseUser();
 
- if(!p.media)
- return `<div class="media">IB65</div>`;
+    await loadFirebasePosts();
 
- return `<div class="media">
+    render();
 
- ${
- p.type==='video'
+    toast('Firebase connected ✓');
 
- ? `<video
-     src="${esc(p.media)}"
-     controls
-     playsinline>
-    </video>`
+  }else{
 
- : `<img
-     src="${esc(p.media)}"
-     alt="Post media">`
- }
+    firebaseReady = false;
 
- </div>`;
-
-}
-
-function postHTML(p){
-
- const isSaved=state.saved.includes(p.id);
-
- return `
-
-<article id="post-${p.id}" class="card post">
-
-<div class="post-head">
-
-<div class="user">
-
-${avatarHTML(
- p.initial,
- p.handle===state.user.handle
- ? state.user.avatar
- : '',
- 'avatar'
-)}
-
-<div>
-
-<div class="name">
-${esc(p.user)}
-</div>
-
-<div class="handle">
-${esc(p.handle)} · 2h
-</div>
-
-</div>
-
-</div>
-
-${
-p.handle!==state.user.handle
-
-? `<button
- class="follow ${
- state.following.includes(p.handle)
- ? 'following'
- : ''
- }"
- onclick="toggleFollow('${esc(p.handle)}',this)">
-
-${
-state.following.includes(p.handle)
-?'Following'
-:'Follow'
-}
-
-</button>`
-
-: `<button
- class="icon"
- onclick="openProfile()">
-•••
-</button>`
-}
-
-</div>
-
-<p>${esc(p.text)}</p>
-
-${mediaHTML(p)}
-
-<div class="post-actions">
-
-<button
- class="${p.liked?'liked':''}"
- onclick="like(${p.id})">
-♥ ${p.likes}
-</button>
-
-<button onclick="toggleComments(${p.id})">
-💬 ${p.comments.length}
-</button>
-
-<button onclick="sharePost(${p.id})">
-↗ Share
-</button>
-
-<button
- class="${isSaved?'saved':''}"
- onclick="toggleSave(${p.id})">
-🔖
-</button>
-
-</div>
-
-<div
-id="comments-${p.id}"
-class="comments hidden">
-
-<div>
-
-${p.comments.map(c=>`
-
-<div class="comment">
-
-${avatarHTML(c.initial,'','avatar')}
-
-<div class="comment-body">
-
-<b>${esc(c.user)}</b>
-
-<div>
-${esc(c.text)}
-</div>
-
-</div>
-
-</div>
-
-`).join('')}
-
-</div>
-
-<div class="comment-input">
-
-<input
-id="comment-${p.id}"
-placeholder="Write a comment..."
-onkeydown="
-if(event.key==='Enter')
-addComment(${p.id})
-">
-
-<button
-class="primary"
-onclick="addComment(${p.id})">
-Send
-</button>
-
-</div>
-
-</div>
-
-</article>`;
-
-}
-
-function like(id){
-
- const p=state.posts.find(x=>x.id===id);
-
- if(!p)return;
-
- p.liked=!p.liked;
-
- p.likes+=p.liked?1:-1;
-
- if(
-  p.liked &&
-  p.handle!==state.user.handle
- ){
-
-  state.notifications.unshift({
-   text:`${p.user} को आपका like पसंद आया।`,
-   time:'Just now'
-  });
-
- }
-
- save();
- render();
-
-}
-
-function toggleSave(id){
-
- const i=state.saved.indexOf(id);
-
- if(i>=0)
- state.saved.splice(i,1);
- else
- state.saved.push(id);
-
- save();
- render();
-
- toast(
-  i>=0
-  ? 'Removed from saved'
-  : 'Saved ✓'
- );
-
-}
-
-function toggleComments(id){
-
- document
- .getElementById('comments-'+id)
- ?.classList.toggle('hidden');
-
-}
-
-function addComment(id){
-
- const input=
- document.getElementById('comment-'+id);
-
- const t=input.value.trim();
-
- if(!t)return;
-
- const p=
- state.posts.find(x=>x.id===id);
-
- p.comments.push({
-  user:state.user.name,
-  initial:state.user.initial,
-  text:t
- });
-
- input.value='';
-
- save();
- render();
-
- setTimeout(()=>{
-
-  document
-  .getElementById('comments-'+id)
-  ?.classList.remove('hidden');
-
- },0);
-
-}
-
-function toggleFollow(handle,b){
-
- const i=state.following.indexOf(handle);
-
- if(i>=0){
-
-  state.following.splice(i,1);
-
-  state.user.followers=
-  Math.max(0,state.user.followers-1);
-
-  b.textContent='Follow';
-  b.classList.remove('following');
-
- }else{
-
-  state.following.push(handle);
-
-  state.user.followers++;
-
-  b.textContent='Following';
-  b.classList.add('following');
-
-  state.notifications.unshift({
-   text:`अब आप ${handle} को follow कर रहे हैं।`,
-   time:'Just now'
-  });
-
- }
-
- save();
-
- renderProfileCard();
- renderSuggestions();
-
-}
-
-function sharePost(id){
-
- const url=
- location.href.split('#')[0]+'#post-'+id;
-
- if(navigator.share){
-
-  navigator.share({
-   title:'IB65',
-   text:'IB65 post देखें',
-   url
-  }).catch(()=>{});
-
- }else{
-
-  navigator.clipboard
-  ?.writeText(url)
-  .then(()=>toast('Post link copied ✓'))
-  .catch(()=>toast('Link copied नहीं हुआ'));
-
- }
-
-}
-
-function renderProfileCard(){
-
- document.getElementById('profileCard').innerHTML=`
-
-${avatarHTML(
- state.user.initial,
- state.user.avatar
-)}
-
-<h3 style="margin:4px 0">
-${esc(state.user.name)}
-</h3>
-
-<div class="small">
-${esc(state.user.handle)}
-</div>
-
-<p class="small">
-${esc(state.user.bio)}
-</p>
-
-<div class="stats">
-
-<div class="stat">
-<b>
-${state.posts.filter(
- p=>p.handle===state.user.handle
-).length}
-</b>
-<span>Posts</span>
-</div>
-
-<div class="stat">
-<b>${state.user.followers}</b>
-<span>Followers</span>
-</div>
-
-<div class="stat">
-<b>${state.user.following}</b>
-<span>Following</span>
-</div>
-
-</div>
-
-<button
-class="pill"
-onclick="openProfile()">
-View profile
-</button>
-
-`;
-
-}
-
-function renderSuggestions(){
-
- document.getElementById('suggestions').innerHTML=
-
- state.creators
- .filter(c=>c.handle!==state.user.handle)
- .map(c=>`
-
-<div class="row" style="margin:12px 0">
-
-${avatarHTML(c.initial,'')}
-
-<div style="flex:1">
-
-<b>${esc(c.name)}</b>
-
-<div class="small">
-${esc(c.handle)}
-</div>
-
-</div>
-
-<button
-class="follow ${
-state.following.includes(c.handle)
-?'following':''
-}"
-onclick="toggleFollow('${esc(c.handle)}',this)">
-
-${
-state.following.includes(c.handle)
-?'Following'
-:'Follow'
-}
-
-</button>
-
-</div>
-
-`).join('');
-
-}
-
-function openCreate(){
-
- openModal(`
-
-<div class="row"
-style="justify-content:space-between">
-
-<h2 style="margin:0">
-Create post
-</h2>
-
-<button
-class="icon"
-onclick="closeModal()">
-✕
-</button>
-
-</div>
-
-<textarea
-id="postText"
-placeholder="Share something with IB65...">
-</textarea>
-
-<div class="row"
-style="flex-wrap:wrap">
-
-<label class="upload-label">
-
-🖼 Photo
-
-<input
-id="photoInput"
-type="file"
-accept="image/*"
-onchange="previewUpload(this,'image')">
-
-</label>
-
-<label class="upload-label">
-
-🎬 Video
-
-<input
-id="videoInput"
-type="file"
-accept="video/*"
-onchange="previewUpload(this,'video')">
-
-</label>
-
-</div>
-
-<div id="uploadPreview"></div>
-
-<div class="notice">
-
-Media इस browser में local preview के रूप में save होगा।
-बड़े videos के लिए backend/cloud storage जोड़ना होगा।
-
-</div>
-
-<div class="modal-actions">
-
-<button
-class="pill"
-onclick="closeModal()">
-Cancel
-</button>
-
-<button
-class="primary"
-onclick="createPost()">
-Publish
-</button>
-
-</div>
-
-`);
-
- window.pendingMedia={
-  data:'',
-  type:''
- };
-
-}
-
-function previewUpload(input,type){
-
- const file=input.files?.[0];
-
- if(!file)return;
-
- if(file.size>8*1024*1024){
-
-  toast('File 8MB से छोटी रखें');
-  input.value='';
-  return;
-
- }
-
- const reader=new FileReader();
-
- reader.onload=()=>{
-
-  window.pendingMedia={
-   data:reader.result,
-   type
-  };
-
-  document.getElementById(
-   'uploadPreview'
-  ).innerHTML=
-
-  type==='image'
-
-  ? `<img class="preview"
-      src="${reader.result}">`
-
-  : `<video
-      class="preview"
-      src="${reader.result}"
-      controls>
-     </video>`;
-
- };
-
- reader.readAsDataURL(file);
-
-}
-
-function createPost(){
-
- const t=
- document.getElementById('postText')
- .value.trim();
-
- if(
-  !t &&
-  !window.pendingMedia?.data
- ){
-
-  return toast(
-   'Post में text या media जोड़ें'
-  );
-
- }
-
- state.posts.unshift({
-
-  id:Date.now(),
-
-  user:state.user.name,
-
-  handle:state.user.handle,
-
-  initial:state.user.initial,
-
-  text:t||'New post 🎬',
-
-  likes:0,
-
-  comments:[],
-
-  liked:false,
-
-  media:window.pendingMedia?.data||'',
-
-  type:window.pendingMedia?.type||'text'
-
- });
-
- save();
-
- closeModal();
-
- render();
-
- toast('Post published ✓');
-
- window.pendingMedia=null;
-
-}
-
-function openProfile(){
-
- openModal(`
-
-<div class="row"
-style="justify-content:space-between">
-
-<h2 style="margin:0">
-My Profile
-</h2>
-
-<button
-class="icon"
-onclick="closeModal()">
-✕
-</button>
-
-</div>
-
-<div class="profile-card"
-style="background:transparent;border:0">
-
-<div class="profile-big">
-
-${
-state.user.avatar
-? `<img src="${esc(state.user.avatar)}">`
-: esc(state.user.initial)
-}
-
-</div>
-
-<h2>${esc(state.user.name)}</h2>
-
-<div class="small">
-${esc(state.user.handle)}
-</div>
-
-<p>${esc(state.user.bio)}</p>
-
-<div class="stats">
-
-<div class="stat">
-<b>${state.posts.filter(
- p=>p.handle===state.user.handle
-).length}</b>
-<span>Posts</span>
-</div>
-
-<div class="stat">
-<b>${state.user.followers}</b>
-<span>Followers</span>
-</div>
-
-<div class="stat">
-<b>${state.user.following}</b>
-<span>Following</span>
-</div>
-
-</div>
-
-<button
-class="primary"
-onclick="openEditProfile()">
-Edit profile
-</button>
-
-</div>
-
-`);
-
-}
-
-function openEditProfile(){
-
- openModal(`
-
-<div class="row"
-style="justify-content:space-between">
-
-<h2 style="margin:0">
-Edit profile
-</h2>
-
-<button
-class="icon"
-onclick="closeModal()">
-✕
-</button>
-
-</div>
-
-<div class="profile-big">
-
-${
-state.user.avatar
-? `<img src="${esc(state.user.avatar)}">`
-: esc(state.user.initial)
-}
-
-</div>
-
-<div style="text-align:center;margin:10px">
-
-<label class="upload-label">
-
-📷 Change photo
-
-<input
-id="avatarInput"
-type="file"
-accept="image/*"
-onchange="changeAvatar(this)">
-
-</label>
-
-</div>
-
-<label>Name</label>
-
-<input
-id="editName"
-value="${esc(state.user.name)}">
-
-<label>Username</label>
-
-<input
-id="editHandle"
-value="${esc(state.user.handle)}">
-
-<label>Bio</label>
-
-<input
-id="editBio"
-value="${esc(state.user.bio)}">
-
-<div class="modal-actions">
-
-<button
-class="pill"
-onclick="openProfile()">
-Cancel
-</button>
-
-<button
-class="primary"
-onclick="saveProfile()">
-Save
-</button>
-
-</div>
-
-`);
-
-}
-
-function changeAvatar(input){
-
- const file=input.files?.[0];
-
- if(!file)return;
-
- if(file.size>3*1024*1024){
-
-  toast('Photo 3MB से छोटी रखें');
-  input.value='';
-  return;
-
- }
-
- const reader=new FileReader();
-
- reader.onload=()=>{
-
-  state.user.avatar=reader.result;
-
-  state.user.initial=
-  state.user.name.charAt(0).toUpperCase();
-
-  save();
-
-  openEditProfile();
-
- };
-
- reader.readAsDataURL(file);
-
-}
-
-function saveProfile(){
-
- const oldHandle=state.user.handle;
-
- const n=
- document.getElementById('editName')
- .value.trim()||state.user.name;
-
- let h=
- document.getElementById('editHandle')
- .value.trim();
-
- if(!h.startsWith('@'))
- h='@'+h;
-
- state.user.name=n;
- state.user.handle=h;
-
- state.user.initial=
- n.charAt(0).toUpperCase();
-
- state.user.bio=
- document.getElementById('editBio')
- .value.trim();
-
- state.posts.forEach(p=>{
-
-  if(p.handle===oldHandle){
-
-   p.user=state.user.name;
-   p.handle=state.user.handle;
-   p.initial=state.user.initial;
+    showLogin();
 
   }
 
- });
+});
 
- save();
 
- render();
+/* =========================================
+   LOGIN / SIGNUP UI
+========================================= */
 
- openProfile();
+function showLogin(){
 
- toast('Profile updated ✓');
+  openModal(`
 
-}
+    <div style="text-align:center;padding:10px">
 
-function openNotifications(){
+      <div class="logo"
+           style="margin:auto;width:58px;height:58px">
 
- openModal(`
+        <b>IB</b>
 
-<div class="row"
-style="justify-content:space-between">
+      </div>
 
-<h2 style="margin:0">
-Notifications
-</h2>
+      <h2>Welcome to IB65</h2>
 
-<button
-class="icon"
-onclick="closeModal()">
-✕
-</button>
+      <p class="small">
+        Login या नया account बनाकर IB65 इस्तेमाल करें।
+      </p>
 
-</div>
+      <input
+        id="authName"
+        placeholder="Your name"
+        autocomplete="name">
 
-${
-state.notifications.length
+      <input
+        id="authEmail"
+        type="email"
+        placeholder="Email"
+        autocomplete="email">
 
-? state.notifications.map(n=>`
+      <input
+        id="authPassword"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password">
 
-<div class="notice">
+      <div class="modal-actions">
 
-🔔 ${esc(n.text)}
+        <button
+          class="pill"
+          onclick="loginUser()">
+          Login
+        </button>
 
-<div class="small">
-${esc(n.time)}
-</div>
+        <button
+          class="primary"
+          onclick="signupUser()">
+          Sign up
+        </button>
 
-</div>
+      </div>
 
-`).join('')
+      <div class="notice">
+        🔐 आपका account Firebase Authentication से सुरक्षित रहेगा।
+      </div>
 
-: '<p class="small">No notifications yet.</p>'
-}
+    </div>
 
-<div class="modal-actions">
-
-<button
-class="pill"
-onclick="
-state.notifications=[];
-save();
-render();
-closeModal();
-">
-
-Mark all read
-
-</button>
-
-</div>
-
-`);
+  `);
 
 }
 
-function openMessages(){
+async function signupUser(){
 
- openModal(`
+  const name =
+    document.getElementById('authName')
+    .value.trim();
 
-<div class="row"
-style="justify-content:space-between">
+  const email =
+    document.getElementById('authEmail')
+    .value.trim();
 
-<h2 style="margin:0">
-Messages
-</h2>
+  const password =
+    document.getElementById('authPassword')
+    .value;
 
-<button
-class="icon"
-onclick="closeModal()">
-✕
-</button>
+  if(!name)
+    return toast('Name डालो');
 
-</div>
+  if(!email)
+    return toast('Email डालो');
 
-<div class="message">
+  if(password.length < 6)
+    return toast('Password कम से कम 6 characters का रखें');
 
-${avatarHTML('A','')}
+  try{
 
-<div>
+    const result =
+      await auth.createUserWithEmailAndPassword(
+        email,
+        password
+      );
 
-<b>Arjun</b>
+    const user = result.user;
 
-<div class="small">
-Hey! Welcome to IB65 👋
-</div>
+    const handle =
+      '@' +
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g,'')
+        .slice(0,18) +
+      Math.floor(Math.random()*1000);
 
-</div>
+    await db
+      .collection('users')
+      .doc(user.uid)
+      .set({
 
-</div>
+        uid:user.uid,
 
-<div class="message">
+        name:name,
 
-${avatarHTML('R','')}
+        handle:handle,
 
-<div>
+        initial:name
+          .charAt(0)
+          .toUpperCase(),
 
-<b>Riya</b>
+        bio:'Building IB65 🚀',
 
-<div class="small">
-Your new post looks great 🔥
-</div>
+        avatar:'',
 
-</div>
+        followers:0,
 
-</div>
+        following:0,
 
-<div class="notice">
+        email:user.email,
 
-💬 Real-time messaging के लिए
-backend/database connect करना होगा।
+        createdAt:
+          firebase.firestore.FieldValue.serverTimestamp()
 
-</div>
+      });
 
-`);
+    toast('Account created ✓');
 
-}
+    closeModal();
 
-function openReels(){
+  }catch(error){
 
- openModal(`
+    console.error(error);
 
-<div class="row"
-style="justify-content:space-between">
+    toast(
+      firebaseError(error)
+    );
 
-<h2 style="margin:0">
-IB65 Reels
-</h2>
-
-<button
-class="icon"
-onclick="closeModal()">
-✕
-</button>
-
-</div>
-
-${
-state.posts
-.filter(p=>p.type==='video')
-.map(p=>`
-
-<div class="reel">
-
-<video
-src="${esc(p.media)}"
-controls
-playsinline>
-</video>
-
-<div class="caption">
-${esc(p.text)}
-</div>
-
-</div>
-
-`).join('')
-
-||
-
-'<div class="notice">अभी कोई local Reel नहीं है। Create से video post बनाओ।</div>'
-}
-
-`);
+  }
 
 }
 
-function openExplore(){
 
- const tags=[
-  '#IB65',
-  '#Creators',
-  '#India',
-  '#Reels',
-  '#Gaming',
-  '#Photography'
- ];
+async function loginUser(){
 
- openModal(`
+  const email =
+    document.getElementById('authEmail')
+    .value.trim();
 
-<div class="row"
-style="justify-content:space-between">
+  const password =
+    document.getElementById('authPassword')
+    .value;
 
-<h2 style="margin:0">
-Explore
-</h2>
+  if(!email || !password)
+    return toast('Email और password डालो');
 
-<button
-class="icon"
-onclick="closeModal()">
-✕
-</button>
+  try{
 
-</div>
+    await auth
+      .signInWithEmailAndPassword(
+        email,
+        password
+      );
 
-<div class="notice">
+    closeModal();
 
-Search bar में creators या posts खोज सकते हो।
+    toast('Login successful ✓');
 
-</div>
+  }catch(error){
 
-<h3>Trending</h3>
+    console.error(error);
 
-${tags.map(t=>`
+    toast(
+      firebaseError(error)
+    );
 
-<button
-class="pill"
-style="margin:4px"
-onclick="
-closeModal();
-document.getElementById('search').value='${t.replace('#','')}';
-renderFeed();
-">
-
-${t}
-
-</button>
-
-`).join('')}
-
-`);
+  }
 
 }
 
-function openModal(html){
 
- document.getElementById('modalBox').innerHTML=html;
+function firebaseError(error){
 
- document
- .getElementById('modal')
- .classList.add('show');
+  const code = error?.code || '';
+
+  if(code.includes('invalid-credential'))
+    return 'Email या password गलत है';
+
+  if(code.includes('email-already-in-use'))
+    return 'यह email पहले से registered है';
+
+  if(code.includes('invalid-email'))
+    return 'Email सही नहीं है';
+
+  if(code.includes('weak-password'))
+    return 'Password बहुत छोटा है';
+
+  if(code.includes('network-request-failed'))
+    return 'Internet connection check करो';
+
+  return 'Firebase error: ' + code;
 
 }
 
-function closeModal(){
 
- document
- .getElementById('modal')
- .classList.remove('show');
+/* =========================================
+   FIREBASE USER
+========================================= */
+
+async function loadFirebaseUser(){
+
+  if(!currentUser)
+    return;
+
+  const ref =
+    db.collection('users')
+      .doc(currentUser.uid);
+
+  const snap =
+    await ref.get();
+
+  if(snap.exists){
+
+    const data = snap.data();
+
+    state.user = {
+
+      name:data.name || 'User',
+
+      handle:data.handle || '@user',
+
+      initial:data.initial ||
+        (data.name || 'U')
+        .charAt(0)
+        .toUpperCase(),
+
+      bio:data.bio ||
+        'Building IB65 🚀',
+
+      followers:data.followers || 0,
+
+      following:data.following || 0,
+
+      avatar:data.avatar || ''
+
+    };
+
+  }else{
+
+    await ref.set({
+
+      uid:currentUser.uid,
+
+      name:currentUser.email
+        ?.split('@')[0] || 'User',
+
+      handle:
+        '@' +
+        (
+          currentUser.email
+          ?.split('@')[0] || 'user'
+        ),
+
+      initial:
+        (
+          currentUser.email
+          ?.charAt(0) || 'U'
+        ).toUpperCase(),
+
+      bio:'Building IB65 🚀',
+
+      avatar:'',
+
+      followers:0,
+
+      following:0,
+
+      email:currentUser.email,
+
+      createdAt:
+        firebase.firestore.FieldValue.serverTimestamp()
+
+    });
+
+    await loadFirebaseUser();
+
+  }
+
+  saveLocal();
 
 }
 
-function navigate(b,name){
 
- document
- .querySelectorAll('.nav button,.bottom button')
- .forEach(x=>x.classList.remove('active'));
+/* =========================================
+   LOAD POSTS FROM FIRESTORE
+========================================= */
 
- b.classList.add('active');
+async function loadFirebasePosts(){
 
- if(name==='Home'){
+  try{
 
-  document.getElementById('search').value='';
+    const snap =
+      await db
+        .collection('posts')
+        .orderBy('createdAt','desc')
+        .limit(50)
+        .get();
+
+    state.posts =
+      snap.docs.map(doc => {
+
+        const p = doc.data();
+
+        return {
+
+          id:doc.id,
+
+          uid:p.uid || '',
+
+          user:p.user || 'User',
+
+          handle:p.handle || '@user',
+
+          initial:p.initial || 'U',
+
+          text:p.text || '',
+
+          likes:p.likeCount || 0,
+
+          liked:false,
+
+          comments:p.comments || [],
+
+          media:p.media || '',
+
+          type:p.type || 'text'
+
+        };
+
+      });
+
+    saveLocal();
+
+  }catch(error){
+
+    console.error(
+      'Posts loading error:',
+      error
+    );
+
+    toast('Posts load नहीं हुए');
+
+  }
+
+}
+
+
+/* =========================================
+   RENDER
+========================================= */
+
+function render(){
 
   renderFeed();
 
- }
+  renderProfileCard();
 
- else if(name==='Explore')
- openExplore();
+  renderSuggestions();
 
- else if(name==='Reels')
- openReels();
+  const ca =
+    document.getElementById(
+      'composerAvatar'
+    );
 
- else if(name==='Messages')
- openMessages();
+  if(ca){
+
+    ca.innerHTML =
+      state.user.avatar
+
+      ? `<img
+          src="${esc(state.user.avatar)}"
+          alt="">`
+
+      : esc(state.user.initial);
+
+  }
+
+  const nc =
+    document.getElementById(
+      'notifCount'
+    );
+
+  if(nc){
+
+    nc.textContent =
+      state.notifications.length
+      ? `(${state.notifications.length})`
+      : '';
+
+  }
 
 }
+
+
+function renderFeed(){
+
+  const search =
+    document.getElementById('search');
+
+  const q =
+    (search?.value || '')
+    .toLowerCase();
+
+  const f =
+    state.posts.filter(p =>
+      (
+        p.text +
+        p.user +
+        p.handle
+      )
+      .toLowerCase()
+      .includes(q)
+    );
+
+  document.getElementById('feed').innerHTML =
+
+    f.map(postHTML).join('') ||
+
+    `<div
+      class="card"
+      style="padding:30px;text-align:center;color:var(--muted)">
+
+      ${firebaseReady
+        ? 'अभी कोई post नहीं है। पहला post बनाओ 🚀'
+        : 'Firebase से connect हो रहा है...'}
+
+    </div>`;
+
+}
+
+
+function mediaHTML(p){
+
+  if(!p.media)
+    return `<div class="media">IB65</div>`;
+
+  return `
+
+    <div class="media">
+
+      ${
+        p.type === 'video'
+
+        ? `<video
+            src="${esc(p.media)}"
+            controls
+            playsinline>
+           </video>`
+
+        : `<img
+            src="${esc(p.media)}"
+            alt="Post media">`
+      }
+
+    </div>
+
+  `;
+
+}
+
+
+function postHTML(p){
+
+  const isSaved =
+    state.saved.includes(p.id);
+
+  return `
+
+  <article
+    id="post-${esc(p.id)}"
+    class="card post">
+
+    <div class="post-head">
+
+      <div class="user">
+
+        ${avatarHTML(
+          p.initial,
+          p.handle === state.user.handle
+            ? state.user.avatar
+            : '',
+          'avatar'
+        )}
+
+        <div>
+
+          <div class="name">
+            ${esc(p.user)}
+          </div>
+
+          <div class="handle">
+            ${esc(p.handle)}
+          </div>
+
+        </div>
+
+      </div>
+
+      ${
+        p.handle !== state.user.handle
+
+        ? `<button
+            class="follow"
+            onclick="followUser('${esc(p.uid)}')">
+
+            Follow
+
+           </button>`
+
+        : `<button
+            class="icon"
+            onclick="openProfile()">
+            •••
+           </button>`
+      }
+
+    </div>
+
+    <p>${esc(p.text)}</p>
+
+    ${mediaHTML(p)}
+
+    <div class="post-actions">
+
+      <button
+        class="${p.liked ? 'liked':''}"
+        onclick="likePost('${esc(p.id)}')">
+
+        ♥ ${p.likes}
+
+      </button>
+
+      <button
+        onclick="toggleComments('${esc(p.id)}')">
+
+        💬 ${p.comments?.length || 0}
+
+      </button>
+
+      <button
+        onclick="sharePost('${esc(p.id)}')">
+
+        ↗ Share
+
+      </button>
+
+      <button
+        class="${isSaved?'saved':''}"
+        onclick="toggleSave('${esc(p.id)}')">
+
+        🔖
+
+      </button>
+
+    </div>
+
+    <div
+      id="comments-${esc(p.id)}"
+      class="comments hidden">
+
+      ${(p.comments || []).map(c => `
+
+        <div class="comment">
+
+          ${avatarHTML(
+            c.initial || 'U',
+            '',
+            'avatar'
+          )}
+
+          <div class="comment-body">
+
+            <b>${esc(c.user || 'User')}</b>
+
+            <div>
+              ${esc(c.text || '')}
+            </div>
+
+          </div>
+
+        </div>
+
+      `).join('')}
+
+      <div class="comment-input">
+
+        <input
+          id="comment-${esc(p.id)}"
+          placeholder="Write a comment..."
+          onkeydown="
+            if(event.key==='Enter')
+            addComment('${esc(p.id)}')
+          ">
+
+        <button
+          class="primary"
+          onclick="addComment('${esc(p.id)}')">
+
+          Send
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </article>
+
+  `;
+
+}
+
+
+/* =========================================
+   REAL FIRESTORE LIKE
+========================================= */
+
+async function likePost(id){
+
+  if(!currentUser)
+    return showLogin();
+
+  const ref =
+    db.collection('posts').doc(id);
+
+  try{
+
+    const liked =
+      state.posts
+        .find(p=>p.id===id)
+        ?.liked;
+
+    if(liked){
+
+      await ref.update({
+
+        likedBy:
+          firebase.firestore.FieldValue
+            .arrayRemove(currentUser.uid),
+
+        likeCount:
+          firebase.firestore.FieldValue.increment(-1)
+
+      });
+
+    }else{
+
+      await ref.update({
+
+        likedBy:
+          firebase.firestore.FieldValue
+            .arrayUnion(currentUser.uid),
+
+        likeCount:
+          firebase.firestore.FieldValue.increment(1)
+
+      });
+
+    }
+
+    await loadFirebasePosts();
+
+    const p =
+      state.posts.find(x=>x.id===id);
+
+    if(p){
+
+      p.liked =
+        (p.likedBy || [])
+          .includes(currentUser.uid);
+
+    }
+
+    render();
+
+  }catch(error){
+
+    console.error(error);
+
+    toast('Like नहीं हो पाया');
+
+  }
+
+}
+
+
+/* =========================================
+   COMMENTS
+========================================= */
+
+function toggleComments(id){
+
+  document
+    .getElementById('comments-'+id)
+    ?.classList.toggle('hidden');
+
+}
+
+
+async function addComment(id){
+
+  if(!currentUser)
+    return showLogin();
+
+  const input =
+    document.getElementById(
+      'comment-'+id
+    );
+
+  const text =
+    input.value.trim();
+
+  if(!text)
+    return;
+
+  try{
+
+    const postRef =
+      db.collection('posts')
+        .doc(id);
+
+    const comment = {
+
+      uid:currentUser.uid,
+
+      user:state.user.name,
+
+      initial:state.user.initial,
+
+      text:text,
+
+      createdAt:
+        firebase.firestore.FieldValue
+          .serverTimestamp()
+
+    };
+
+    await postRef
+      .collection('comments')
+      .add(comment);
+
+    input.value='';
+
+    await refreshPostComments(id);
+
+    render();
+
+    setTimeout(()=>{
+
+      document
+        .getElementById('comments-'+id)
+        ?.classList.remove('hidden');
+
+    },50);
+
+    toast('Comment added ✓');
+
+  }catch(error){
+
+    console.error(error);
+
+    toast('Comment नहीं जुड़ा');
+
+  }
+
+}
+
+
+async function refreshPostComments(id){
+
+  const snap =
+    await db
+      .collection('posts')
+      .doc(id)
+      .collection('comments')
+      .orderBy('createdAt','asc')
+      .limit(100)
+      .get();
+
+  const comments =
+    snap.docs.map(d=>d.data());
+
+  const p =
+    state.posts.find(x=>x.id===id);
+
+  if(p)
+    p.comments = comments;
+
+}
+
+
+/* =========================================
+   CREATE POST
+========================================= */
+
+function openCreate(){
+
+  if(!currentUser)
+    return showLogin();
+
+  openModal(`
+
+    <div class="row"
+         style="justify-content:space-between">
+
+      <h2 style="margin:0">
+        Create post
+      </h2>
+
+      <button
+        class="icon"
+        onclick="closeModal()">
+        ✕
+      </button>
+
+    </div>
+
+    <textarea
+      id="postText"
+      placeholder="Share something with IB65...">
+    </textarea>
+
+    <div class="row"
+         style="flex-wrap:wrap">
+
+      <label class="upload-label">
+
+        🖼 Photo
+
+        <input
+          id="photoInput"
+          type="file"
+          accept="image/*"
+          onchange="previewUpload(this,'image')">
+
+      </label>
+
+      <label class="upload-label">
+
+        🎬 Video
+
+        <input
+          id="videoInput"
+          type="file"
+          accept="video/*"
+          onchange="previewUpload(this,'video')">
+
+      </label>
+
+    </div>
+
+    <div id="uploadPreview"></div>
+
+    <div class="notice">
+
+      अभी text posts Firebase में save होंगे।
+      Photo/video का local preview रहेगा।
+      Cloud Storage बाद में जोड़ेंगे।
+
+    </div>
+
+    <div class="modal-actions">
+
+      <button
+        class="pill"
+        onclick="closeModal()">
+        Cancel
+      </button>
+
+      <button
+        class="primary"
+        onclick="createPost()">
+        Publish
+      </button>
+
+    </div>
+
+  `);
+
+  window.pendingMedia={
+    data:'',
+    type:''
+  };
+
+}
+
+
+function previewUpload(input,type){
+
+  const file =
+    input.files?.[0];
+
+  if(!file)
+    return;
+
+  if(file.size > 8*1024*1024){
+
+    toast('File 8MB से छोटी रखें');
+
+    input.value='';
+
+    return;
+
+  }
+
+  const reader =
+    new FileReader();
+
+  reader.onload=()=>{
+
+    window.pendingMedia={
+      data:reader.result,
+      type:type
+    };
+
+    document
+      .getElementById('uploadPreview')
+      .innerHTML =
+
+      type === 'image'
+
+      ? `<img
+          class="preview"
+          src="${reader.result}">`
+
+      : `<video
+          class="preview"
+          src="${reader.result}"
+          controls>
+         </video>`;
+
+  };
+
+  reader.readAsDataURL(file);
+
+}
+
+
+async function createPost(){
+
+  if(!currentUser)
+    return showLogin();
+
+  const text =
+    document
+      .getElementById('postText')
+      .value
+      .trim();
+
+  if(
+    !text &&
+    !window.pendingMedia?.data
+  ){
+
+    return toast(
+      'Post में text या media जोड़ें'
+    );
+
+  }
+
+  try{
+
+    const post = {
+
+      uid:currentUser.uid,
+
+      user:state.user.name,
+
+      handle:state.user.handle,
+
+      initial:state.user.initial,
+
+      text:
+        text || 'New post 🎬',
+
+      likeCount:0,
+
+      likedBy:[],
+
+      media:
+        window.pendingMedia?.data || '',
+
+      type:
+        window.pendingMedia?.type || 'text',
+
+      createdAt:
+        firebase.firestore.FieldValue
+          .serverTimestamp()
+
+    };
+
+    await db
+      .collection('posts')
+      .add(post);
+
+    closeModal();
+
+    await loadFirebasePosts();
+
+    render();
+
+    toast('Post published online ✓');
+
+    window.pendingMedia=null;
+
+  }catch(error){
+
+    console.error(error);
+
+    toast('Post publish नहीं हुआ');
+
+  }
+
+}
+
+
+/* =========================================
+   SAVE
+========================================= */
+
+function toggleSave(id){
+
+  const i =
+    state.saved.indexOf(id);
+
+  if(i >= 0)
+    state.saved.splice(i,1);
+  else
+    state.saved.push(id);
+
+  saveLocal();
+
+  render();
+
+  toast(
+    i >= 0
+      ? 'Removed from saved'
+      : 'Saved ✓'
+  );
+
+}
+
+
+/* =========================================
+   FOLLOW
+========================================= */
+
+async function followUser(targetUid){
+
+  if(!currentUser)
+    return showLogin();
+
+  if(!targetUid)
+    return toast('User profile उपलब्ध नहीं है');
+
+  if(targetUid === currentUser.uid)
+    return;
+
+  try{
+
+    const followId =
+      currentUser.uid + '_' + targetUid;
+
+    const ref =
+      db.collection('follows')
+        .doc(followId);
+
+    const snap =
+      await ref.get();
+
+    if(snap.exists){
+
+      await ref.delete();
+
+      toast('Unfollowed');
+
+    }else{
+
+      await ref.set({
+
+        followerId:currentUser.uid,
+
+        followingId:targetUid,
+
+        createdAt:
+          firebase.firestore.FieldValue
+            .serverTimestamp()
+
+      });
+
+      toast('Following ✓');
+
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+    toast('Follow नहीं हो पाया');
+
+  }
+
+}
+
+
+/* =========================================
+   PROFILE
+========================================= */
+
+function renderProfileCard(){
+
+  const card =
+    document.getElementById(
+      'profileCard'
+    );
+
+  if(!card)
+    return;
+
+  card.innerHTML=`
+
+    ${avatarHTML(
+      state.user.initial,
+      state.user.avatar
+    )}
+
+    <h3 style="margin:4px 0">
+      ${esc(state.user.name)}
+    </h3>
+
+    <div class="small">
+      ${esc(state.user.handle)}
+    </div>
+
+    <p class="small">
+      ${esc(state.user.bio)}
+    </p>
+
+    <div class="stats">
+
+      <div class="stat">
+        <b>
+          ${state.posts.filter(
+            p=>p.uid===currentUser?.uid
+          ).length}
+        </b>
+        <span>Posts</span>
+      </div>
+
+      <div class="stat">
+        <b>${state.user.followers}</b>
+        <span>Followers</span>
+      </div>
+
+      <div class="stat">
+        <b>${state.user.following}</b>
+        <span>Following</span>
+      </div>
+
+    </div>
+
+    <button
+      class="pill"
+      onclick="openProfile()">
+      View profile
+    </button>
+
+  `;
+
+}
+
+
+function renderSuggestions(){
+
+  const box =
+    document.getElementById(
+      'suggestions'
+    );
+
+  if(!box)
+    return;
+
+  box.innerHTML = `
+
+    <div class="notice">
+
+      👥 नए creators के profiles
+      Firebase में signup करने के बाद
+      यहाँ दिखाई दे सकते हैं।
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================
+   EDIT PROFILE
+========================================= */
+
+function openProfile(){
+
+  if(!currentUser)
+    return showLogin();
+
+  openModal(`
+
+    <div class="row"
+         style="justify-content:space-between">
+
+      <h2 style="margin:0">
+        My Profile
+      </h2>
+
+      <button
+        class="icon"
+        onclick="closeModal()">
+        ✕
+      </button>
+
+    </div>
+
+    <div class="profile-card"
+         style="background:transparent;border:0">
+
+      <div class="profile-big">
+
+        ${
+          state.user.avatar
+
+          ? `<img
+              src="${esc(state.user.avatar)}">`
+
+          : esc(state.user.initial)
+        }
+
+      </div>
+
+      <h2>
+        ${esc(state.user.name)}
+      </h2>
+
+      <div class="small">
+        ${esc(state.user.handle)}
+      </div>
+
+      <p>
+        ${esc(state.user.bio)}
+      </p>
+
+      <button
+        class="primary"
+        onclick="openEditProfile()">
+
+        Edit profile
+
+      </button>
+
+      <button
+        class="pill"
+        style="margin-left:6px"
+        onclick="logoutUser()">
+
+        Logout
+
+      </button>
+
+    </div>
+
+  `);
+
+}
+
+
+function openEditProfile(){
+
+  openModal(`
+
+    <div class="row"
+         style="justify-content:space-between">
+
+      <h2 style="margin:0">
+        Edit profile
+      </h2>
+
+      <button
+        class="icon"
+        onclick="closeModal()">
+        ✕
+      </button>
+
+    </div>
+
+    <label>Name</label>
+
+    <input
+      id="editName"
+      value="${esc(state.user.name)}">
+
+    <label>Username</label>
+
+    <input
+      id="editHandle"
+      value="${esc(state.user.handle)}">
+
+    <label>Bio</label>
+
+    <input
+      id="editBio"
+      value="${esc(state.user.bio)}">
+
+    <div class="modal-actions">
+
+      <button
+        class="pill"
+        onclick="openProfile()">
+        Cancel
+      </button>
+
+      <button
+        class="primary"
+        onclick="saveProfile()">
+        Save
+      </button>
+
+    </div>
+
+  `);
+
+}
+
+
+async function saveProfile(){
+
+  const name =
+    document
+      .getElementById('editName')
+      .value.trim() ||
+    state.user.name;
+
+  let handle =
+    document
+      .getElementById('editHandle')
+      .value.trim();
+
+  const bio =
+    document
+      .getElementById('editBio')
+      .value.trim();
+
+  if(!handle.startsWith('@'))
+    handle='@'+handle;
+
+  const initial =
+    name.charAt(0).toUpperCase();
+
+  try{
+
+    await db
+      .collection('users')
+      .doc(currentUser.uid)
+      .update({
+
+        name:name,
+
+        handle:handle,
+
+        initial:initial,
+
+        bio:bio
+
+      });
+
+    state.user.name=name;
+    state.user.handle=handle;
+    state.user.initial=initial;
+    state.user.bio=bio;
+
+    saveLocal();
+
+    await loadFirebasePosts();
+
+    render();
+
+    openProfile();
+
+    toast('Profile updated ✓');
+
+  }catch(error){
+
+    console.error(error);
+
+    toast('Profile update नहीं हुआ');
+
+  }
+
+}
+
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+async function logoutUser(){
+
+  try{
+
+    await auth.signOut();
+
+    closeModal();
+
+    toast('Logged out');
+
+  }catch(error){
+
+    toast('Logout failed');
+
+  }
+
+}
+
+
+/* =========================================
+   NOTIFICATIONS
+========================================= */
+
+function openNotifications(){
+
+  openModal(`
+
+    <div class="row"
+         style="justify-content:space-between">
+
+      <h2 style="margin:0">
+        Notifications
+      </h2>
+
+      <button
+        class="icon"
+        onclick="closeModal()">
+        ✕
+      </button>
+
+    </div>
+
+    ${
+      state.notifications.length
+
+      ? state.notifications.map(n=>`
+
+        <div class="notice">
+
+          🔔 ${esc(n.text)}
+
+          <div class="small">
+            ${esc(n.time)}
+          </div>
+
+        </div>
+
+      `).join('')
+
+      : '<p class="small">No notifications yet.</p>'
+    }
+
+    <div class="modal-actions">
+
+      <button
+        class="pill"
+        onclick="
+          state.notifications=[];
+          saveLocal();
+          render();
+          closeModal();
+        ">
+
+        Mark all read
+
+      </button>
+
+    </div>
+
+  `);
+
+}
+
+
+/* =========================================
+   MESSAGES
+========================================= */
+
+function openMessages(){
+
+  openModal(`
+
+    <div class="row"
+         style="justify-content:space-between">
+
+      <h2 style="margin:0">
+        Messages
+      </h2>
+
+      <button
+        class="icon"
+        onclick="closeModal()">
+        ✕
+      </button>
+
+    </div>
+
+    <div class="notice">
+
+      💬 Real-time Messages अगला चरण है।
+      अभी Firebase Posts system तैयार है।
+
+    </div>
+
+  `);
+
+}
+
+
+/* =========================================
+   REELS
+========================================= */
+
+function openReels(){
+
+  const videos =
+    state.posts
+      .filter(p=>p.type==='video' && p.media);
+
+  openModal(`
+
+    <div class="row"
+         style="justify-content:space-between">
+
+      <h2 style="margin:0">
+        IB65 Reels
+      </h2>
+
+      <button
+        class="icon"
+        onclick="closeModal()">
+        ✕
+      </button>
+
+    </div>
+
+    ${
+      videos.length
+
+      ? videos.map(p=>`
+
+        <div class="reel">
+
+          <video
+            src="${esc(p.media)}"
+            controls
+            playsinline>
+          </video>
+
+          <div class="caption">
+            ${esc(p.text)}
+          </div>
+
+        </div>
+
+      `).join('')
+
+      : `<div class="notice">
+          अभी कोई Reel नहीं है।
+         </div>`
+    }
+
+  `);
+
+}
+
+
+/* =========================================
+   EXPLORE
+========================================= */
+
+function openExplore(){
+
+  const tags=[
+    '#IB65',
+    '#Creators',
+    '#India',
+    '#Reels',
+    '#Gaming',
+    '#Photography'
+  ];
+
+  openModal(`
+
+    <div class="row"
+         style="justify-content:space-between">
+
+      <h2 style="margin:0">
+        Explore
+      </h2>
+
+      <button
+        class="icon"
+        onclick="closeModal()">
+        ✕
+      </button>
+
+    </div>
+
+    <div class="notice">
+      Search bar से posts और creators खोजो।
+    </div>
+
+    <h3>Trending</h3>
+
+    ${tags.map(t=>`
+
+      <button
+        class="pill"
+        style="margin:4px"
+        onclick="
+          closeModal();
+          document.getElementById('search').value='${t.replace('#','')}';
+          renderFeed();
+        ">
+
+        ${t}
+
+      </button>
+
+    `).join('')}
+
+  `);
+
+}
+
+
+/* =========================================
+   SHARE
+========================================= */
+
+function sharePost(id){
+
+  const url =
+    location.href
+      .split('#')[0] +
+    '#post-' + id;
+
+  if(navigator.share){
+
+    navigator.share({
+
+      title:'IB65',
+
+      text:'IB65 post देखें',
+
+      url:url
+
+    }).catch(()=>{});
+
+  }else{
+
+    navigator.clipboard
+      ?.writeText(url)
+      .then(()=>toast('Post link copied ✓'))
+      .catch(()=>toast('Link copy नहीं हुआ'));
+
+  }
+
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+function openModal(html){
+
+  document
+    .getElementById('modalBox')
+    .innerHTML=html;
+
+  document
+    .getElementById('modal')
+    .classList.add('show');
+
+}
+
+
+function closeModal(){
+
+  document
+    .getElementById('modal')
+    .classList.remove('show');
+
+}
+
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+function navigate(b,name){
+
+  document
+    .querySelectorAll(
+      '.nav button,.bottom button'
+    )
+    .forEach(x =>
+      x.classList.remove('active')
+    );
+
+  b.classList.add('active');
+
+  if(name==='Home'){
+
+    document
+      .getElementById('search')
+      .value='';
+
+    renderFeed();
+
+  }
+
+  else if(name==='Explore')
+    openExplore();
+
+  else if(name==='Reels')
+    openReels();
+
+  else if(name==='Messages')
+    openMessages();
+
+}
+
+
+/* =========================================
+   TOAST
+========================================= */
 
 function toast(t){
 
- const e=document.getElementById('toast');
+  const e =
+    document.getElementById('toast');
 
- e.textContent=t;
+  if(!e)
+    return;
 
- e.classList.add('show');
+  e.textContent=t;
 
- clearTimeout(window.tt);
+  e.classList.add('show');
 
- window.tt=setTimeout(
-  ()=>e.classList.remove('show'),
-  1900
- );
+  clearTimeout(window.tt);
+
+  window.tt =
+    setTimeout(
+      ()=>e.classList.remove('show'),
+      2200
+    );
 
 }
 
-/* =========================
-   PWA / INSTALL SUPPORT
-========================= */
+
+/* =========================================
+   PWA INSTALL
+========================================= */
 
 let deferredInstallPrompt=null;
 
 window.addEventListener(
- 'beforeinstallprompt',
- event=>{
+  'beforeinstallprompt',
+  event=>{
 
-  event.preventDefault();
+    event.preventDefault();
 
-  deferredInstallPrompt=event;
+    deferredInstallPrompt=event;
 
-  document
-  .getElementById('installApp')
-  .classList.add('show');
+    document
+      .getElementById('installApp')
+      .classList.add('show');
 
- }
+  }
 );
+
 
 async function installApp(){
 
- if(!deferredInstallPrompt){
+  if(!deferredInstallPrompt){
 
-  toast(
-   'Chrome menu ⋮ → Add to Home screen दबाएँ'
-  );
+    toast(
+      'Chrome ⋮ → Add to Home screen दबाएँ'
+    );
 
-  return;
-
- }
-
- deferredInstallPrompt.prompt();
-
- const result=
- await deferredInstallPrompt.userChoice;
-
- deferredInstallPrompt=null;
-
- document
- .getElementById('installApp')
- .classList.remove('show');
-
-}
-
-/* Share API */
-
-if(
- navigator.share
-){
-
- console.log(
-  'IB65 Share API supported'
- );
-
-}
-
-/* Keyboard shortcut */
-
-document.addEventListener(
- 'keydown',
- e=>{
-
-  if(
-   (e.ctrlKey||e.metaKey) &&
-   e.key.toLowerCase()==='k'
-  ){
-
-   e.preventDefault();
-
-   document
-   .getElementById('search')
-   .focus();
+    return;
 
   }
 
-  if(e.key==='Escape')
-  closeModal();
+  deferredInstallPrompt.prompt();
 
- }
+  await deferredInstallPrompt.userChoice;
+
+  deferredInstallPrompt=null;
+
+  document
+    .getElementById('installApp')
+    .classList.remove('show');
+
+}
+
+
+/* =========================================
+   KEYBOARD
+========================================= */
+
+document.addEventListener(
+  'keydown',
+  e=>{
+
+    if(
+      (e.ctrlKey || e.metaKey) &&
+      e.key.toLowerCase()==='k'
+    ){
+
+      e.preventDefault();
+
+      document
+        .getElementById('search')
+        .focus();
+
+    }
+
+    if(e.key==='Escape')
+      closeModal();
+
+  }
 );
+
+
+/* =========================================
+   START
+========================================= */
 
 render();
 
-</script>
-
-</body>
-</html>
+   </script>
