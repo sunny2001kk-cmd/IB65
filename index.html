@@ -9,8 +9,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  
-  <!-- Storage script is included just in case, but we use Cloudinary for media -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
   <style>
@@ -90,7 +88,6 @@
 
   <div class="app-container">
     <aside class="sidebar-left">
-      <!-- IB65 BY MANISH LOGO -->
       <div style="margin-bottom: 25px; margin-left: 8px;">
         <div style="font-size: 28px; font-weight: 800; color: var(--primary); letter-spacing: 1px;">IB65</div>
         <div style="font-size: 12px; color: var(--muted); margin-top: -4px; font-weight: 500;">by Manish</div>
@@ -157,7 +154,6 @@
     let deferredInstallPrompt = null;
     window.pendingMedia = null;
 
-    // PWA Install Prompt Listener
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredInstallPrompt = e;
@@ -220,12 +216,10 @@
     function showLogin() {
       openModal(`
         <div style="text-align:center;padding:10px">
-          <!-- IB65 BY MANISH LOGO (LOGIN SCREEN) -->
           <div style="text-align:center; margin-bottom: 5px;">
             <div style="font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: 1px;">IB65</div>
             <div style="font-size: 14px; color: var(--muted); margin-top: -4px; font-weight: 500;">by Manish</div>
           </div>
-
           <h2 style="margin-top:10px;">Welcome to IB65</h2>
           <p class="small" style="color:var(--muted); margin-bottom:14px;">Login ya naya account banayein</p>
           <input id="authName" placeholder="Your name" autocomplete="name">
@@ -443,9 +437,9 @@
         let mediaUrl = '';
         
         if (media?.file) {
-          // UPDATE THESE TWO LINES LATER WITH YOUR CLOUDINARY DETAILS
-          const cloudName = 'YOUR_CLOUD_NAME'; 
-          const uploadPreset = 'YOUR_UPLOAD_PRESET'; 
+          // असली CLOUDINARY DETAILS यहाँ डाली गई हैं
+          const cloudName = 'mhj8jvag'; 
+          const uploadPreset = 'ib65_upload'; 
           
           const formData = new FormData();
           formData.append('file', media.file);
@@ -593,9 +587,9 @@
       try {
         showLoading('Avatar upload ho raha hai...');
         
-        // UPDATE THESE TWO LINES LATER WITH YOUR CLOUDINARY DETAILS
-        const cloudName = 'YOUR_CLOUD_NAME'; 
-        const uploadPreset = 'YOUR_UPLOAD_PRESET'; 
+        // असली CLOUDINARY DETAILS यहाँ डाली गई हैं
+        const cloudName = 'mhj8jvag'; 
+        const uploadPreset = 'ib65_upload'; 
 
         const formData = new FormData();
         formData.append('file', file);
@@ -739,7 +733,6 @@
     }
 
     function downloadApk() {
-      // Direct APK Link: Update this when you have your APK ready
       const apkUrl = "https://github.com/sunny200/ib65-web/releases/download/v1.0/IB65.apk";
       const a = document.createElement('a');
       a.href = apkUrl;
