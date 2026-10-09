@@ -9,6 +9,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  
+  <!-- Storage script is included just in case, but we use Cloudinary for media -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
   <style>
@@ -38,7 +40,6 @@
     .row { display: flex; align-items: center; }
     .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; flex-shrink: 0; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .logo { width: 44px; height: 44px; border-radius: 12px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #fff; }
 
     input, textarea { width: 100%; background: #0e121a; border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 10px 14px; margin-top: 6px; margin-bottom: 12px; outline: none; }
     input:focus, textarea:focus { border-color: var(--primary); }
@@ -52,7 +53,6 @@
     button.danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
     button.icon { background: transparent; color: var(--muted); font-size: 20px; padding: 6px 12px; }
     button.liked { color: #ef4444; }
-    button.saved { color: #f59e0b; }
 
     .nav-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px; text-align: left; background: transparent; color: var(--text); border-radius: 10px; margin-bottom: 4px; border: 0; font-size: 15px; }
     .nav-btn:hover, .nav-btn.active { background: var(--card); color: var(--primary); }
@@ -79,6 +79,7 @@
     #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 8px 18px; border-radius: 20px; font-weight: 600; display: none; z-index: 100001; font-size: 14px; }
     #toast.show { display: block; }
 
+    /* Reels View */
     .reels-container { height: calc(100vh - 140px); overflow-y: scroll; scroll-snap-type: y mandatory; display: flex; flex-direction: column; gap: 16px; max-width: 420px; margin: 0 auto; }
     .reel-card { position: relative; height: 100%; min-height: calc(100vh - 160px); scroll-snap-align: start; border-radius: 16px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; }
     .reel-card video { width: 100%; height: 100%; object-fit: cover; }
@@ -89,7 +90,12 @@
 
   <div class="app-container">
     <aside class="sidebar-left">
-      <div class="logo" style="margin-bottom:20px;">IB</div>
+      <!-- IB65 BY MANISH LOGO -->
+      <div style="margin-bottom: 25px; margin-left: 8px;">
+        <div style="font-size: 28px; font-weight: 800; color: var(--primary); letter-spacing: 1px;">IB65</div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: -4px; font-weight: 500;">by Manish</div>
+      </div>
+
       <button class="nav-btn active" onclick="navigate(this, 'Home')">🏠 Home</button>
       <button class="nav-btn" onclick="navigate(this, 'Reels')">🎬 Reels</button>
       <button class="nav-btn" onclick="navigate(this, 'Messages')">💬 Messages</button>
@@ -144,7 +150,6 @@
     }
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const storage = firebase.storage();
 
     let currentUser = null;
     let firebaseReady = false;
@@ -152,6 +157,7 @@
     let deferredInstallPrompt = null;
     window.pendingMedia = null;
 
+    // PWA Install Prompt Listener
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredInstallPrompt = e;
@@ -214,7 +220,12 @@
     function showLogin() {
       openModal(`
         <div style="text-align:center;padding:10px">
-          <div class="logo" style="margin:auto;width:58px;height:58px"><b>IB</b></div>
+          <!-- IB65 BY MANISH LOGO (LOGIN SCREEN) -->
+          <div style="text-align:center; margin-bottom: 5px;">
+            <div style="font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: 1px;">IB65</div>
+            <div style="font-size: 14px; color: var(--muted); margin-top: -4px; font-weight: 500;">by Manish</div>
+          </div>
+
           <h2 style="margin-top:10px;">Welcome to IB65</h2>
           <p class="small" style="color:var(--muted); margin-bottom:14px;">Login ya naya account banayein</p>
           <input id="authName" placeholder="Your name" autocomplete="name">
@@ -421,6 +432,7 @@
       reader.readAsDataURL(file);
     }
 
+    /* CLOUDINARY UPLOAD: POST MEDIA */
     async function createPost() {
       const text = document.getElementById('postText')?.value.trim() || '';
       const media = window.pendingMedia;
@@ -429,17 +441,34 @@
       try {
         showLoading('Uploading...');
         let mediaUrl = '';
+        
         if (media?.file) {
-          const path = `posts/${currentUser.uid}/${Date.now()}_${media.file.name}`;
-          const snap = await storage.ref().child(path).put(media.file);
-          mediaUrl = await snap.ref.getDownloadURL();
+          // UPDATE THESE TWO LINES LATER WITH YOUR CLOUDINARY DETAILS
+          const cloudName = 'YOUR_CLOUD_NAME'; 
+          const uploadPreset = 'YOUR_UPLOAD_PRESET'; 
+          
+          const formData = new FormData();
+          formData.append('file', media.file);
+          formData.append('upload_preset', uploadPreset);
+
+          const resourceType = media.type === 'video' ? 'video' : 'image';
+          const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, {
+            method: 'POST',
+            body: formData
+          });
+          
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message);
+          mediaUrl = data.secure_url;
         }
+
         await db.collection('posts').add({
           uid: currentUser.uid, user: state.user.name, handle: state.user.handle,
           initial: state.user.initial, text: text, likeCount: 0, likedBy: [],
           media: mediaUrl, type: media ? media.type : 'text',
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+        
         hideLoading();
         closeModal();
         await loadPosts();
@@ -555,6 +584,7 @@
       });
     }
 
+    /* CLOUDINARY UPLOAD: AVATAR */
     async function uploadAvatar(input) {
       const file = input.files?.[0];
       if (!file || !currentUser) return;
@@ -562,10 +592,24 @@
 
       try {
         showLoading('Avatar upload ho raha hai...');
-        const ext = file.name.split('.').pop() || 'jpg';
-        const avatarRef = storage.ref().child(`avatars/${currentUser.uid}/profile_${Date.now()}.${ext}`);
-        const snap = await avatarRef.put(file);
-        const downloadURL = await snap.ref.getDownloadURL();
+        
+        // UPDATE THESE TWO LINES LATER WITH YOUR CLOUDINARY DETAILS
+        const cloudName = 'YOUR_CLOUD_NAME'; 
+        const uploadPreset = 'YOUR_UPLOAD_PRESET'; 
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', uploadPreset);
+
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.message);
+        
+        const downloadURL = data.secure_url;
 
         await db.collection('users').doc(currentUser.uid).update({ avatar: downloadURL });
         state.user.avatar = downloadURL;
@@ -579,19 +623,25 @@
       }
     }
 
+    /* =========================================
+       PROFILE, EDIT PROFILE & SETTINGS
+    ========================================= */
     function openProfile() {
       if (!currentUser) return showLogin();
       openModal(`
         <div class="row" style="justify-content:space-between; align-items:center;">
           <h2 style="margin:0">My Profile</h2>
-          <button class="icon" onclick="closeModal()">✕</button>
+          <div class="row" style="gap:8px;">
+            <button class="icon" onclick="openSettings()" style="color:var(--text); font-size:22px; padding:4px;">⚙️</button>
+            <button class="icon" onclick="closeModal()">✕</button>
+          </div>
         </div>
         <div style="text-align:center; padding:15px 0;">
           <div style="position:relative; width:80px; height:80px; margin:0 auto 12px;">
             <div class="avatar" style="width:80px; height:80px; font-size:28px;">
               ${state.user.avatar ? `<img src="${esc(state.user.avatar)}" style="width:100%; height:100%; object-fit:cover;">` : esc(state.user.initial)}
             </div>
-            <label style="position:absolute; bottom:0; right:0; background:var(--primary); color:#fff; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px;" title="Change Photo">
+            <label style="position:absolute; bottom:0; right:0; background:var(--primary); color:#fff; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="Change Photo">
               📷
               <input type="file" accept="image/*" style="display:none;" onchange="uploadAvatar(this)">
             </label>
@@ -600,8 +650,8 @@
           <div class="small" style="color:var(--muted);">${esc(state.user.handle)}</div>
           <p style="margin:10px 0; font-size:14px; line-height:1.4;">${esc(state.user.bio || 'No bio yet')}</p>
           <div class="row" style="gap:10px; justify-content:center; margin-top:16px;">
-            <button class="primary" onclick="openEditProfile()">✏️ Edit Profile</button>
-            <button class="pill" onclick="openSettings()">⚙️ Settings</button>
+            <button class="primary" onclick="openEditProfile()" style="flex:1;">✏️ Edit Profile</button>
+            <button class="pill" onclick="openSettings()" style="flex:1;">⚙️ Settings</button>
           </div>
         </div>
       `);
@@ -609,9 +659,10 @@
 
     function openEditProfile() {
       openModal(`
-        <div class="row" style="justify-content:space-between; align-items:center;">
-          <h2 style="margin:0">Edit Profile</h2>
-          <button class="icon" onclick="openProfile()">✕</button>
+        <div class="row" style="justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <button class="pill" style="font-size:13px; padding: 6px 12px;" onclick="openProfile()">← Back</button>
+          <h2 style="margin:0; font-size:18px;">Edit Profile</h2>
+          <button class="icon" onclick="closeModal()">✕</button>
         </div>
         <div style="margin-top:12px;">
           <label class="small" style="color:var(--muted)">Full Name</label>
@@ -653,19 +704,17 @@
       }
     }
 
-    /* =========================================
-       SETTINGS: SECURITY & APK DOWNLOAD
-    ========================================= */
     function openSettings() {
       if (!currentUser) return showLogin();
       openModal(`
         <div class="row" style="justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <h2 style="margin:0">⚙️ Settings</h2>
+          <button class="pill" style="font-size:13px; padding: 6px 12px;" onclick="openProfile()">← Back</button>
+          <h2 style="margin:0; font-size:18px;">⚙️ Settings</h2>
           <button class="icon" onclick="closeModal()">✕</button>
         </div>
 
         <div class="card" style="margin-bottom:14px; background:#0e121a;">
-          <h3 style="font-size:15px; margin-bottom:8px;">📱 IB65 Android App (APK)</h3>
+          <h3 style="font-size:15px; margin-bottom:8px;">📱 IB65 Android App</h3>
           <p class="small" style="color:var(--muted); margin-bottom:12px;">App ko mobile me direct install ya APK download karein:</p>
           <div class="row" style="gap:8px; flex-wrap:wrap;">
             <button class="primary" style="flex:1;" onclick="downloadApk()">📥 Download APK</button>
@@ -690,16 +739,14 @@
     }
 
     function downloadApk() {
-      // Direct APK Link: Aap apna direct uploaded APK link yahan daal sakte hain
+      // Direct APK Link: Update this when you have your APK ready
       const apkUrl = "https://github.com/sunny200/ib65-web/releases/download/v1.0/IB65.apk";
-      
       const a = document.createElement('a');
       a.href = apkUrl;
       a.download = "IB65.apk";
       document.body.appendChild(a);
       a.click();
       a.remove();
-      
       toast('APK download started 📥');
     }
 
