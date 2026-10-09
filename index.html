@@ -20,7 +20,7 @@
 </head>
 <body class="min-h-screen pb-20">
 
-    <!-- Top Header Title (Instagram Style Gradient & Settings Icon) -->
+    <!-- Top Header Title (Instagram Style & Settings) -->
     <header class="sticky top-0 z-40 glass-card border-b border-gray-800 px-4 py-3 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-2">
             <h1 class="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent tracking-wider">IB65</h1>
@@ -34,6 +34,12 @@
     <!-- Main Content Area -->
     <main class="max-w-xl mx-auto p-4 space-y-4">
         
+        <!-- SEARCH BAR (Global for Users & Posts) -->
+        <div class="relative">
+            <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-500"></i>
+            <input type="text" id="global-search" placeholder="Search users, posts or videos..." oninput="globalSearch()" class="w-full glass-card rounded-xl pl-11 pr-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-rose-500 shadow-inner">
+        </div>
+
         <!-- HOME VIEW -->
         <div id="view-home" class="space-y-4">
             <!-- Create Post Box -->
@@ -52,12 +58,10 @@
 
                         <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-800">
                             <div class="flex space-x-4">
-                                <!-- Image Upload Icon -->
                                 <label class="cursor-pointer text-rose-500 hover:text-rose-400 icon-3d flex items-center space-x-1 text-sm font-medium" title="Upload Image">
                                     <i class="fa-solid fa-image text-xl"></i>
                                     <input type="file" id="media-file-img" accept="image/*" class="hidden" onchange="handleMediaSelect(event, 'image')">
                                 </label>
-                                <!-- Video Upload Icon -->
                                 <label class="cursor-pointer text-amber-500 hover:text-amber-400 icon-3d flex items-center space-x-1 text-sm font-medium" title="Upload Video">
                                     <i class="fa-solid fa-video text-xl"></i>
                                     <input type="file" id="media-file-vid" accept="video/*" class="hidden" onchange="handleMediaSelect(event, 'video')">
@@ -68,12 +72,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- Search Bar -->
-            <div class="relative">
-                <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-500"></i>
-                <input type="text" id="search-box" placeholder="Search posts..." oninput="filterPosts()" class="w-full glass-card rounded-xl pl-11 pr-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-rose-500 shadow-inner">
-            </div>
 
             <!-- Posts Feed -->
             <div id="posts-container" class="space-y-4">
@@ -95,7 +93,7 @@
                         <input type="file" accept="video/*" class="hidden" onchange="handleReelUpload(event)">
                     </label>
                 </div>
-                <p class="text-xs text-gray-400">Short vertical videos (Max 1.5 mins recommended)</p>
+                <p class="text-xs text-gray-400">Short vertical videos feed</p>
             </div>
 
             <!-- Reels Feed -->
@@ -104,23 +102,26 @@
             </div>
         </div>
 
-        <!-- CHAT VIEW -->
+        <!-- CHAT VIEW (Instagram DM Style) -->
         <div id="view-chat" class="space-y-4 hidden">
             <div class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
-                <h2 class="font-bold text-base border-b border-gray-800 pb-2">Messages</h2>
-                <div class="space-y-2">
-                    <div class="flex items-center space-x-3 p-2 hover:bg-gray-800/50 rounded-xl cursor-pointer">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center font-bold text-white text-sm">AI</div>
-                        <div>
-                            <p class="font-semibold text-sm">IB65 Support</p>
-                            <p class="text-xs text-gray-400">Welcome to IB65 platform!</p>
-                        </div>
-                    </div>
+                <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                    <h2 class="font-bold text-base">Messages</h2>
+                    <span class="text-xs text-rose-400 font-medium">Direct</span>
+                </div>
+                <!-- Chat List / Box -->
+                <div id="chat-messages-container" class="space-y-3 max-h-72 overflow-y-auto p-2">
+                    <div class="text-center text-gray-500 text-xs py-4">No messages yet. Start a conversation!</div>
+                </div>
+                <!-- Send Message Bar -->
+                <div class="flex space-x-2 pt-2 border-t border-gray-800">
+                    <input type="text" id="chat-input" placeholder="Message..." class="flex-1 bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-rose-500">
+                    <button onclick="sendChatMessage()" class="bg-gradient-to-r from-amber-500 to-rose-600 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-md icon-3d"><i class="fa-solid fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
 
-        <!-- PROFILE VIEW -->
+        <!-- PROFILE VIEW (Instagram Style Grid & Edit) -->
         <div id="view-profile" class="space-y-4 hidden">
             <div class="glass-card rounded-2xl p-6 text-center space-y-4 shadow-xl">
                 <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center font-extrabold text-2xl text-white shadow-xl" id="profile-initial">U</div>
@@ -128,7 +129,26 @@
                     <h2 id="profile-name" class="text-xl font-bold">User Name</h2>
                     <p id="profile-email" class="text-xs text-gray-400">user@email.com</p>
                 </div>
-                <button onclick="handleLogout()" class="bg-red-600/80 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded-xl text-xs transition shadow-lg icon-3d">Logout</button>
+                
+                <!-- Edit Profile Toggle -->
+                <div class="flex justify-center space-x-2">
+                    <button onclick="toggleEditProfile()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold px-4 py-1.5 rounded-xl text-xs transition icon-3d">Edit Profile</button>
+                    <button onclick="handleLogout()" class="bg-red-600/80 hover:bg-red-600 text-white font-semibold px-4 py-1.5 rounded-xl text-xs transition shadow-lg icon-3d">Logout</button>
+                </div>
+
+                <!-- Edit Profile Box (Hidden by default) -->
+                <div id="edit-profile-box" class="hidden space-y-3 pt-3 border-t border-gray-800 text-left">
+                    <input type="text" id="edit-name-input" placeholder="New Name" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-100">
+                    <button onclick="saveProfile()" class="w-full bg-gradient-to-r from-amber-500 to-rose-600 text-white font-semibold py-2 rounded-xl text-xs shadow-md">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- User's Posts & Videos Grid (Instagram Profile Style) -->
+            <div class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
+                <h3 class="font-bold text-sm text-gray-300 border-b border-gray-800 pb-2">My Posts & Videos</h3>
+                <div id="my-posts-grid" class="grid grid-cols-2 gap-3">
+                    <div class="text-center text-gray-500 col-span-2 py-4 text-xs">No posts yet</div>
+                </div>
             </div>
         </div>
 
@@ -259,7 +279,7 @@
                     const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
                     const newReel = {
                         id: Date.now().toString(),
-                        authorUid: currentUser?.uid || '',
+                        authorUid: currentUser?.uid || 'guest',
                         authorEmail: currentUser?.email || '',
                         author: currentUser?.displayName || 'User',
                         videoUrl: data.secure_url
@@ -286,6 +306,7 @@
                 document.getElementById('profile-email').innerText = user.email || '';
                 loadPosts();
                 loadReels();
+                loadChatMessages();
             } else {
                 document.getElementById('auth-modal').classList.remove('hidden');
             }
@@ -338,6 +359,28 @@
             showToast("Logged out successfully");
         }
 
+        window.toggleEditProfile = function() {
+            const box = document.getElementById('edit-profile-box');
+            box.classList.toggle('hidden');
+        }
+
+        window.saveProfile = async function() {
+            const newName = document.getElementById('edit-name-input').value;
+            if(!newName) return;
+            try {
+                await updateProfile(auth.currentUser, { displayName: newName });
+                document.getElementById('profile-name').innerText = newName;
+                document.getElementById('user-initial').innerText = newName[0].toUpperCase();
+                document.getElementById('header-user-avatar').innerText = newName[0].toUpperCase();
+                document.getElementById('profile-initial').innerText = newName[0].toUpperCase();
+                toggleEditProfile();
+                showToast("Profile updated successfully!");
+                loadPosts();
+            } catch(e) {
+                showToast("Update failed: " + e.message);
+            }
+        }
+
         window.createPost = function() {
             const text = document.getElementById('post-text').value;
             if(!text && !selectedFileUrl) return;
@@ -346,7 +389,7 @@
             const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
             const newPost = {
                 id: Date.now().toString(),
-                authorUid: currentUser?.uid || '',
+                authorUid: currentUser?.uid || 'guest',
                 authorEmail: currentUser?.email || '',
                 author: currentUser?.displayName || 'User',
                 text: text,
@@ -362,35 +405,57 @@
             showToast("Post published!");
         }
 
-        window.loadPosts = function() {
+        window.loadPosts = function(filterQuery = '') {
             const container = document.getElementById('posts-container');
+            const gridContainer = document.getElementById('my-posts-grid');
             const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
             const currentUser = auth.currentUser;
 
-            if(posts.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 py-8">No posts yet. Be the first to post!</div>`;
-                return;
-            }
-            
-            container.innerHTML = posts.map(p => {
-                const isOwner = currentUser && (p.authorUid === currentUser.uid || p.authorEmail === currentUser.email);
-                return `
-                <div class="glass-card rounded-2xl p-4 space-y-3 shadow-lg">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-xs text-white">${p.author[0]}</div>
-                            <span class="font-semibold text-sm text-gray-200">${p.author}</span>
+            const filteredPosts = posts.filter(p => {
+                const matchText = (p.text || '').toLowerCase().includes(filterQuery.toLowerCase());
+                const matchAuthor = (p.author || '').toLowerCase().includes(filterQuery.toLowerCase());
+                return matchText || matchAuthor;
+            });
+
+            if(filteredPosts.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 py-8">No posts found.</div>`;
+            } else {
+                container.innerHTML = filteredPosts.map(p => {
+                    const isOwner = currentUser && (p.authorUid === currentUser.uid || p.authorEmail === currentUser.email);
+                    return `
+                    <div class="glass-card rounded-2xl p-4 space-y-3 shadow-lg">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-xs text-white">${p.author[0]}</div>
+                                <span class="font-semibold text-sm text-gray-200">${p.author}</span>
+                            </div>
+                            ${isOwner ? `<button onclick="deletePost('${p.id}')" class="text-gray-500 hover:text-red-500 text-xs icon-3d"><i class="fa-solid fa-trash"></i> Delete</button>` : ''}
                         </div>
-                        ${isOwner ? `<button onclick="deletePost('${p.id}')" class="text-gray-500 hover:text-red-500 text-xs icon-3d"><i class="fa-solid fa-trash"></i> Delete</button>` : ''}
+                        ${p.text ? `<p class="text-sm text-gray-300">${p.text}</p>` : ''}
+                        ${p.mediaUrl ? (
+                            p.mediaType === 'video' ? 
+                            `<video src="${p.mediaUrl}" class="rounded-xl w-full max-h-64 object-cover shadow-md" controls></video>` :
+                            `<img src="${p.mediaUrl}" class="rounded-xl w-full max-h-64 object-cover shadow-md">`
+                        ) : ''}
                     </div>
-                    ${p.text ? `<p class="text-sm text-gray-300">${p.text}</p>` : ''}
-                    ${p.mediaUrl ? (
-                        p.mediaType === 'video' ? 
-                        `<video src="${p.mediaUrl}" class="rounded-xl w-full max-h-64 object-cover shadow-md" controls></video>` :
-                        `<img src="${p.mediaUrl}" class="rounded-xl w-full max-h-64 object-cover shadow-md">`
-                    ) : ''}
-                </div>
-            `}).join('');
+                `}).join('');
+            }
+
+            // Load user's own posts grid in Profile
+            if(currentUser) {
+                const myPosts = posts.filter(p => p.authorUid === currentUser.uid || p.authorEmail === currentUser.email);
+                if(myPosts.length === 0) {
+                    gridContainer.innerHTML = `<div class="text-center text-gray-500 col-span-2 py-4 text-xs">No posts yet</div>`;
+                } else {
+                    gridContainer.innerHTML = myPosts.map(p => `
+                        <div class="relative rounded-xl overflow-hidden glass-card h-32 flex items-center justify-center">
+                            ${p.mediaUrl ? (
+                                p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${p.mediaUrl}" class="w-full h-full object-cover">`
+                            ) : `<div class="p-2 text-xs text-gray-300 text-center">${p.text}</div>`}
+                        </div>
+                    `).join('');
+                }
+            }
         }
 
         window.deletePost = function(id) {
@@ -435,7 +500,54 @@
             showToast("Reel deleted!");
         }
 
-        window.filterPosts = function() {}
+        // Live Chat (Instagram Grama Style DM)
+        window.sendChatMessage = function() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const currentUser = auth.currentUser;
+            const messages = JSON.parse(localStorage.getItem('ib65_chat') || '[]');
+            const newMsg = {
+                id: Date.now().toString(),
+                sender: currentUser?.displayName || 'User',
+                email: currentUser?.email || '',
+                text: text,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            messages.push(newMsg);
+            localStorage.setItem('ib65_chat', JSON.stringify(messages));
+            input.value = '';
+            loadChatMessages();
+        }
+
+        window.loadChatMessages = function() {
+            const container = document.getElementById('chat-messages-container');
+            const messages = JSON.parse(localStorage.getItem('ib65_chat') || '[]');
+            const currentUser = auth.currentUser;
+
+            if(messages.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 text-xs py-4">No messages yet. Start a conversation!</div>`;
+                return;
+            }
+
+            container.innerHTML = messages.map(m => {
+                const isMe = currentUser && m.email === currentUser.email;
+                return `
+                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1">
+                    <span class="text-[10px] text-gray-400 px-1">${m.sender}</span>
+                    <div class="max-w-[75%] px-4 py-2 rounded-2xl text-sm shadow-md ${isMe ? 'bg-gradient-to-r from-amber-500 to-rose-600 text-white rounded-br-none' : 'glass-card text-gray-200 rounded-bl-none'}">
+                        ${m.text}
+                    </div>
+                </div>
+            `}).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        window.globalSearch = function() {
+            const query = document.getElementById('global-search').value;
+            loadPosts(query);
+        }
 
         window.switchTab = function(tab) {
             const tabs = ['home', 'reels', 'chat', 'profile'];
@@ -456,6 +568,7 @@
                 activeNav.classList.remove('text-gray-400');
                 activeNav.classList.add('text-rose-500');
             }
+            if(tab === 'chat') loadChatMessages();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
