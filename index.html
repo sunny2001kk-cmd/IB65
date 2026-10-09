@@ -20,12 +20,15 @@
 </head>
 <body class="min-h-screen pb-20">
 
-    <!-- Top Header Title (Instagram Style Gradient) -->
+    <!-- Top Header Title (Instagram Style Gradient & Settings Icon) -->
     <header class="sticky top-0 z-40 glass-card border-b border-gray-800 px-4 py-3 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-2">
             <h1 class="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent tracking-wider">IB65</h1>
         </div>
-        <div id="header-user-avatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-white text-sm shadow-md">U</div>
+        <div class="flex items-center space-x-4">
+            <button onclick="switchTab('profile')" class="text-gray-300 hover:text-rose-500 icon-3d text-xl"><i class="fa-solid fa-gear"></i></button>
+            <div id="header-user-avatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-white text-sm shadow-md cursor-pointer" onclick="switchTab('profile')">U</div>
+        </div>
     </header>
 
     <!-- Main Content Area -->
@@ -49,9 +52,15 @@
 
                         <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-800">
                             <div class="flex space-x-4">
-                                <label class="cursor-pointer text-rose-500 hover:text-rose-400 icon-3d flex items-center space-x-1 text-sm font-medium">
+                                <!-- Image Upload Icon -->
+                                <label class="cursor-pointer text-rose-500 hover:text-rose-400 icon-3d flex items-center space-x-1 text-sm font-medium" title="Upload Image">
                                     <i class="fa-solid fa-image text-xl"></i>
-                                    <input type="file" id="media-file" accept="image/*,video/*" class="hidden" onchange="handleMediaSelect(event)">
+                                    <input type="file" id="media-file-img" accept="image/*" class="hidden" onchange="handleMediaSelect(event, 'image')">
+                                </label>
+                                <!-- Video Upload Icon -->
+                                <label class="cursor-pointer text-amber-500 hover:text-amber-400 icon-3d flex items-center space-x-1 text-sm font-medium" title="Upload Video">
+                                    <i class="fa-solid fa-video text-xl"></i>
+                                    <input type="file" id="media-file-vid" accept="video/*" class="hidden" onchange="handleMediaSelect(event, 'video')">
                                 </label>
                             </div>
                             <button onclick="createPost()" class="bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-semibold px-5 py-2 rounded-xl text-sm shadow-lg shadow-rose-500/30 hover:opacity-90 transition icon-3d">Post</button>
@@ -189,10 +198,10 @@
             setTimeout(() => t.classList.add('hidden'), 3000);
         }
 
-        window.handleMediaSelect = async function(event) {
+        window.handleMediaSelect = async function(event, type) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Uploading media...");
+            showToast("Uploading " + type + "...");
             const formData = new FormData();
             formData.append("file", file);
             formData.append("upload_preset", "ib65_upload");
@@ -205,9 +214,9 @@
                 const data = await res.json();
                 if (data.secure_url) {
                     selectedFileUrl = data.secure_url;
-                    selectedFileType = file.type.startsWith('video') ? 'video' : 'image';
+                    selectedFileType = type;
                     
-                    if(selectedFileType === 'video') {
+                    if(type === 'video') {
                         document.getElementById('video-preview').src = selectedFileUrl;
                         document.getElementById('video-preview').classList.remove('hidden');
                         document.getElementById('image-preview').classList.add('hidden');
@@ -230,7 +239,6 @@
             document.getElementById('media-preview-container').classList.add('hidden');
         }
 
-        // Reel Upload Handler
         window.handleReelUpload = async function(event) {
             const file = event.target.files[0];
             if (!file) return;
