@@ -11,21 +11,21 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0e14; color: #f3f4f6; }
         .icon-3d {
-            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4)) drop-shadow(0 1px 3px rgba(59, 130, 246, 0.5));
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4)) drop-shadow(0 1px 3px rgba(225, 48, 108, 0.5));
             transition: transform 0.2s ease, filter 0.2s ease;
         }
-        .icon-3d:active { transform: scale(0.9); }
-        .glass-card { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .icon-3d:active { transform: scale(0.85); }
+        .glass-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
     </style>
 </head>
 <body class="min-h-screen pb-20">
 
-    <!-- Top Header Title -->
-    <header class="sticky top-0 z-40 glass-card border-b border-gray-800 px-4 py-3 flex justify-between items-center">
+    <!-- Top Header Title (Instagram Style Gradient) -->
+    <header class="sticky top-0 z-40 glass-card border-b border-gray-800 px-4 py-3 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-2">
             <h1 class="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent tracking-wider">IB65</h1>
         </div>
-        <div id="header-user-avatar" class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-sm shadow-lg">U</div>
+        <div id="header-user-avatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-white text-sm shadow-md">U</div>
     </header>
 
     <!-- Main Content Area -->
@@ -34,7 +34,7 @@
         <!-- Create Post Box -->
         <section class="glass-card rounded-2xl p-4 shadow-xl">
             <div class="flex space-x-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-md" id="user-initial">U</div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-white shadow-md" id="user-initial">U</div>
                 <div class="flex-1">
                     <textarea id="post-text" rows="2" placeholder="What's on your mind?" class="w-full bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none resize-none text-sm"></textarea>
                     
@@ -47,12 +47,12 @@
 
                     <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-800">
                         <div class="flex space-x-4">
-                            <label class="cursor-pointer text-blue-400 hover:text-blue-300 icon-3d flex items-center space-x-1 text-sm font-medium">
-                                <i class="fa-solid fa-image text-lg"></i>
+                            <label class="cursor-pointer text-rose-500 hover:text-rose-400 icon-3d flex items-center space-x-1 text-sm font-medium">
+                                <i class="fa-solid fa-image text-xl"></i>
                                 <input type="file" id="media-file" accept="image/*,video/*" class="hidden" onchange="handleMediaSelect(event)">
                             </label>
                         </div>
-                        <button onclick="createPost()" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold px-5 py-2 rounded-xl text-sm shadow-lg shadow-blue-500/30 hover:opacity-90 transition icon-3d">Post</button>
+                        <button onclick="createPost()" class="bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-semibold px-5 py-2 rounded-xl text-sm shadow-lg shadow-rose-500/30 hover:opacity-90 transition icon-3d">Post</button>
                     </div>
                 </div>
             </div>
@@ -61,7 +61,7 @@
         <!-- Search Bar -->
         <div class="relative">
             <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-500"></i>
-            <input type="text" id="search-box" placeholder="Search posts..." oninput="filterPosts()" class="w-full glass-card rounded-xl pl-11 pr-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-blue-500 shadow-inner">
+            <input type="text" id="search-box" placeholder="Search posts..." oninput="filterPosts()" class="w-full glass-card rounded-xl pl-11 pr-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-rose-500 shadow-inner">
         </div>
 
         <!-- Posts Feed -->
@@ -72,51 +72,49 @@
 
     <!-- Bottom Navigation Bar (3D Icons) -->
     <nav class="fixed bottom-0 left-0 right-0 glass-card border-t border-gray-800 py-3 px-6 flex justify-around items-center z-50 shadow-2xl">
-        <button onclick="switchTab('home')" class="text-blue-500 icon-3d flex flex-col items-center"><i class="fa-solid fa-house text-xl"></i></button>
-        <button onclick="switchTab('reels')" class="text-gray-400 hover:text-blue-400 icon-3d flex flex-col items-center"><i class="fa-solid fa-clapperboard text-xl"></i></button>
-        <button onclick="openCreateModal()" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/40 icon-3d -mt-5"><i class="fa-solid fa-plus text-xl"></i></button>
-        <button onclick="switchTab('chat')" class="text-gray-400 hover:text-blue-400 icon-3d flex flex-col items-center"><i class="fa-solid fa-comment-dots text-xl"></i></button>
-        <button onclick="switchTab('profile')" class="text-gray-400 hover:text-blue-400 icon-3d flex flex-col items-center"><i class="fa-solid fa-user text-xl"></i></button>
+        <button onclick="switchTab('home')" id="nav-home" class="text-rose-500 icon-3d flex flex-col items-center"><i class="fa-solid fa-house text-xl"></i></button>
+        <button onclick="switchTab('reels')" id="nav-reels" class="text-gray-400 hover:text-rose-400 icon-3d flex flex-col items-center"><i class="fa-solid fa-clapperboard text-xl"></i></button>
+        <button onclick="openCreateModal()" class="bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg shadow-rose-500/40 icon-3d -mt-5"><i class="fa-solid fa-plus text-xl"></i></button>
+        <button onclick="switchTab('chat')" id="nav-chat" class="text-gray-400 hover:text-rose-400 icon-3d flex flex-col items-center"><i class="fa-solid fa-comment-dots text-xl"></i></button>
+        <button onclick="switchTab('profile')" id="nav-profile" class="text-gray-400 hover:text-rose-400 icon-3d flex flex-col items-center"><i class="fa-solid fa-user text-xl"></i></button>
     </nav>
 
     <!-- Auth Modal (Login / Signup / Forgot Password) -->
-    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-card rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl border border-gray-700">
             <div class="text-center space-y-1">
-                <h2 class="text-2xl font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">IB65</h2>
+                <h2 class="text-3xl font-extrabold bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">IB65</h2>
                 <p id="auth-subtitle" class="text-xs text-gray-400">Login ya naya account banayein</p>
             </div>
 
             <div id="auth-form" class="space-y-3">
-                <input type="text" id="auth-name" placeholder="Your name" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500">
-                <input type="email" id="auth-email" placeholder="Email" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500">
-                <input type="password" id="auth-password" placeholder="Password (6+ chars)" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500">
+                <input type="text" id="auth-name" placeholder="Your name" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-rose-500">
+                <input type="email" id="auth-email" placeholder="Email" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-rose-500">
+                <input type="password" id="auth-password" placeholder="Password (6+ chars)" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-rose-500">
                 
                 <div class="flex space-x-2 pt-2">
-                    <button onclick="handleLogin()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-2.5 rounded-xl text-sm transition icon-3D">Login</button>
-                    <button onclick="handleSignup()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition icon-3D shadow-lg shadow-blue-600/30">Sign up</button>
+                    <button onclick="handleLogin()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-2.5 rounded-xl text-sm transition icon-3d">Login</button>
+                    <button onclick="handleSignup()" class="flex-1 bg-gradient-to-r from-amber-500 to-rose-600 text-white font-semibold py-2.5 rounded-xl text-sm transition icon-3d shadow-lg shadow-rose-600/30">Sign up</button>
                 </div>
 
-                <!-- Forgot Password Link -->
+                <!-- Forgot Password Option -->
                 <div class="text-center pt-2">
-                    <button onclick="handleForgotPassword()" class="text-xs text-blue-400 hover:underline">Forgot Password?</button>
+                    <button onclick="handleForgotPassword()" class="text-xs text-rose-400 hover:underline">Forgot Password?</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-xs px-4 py-2 rounded-full border border-gray-700 shadow-xl hidden z-50"></div>
+    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-900/95 text-white text-xs px-4 py-2 rounded-full border border-gray-700 shadow-xl hidden z-50"></div>
 
-    <!-- Firebase SDKs -->
+    <!-- Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addFirestoreDoc, getDocs, doc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Firebase Configuration (ib65-67f62)
         const firebaseConfig = {
-            apiKey: "AIzaSyDummyKeyForIB65", // Aapki original config agar pehle wali hai toh chalegi
+            apiKey: "AIzaSyDummyKeyForIB65",
             authDomain: "ib65-67f62.firebaseapp.com",
             projectId: "ib65-67f62",
             storageBucket: "ib65-67f62.appspot.com",
@@ -126,8 +124,6 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
-
         let selectedFileUrl = "";
 
         window.showToast = function(msg) {
@@ -137,11 +133,9 @@
             setTimeout(() => t.classList.add('hidden'), 3000);
         }
 
-        // Handle Media Upload to Cloudinary
         window.handleMediaSelect = async function(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
             showToast("Uploading media...");
             const formData = new FormData();
             formData.append("file", file);
@@ -178,7 +172,6 @@
             document.getElementById('media-preview-container').classList.add('hidden');
         }
 
-        // Auth State Listener
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('auth-modal').classList.add('hidden');
@@ -233,7 +226,6 @@
             }
         }
 
-        // Dummy/Local storage post handler for fast response & deletion testing
         window.createPost = function() {
             const text = document.getElementById('post-text').value;
             if(!text && !selectedFileUrl) return;
@@ -243,8 +235,7 @@
                 id: Date.now().toString(),
                 author: auth.currentUser?.displayName || 'User',
                 text: text,
-                mediaUrl: selectedFileUrl,
-                time: 'Just now'
+                mediaUrl: selectedFileUrl
             };
             posts.unshift(newPost);
             localStorage.setItem('ib65_posts', JSON.stringify(posts));
@@ -266,7 +257,7 @@
                 <div class="glass-card rounded-2xl p-4 space-y-3 shadow-lg">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs text-white">${p.author[0]}</div>
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-xs text-white">${p.author[0]}</div>
                             <span class="font-semibold text-sm text-gray-200">${p.author}</span>
                         </div>
                         <button onclick="deletePost('${p.id}')" class="text-gray-500 hover:text-red-500 text-xs icon-3d"><i class="fa-solid fa-trash"></i> Delete</button>
@@ -285,12 +276,28 @@
             showToast("Post deleted!");
         }
 
-        window.filterPosts = function() {
-            // Simple search filter
-        }
+        window.filterPosts = function() {}
 
         window.switchTab = function(tab) {
+            const tabs = ['home', 'reels', 'chat', 'profile'];
+            tabs.forEach(t => {
+                const el = document.getElementById('nav-' + t);
+                if(el) {
+                    el.classList.remove('text-rose-500');
+                    el.classList.add('text-gray-400');
+                }
+            });
+            const activeEl = document.getElementById('nav-' + tab);
+            if(activeEl) {
+                activeEl.classList.remove('text-gray-400');
+                activeEl.classList.add('text-rose-500');
+            }
             showToast("Switched to " + tab);
+        }
+
+        window.openCreateModal = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('post-text').focus();
         }
     </script>
 </body>
