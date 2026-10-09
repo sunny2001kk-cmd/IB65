@@ -283,10 +283,13 @@
             const text = document.getElementById('post-text').value;
             if(!text && !selectedFileUrl) return;
 
+            const currentUser = auth.currentUser;
             const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
             const newPost = {
                 id: Date.now().toString(),
-                author: auth.currentUser?.displayName || 'User',
+                authorUid: currentUser?.uid || '',
+                authorEmail: currentUser?.email || '',
+                author: currentUser?.displayName || 'User',
                 text: text,
                 mediaUrl: selectedFileUrl,
                 mediaType: selectedFileType
@@ -303,18 +306,25 @@
         window.loadPosts = function() {
             const container = document.getElementById('posts-container');
             const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+            const currentUser = auth.currentUser;
+
             if(posts.length === 0) {
                 container.innerHTML = `<div class="text-center text-gray-500 py-8">No posts yet. Be the first to post!</div>`;
                 return;
             }
-            container.innerHTML = posts.map(p => `
+            
+            container.innerHTML = posts.map(p => {
+                // Check if current user is the owner of this post
+                const isOwner = currentUser && (p.authorUid === currentUser.uid || p.authorEmail === currentUser.email);
+                
+                return `
                 <div class="glass-card rounded-2xl p-4 space-y-3 shadow-lg">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center space-x-2">
                             <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-xs text-white">${p.author[0]}</div>
                             <span class="font-semibold text-sm text-gray-200">${p.author}</span>
                         </div>
-                        <button onclick="deletePost('${p.id}')" class="text-gray-500 hover:text-red-500 text-xs icon-3d"><i class="fa-solid fa-trash"></i> Delete</button>
+                        ${isOwner ? `<button onclick="deletePost('${p.id}')" class="text-gray-500 hover:text-red-500 text-xs icon-3d"><i class="fa-solid fa-trash"></i> Delete</button>` : ''}
                     </div>
                     ${p.text ? `<p class="text-sm text-gray-300">${p.text}</p>` : ''}
                     ${p.mediaUrl ? (
@@ -323,7 +333,7 @@
                         `<img src="${p.mediaUrl}" class="rounded-xl w-full max-h-64 object-cover shadow-md">`
                     ) : ''}
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         window.deletePost = function(id) {
