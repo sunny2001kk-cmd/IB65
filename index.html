@@ -31,43 +31,84 @@
     <!-- Main Content Area -->
     <main class="max-w-xl mx-auto p-4 space-y-4">
         
-        <!-- Create Post Box -->
-        <section class="glass-card rounded-2xl p-4 shadow-xl">
-            <div class="flex space-x-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-white shadow-md" id="user-initial">U</div>
-                <div class="flex-1">
-                    <textarea id="post-text" rows="2" placeholder="What's on your mind?" class="w-full bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none resize-none text-sm"></textarea>
-                    
-                    <!-- Media Preview -->
-                    <div id="media-preview-container" class="relative mt-2 hidden">
-                        <img id="image-preview" class="rounded-xl max-h-48 w-full object-cover hidden shadow-md">
-                        <video id="video-preview" class="rounded-xl max-h-48 w-full object-cover hidden shadow-md" controls></video>
-                        <button onclick="removeMedia()" class="absolute top-2 right-2 bg-black/70 text-white rounded-full p-1 px-2 text-xs hover:bg-red-600 transition"><i class="fa-solid fa-xmark"></i> Remove</button>
-                    </div>
-
-                    <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-800">
-                        <div class="flex space-x-4">
-                            <label class="cursor-pointer text-rose-500 hover:text-rose-400 icon-3d flex items-center space-x-1 text-sm font-medium">
-                                <i class="fa-solid fa-image text-xl"></i>
-                                <input type="file" id="media-file" accept="image/*,video/*" class="hidden" onchange="handleMediaSelect(event)">
-                            </label>
+        <!-- HOME VIEW -->
+        <div id="view-home" class="space-y-4">
+            <!-- Create Post Box -->
+            <section class="glass-card rounded-2xl p-4 shadow-xl">
+                <div class="flex space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-white shadow-md" id="user-initial">U</div>
+                    <div class="flex-1">
+                        <textarea id="post-text" rows="2" placeholder="What's on your mind?" class="w-full bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none resize-none text-sm"></textarea>
+                        
+                        <!-- Media Preview -->
+                        <div id="media-preview-container" class="relative mt-2 hidden">
+                            <img id="image-preview" class="rounded-xl max-h-48 w-full object-cover hidden shadow-md">
+                            <video id="video-preview" class="rounded-xl max-h-48 w-full object-cover hidden shadow-md" controls></video>
+                            <button onclick="removeMedia()" class="absolute top-2 right-2 bg-black/70 text-white rounded-full p-1 px-2 text-xs hover:bg-red-600 transition"><i class="fa-solid fa-xmark"></i> Remove</button>
                         </div>
-                        <button onclick="createPost()" class="bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-semibold px-5 py-2 rounded-xl text-sm shadow-lg shadow-rose-500/30 hover:opacity-90 transition icon-3d">Post</button>
+
+                        <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-800">
+                            <div class="flex space-x-4">
+                                <label class="cursor-pointer text-rose-500 hover:text-rose-400 icon-3d flex items-center space-x-1 text-sm font-medium">
+                                    <i class="fa-solid fa-image text-xl"></i>
+                                    <input type="file" id="media-file" accept="image/*,video/*" class="hidden" onchange="handleMediaSelect(event)">
+                                </label>
+                            </div>
+                            <button onclick="createPost()" class="bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-semibold px-5 py-2 rounded-xl text-sm shadow-lg shadow-rose-500/30 hover:opacity-90 transition icon-3d">Post</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search Bar -->
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-500"></i>
+                <input type="text" id="search-box" placeholder="Search posts..." oninput="filterPosts()" class="w-full glass-card rounded-xl pl-11 pr-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-rose-500 shadow-inner">
+            </div>
+
+            <!-- Posts Feed -->
+            <div id="posts-container" class="space-y-4">
+                <div class="text-center text-gray-500 py-8">Loading posts...</div>
+            </div>
+        </div>
+
+        <!-- REELS VIEW -->
+        <div id="view-reels" class="space-y-4 hidden">
+            <div class="glass-card rounded-2xl p-6 text-center space-y-3">
+                <div class="text-rose-500 text-3xl"><i class="fa-solid fa-clapperboard"></i></div>
+                <h2 class="text-lg font-bold">IB65 Reels</h2>
+                <p class="text-xs text-gray-400">Short vertical videos feed coming soon!</p>
+            </div>
+        </div>
+
+        <!-- CHAT VIEW -->
+        <div id="view-chat" class="space-y-4 hidden">
+            <div class="glass-card rounded-2xl p-4 space-y-3">
+                <h2 class="font-bold text-base border-b border-gray-800 pb-2">Messages</h2>
+                <div class="space-y-2">
+                    <div class="flex items-center space-x-3 p-2 hover:bg-gray-800/50 rounded-xl cursor-pointer">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center font-bold text-white text-sm">AI</div>
+                        <div>
+                            <p class="font-semibold text-sm">IB65 Support</p>
+                            <p class="text-xs text-gray-400">Welcome to IB65 platform!</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- Search Bar -->
-        <div class="relative">
-            <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-500"></i>
-            <input type="text" id="search-box" placeholder="Search posts..." oninput="filterPosts()" class="w-full glass-card rounded-xl pl-11 pr-4 py-3 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-rose-500 shadow-inner">
         </div>
 
-        <!-- Posts Feed -->
-        <div id="posts-container" class="space-y-4">
-            <div class="text-center text-gray-500 py-8">Loading posts...</div>
+        <!-- PROFILE VIEW -->
+        <div id="view-profile" class="space-y-4 hidden">
+            <div class="glass-card rounded-2xl p-6 text-center space-y-4">
+                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center font-extrabold text-2xl text-white shadow-xl" id="profile-initial">U</div>
+                <div>
+                    <h2 id="profile-name" class="text-xl font-bold">User Name</h2>
+                    <p id="profile-email" class="text-xs text-gray-400">user@email.com</p>
+                </div>
+                <button onclick="handleLogout()" class="bg-red-600/80 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded-xl text-xs transition shadow-lg icon-3d">Logout</button>
+            </div>
         </div>
+
     </main>
 
     <!-- Bottom Navigation Bar (3D Icons) -->
@@ -125,6 +166,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         let selectedFileUrl = "";
+        let selectedFileType = "";
 
         window.showToast = function(msg) {
             const t = document.getElementById('toast');
@@ -149,8 +191,9 @@
                 const data = await res.json();
                 if (data.secure_url) {
                     selectedFileUrl = data.secure_url;
-                    const isVid = file.type.startsWith('video');
-                    if(isVid) {
+                    selectedFileType = file.type.startsWith('video') ? 'video' : 'image';
+                    
+                    if(selectedFileType === 'video') {
                         document.getElementById('video-preview').src = selectedFileUrl;
                         document.getElementById('video-preview').classList.remove('hidden');
                         document.getElementById('image-preview').classList.add('hidden');
@@ -169,6 +212,7 @@
 
         window.removeMedia = function() {
             selectedFileUrl = "";
+            selectedFileType = "";
             document.getElementById('media-preview-container').classList.add('hidden');
         }
 
@@ -178,6 +222,10 @@
                 const initial = user.displayName ? user.displayName[0].toUpperCase() : 'U';
                 document.getElementById('user-initial').innerText = initial;
                 document.getElementById('header-user-avatar').innerText = initial;
+                
+                document.getElementById('profile-initial').innerText = initial;
+                document.getElementById('profile-name').innerText = user.displayName || 'User Name';
+                document.getElementById('profile-email').innerText = user.email || '';
                 loadPosts();
             } else {
                 document.getElementById('auth-modal').classList.remove('hidden');
@@ -226,6 +274,11 @@
             }
         }
 
+        window.handleLogout = async function() {
+            await signOut(auth);
+            showToast("Logged out successfully");
+        }
+
         window.createPost = function() {
             const text = document.getElementById('post-text').value;
             if(!text && !selectedFileUrl) return;
@@ -235,7 +288,8 @@
                 id: Date.now().toString(),
                 author: auth.currentUser?.displayName || 'User',
                 text: text,
-                mediaUrl: selectedFileUrl
+                mediaUrl: selectedFileUrl,
+                mediaType: selectedFileType
             };
             posts.unshift(newPost);
             localStorage.setItem('ib65_posts', JSON.stringify(posts));
@@ -263,7 +317,11 @@
                         <button onclick="deletePost('${p.id}')" class="text-gray-500 hover:text-red-500 text-xs icon-3d"><i class="fa-solid fa-trash"></i> Delete</button>
                     </div>
                     ${p.text ? `<p class="text-sm text-gray-300">${p.text}</p>` : ''}
-                    ${p.mediaUrl ? `<img src="${p.mediaUrl}" class="rounded-xl w-full max-h-64 object-cover shadow-md">` : ''}
+                    ${p.mediaUrl ? (
+                        p.mediaType === 'video' ? 
+                        `<video src="${p.mediaUrl}" class="rounded-xl w-full max-h-64 object-cover shadow-md" controls></video>` :
+                        `<img src="${p.mediaUrl}" class="rounded-xl w-full max-h-64 object-cover shadow-md">`
+                    ) : ''}
                 </div>
             `).join('');
         }
@@ -281,21 +339,27 @@
         window.switchTab = function(tab) {
             const tabs = ['home', 'reels', 'chat', 'profile'];
             tabs.forEach(t => {
-                const el = document.getElementById('nav-' + t);
-                if(el) {
-                    el.classList.remove('text-rose-500');
-                    el.classList.add('text-gray-400');
+                const viewEl = document.getElementById('view-' + t);
+                const navEl = document.getElementById('nav-' + t);
+                if(viewEl) viewEl.classList.add('hidden');
+                if(navEl) {
+                    navEl.classList.remove('text-rose-500');
+                    navEl.classList.add('text-gray-400');
                 }
             });
-            const activeEl = document.getElementById('nav-' + tab);
-            if(activeEl) {
-                activeEl.classList.remove('text-gray-400');
-                activeEl.classList.add('text-rose-500');
+
+            const activeView = document.getElementById('view-' + tab);
+            const activeNav = document.getElementById('nav-' + tab);
+            if(activeView) activeView.classList.remove('hidden');
+            if(activeNav) {
+                activeNav.classList.remove('text-gray-400');
+                activeNav.classList.add('text-rose-500');
             }
-            showToast("Switched to " + tab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         window.openCreateModal = function() {
+            switchTab('home');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             document.getElementById('post-text').focus();
         }
