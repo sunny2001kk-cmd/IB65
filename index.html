@@ -74,16 +74,30 @@
 
         <!-- REELS VIEW -->
         <div id="view-reels" class="space-y-4 hidden">
-            <div class="glass-card rounded-2xl p-6 text-center space-y-3">
-                <div class="text-rose-500 text-3xl"><i class="fa-solid fa-clapperboard"></i></div>
-                <h2 class="text-lg font-bold">IB65 Reels</h2>
-                <p class="text-xs text-gray-400">Short vertical videos feed coming soon!</p>
+            <div class="glass-card rounded-2xl p-5 text-center space-y-4 shadow-xl">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                    <div class="flex items-center space-x-2 text-rose-500">
+                        <i class="fa-solid fa-clapperboard text-xl"></i>
+                        <h2 class="text-lg font-bold text-gray-100">IB65 Reels</h2>
+                    </div>
+                    <label class="cursor-pointer bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-md icon-3d flex items-center space-x-1">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Upload Reel</span>
+                        <input type="file" accept="video/*" class="hidden" onchange="handleReelUpload(event)">
+                    </label>
+                </div>
+                <p class="text-xs text-gray-400">Short vertical videos (Max 1.5 mins recommended)</p>
+            </div>
+
+            <!-- Reels Feed -->
+            <div id="reels-container" class="space-y-4">
+                <div class="text-center text-gray-500 py-8">No reels yet. Upload one!</div>
             </div>
         </div>
 
         <!-- CHAT VIEW -->
         <div id="view-chat" class="space-y-4 hidden">
-            <div class="glass-card rounded-2xl p-4 space-y-3">
+            <div class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
                 <h2 class="font-bold text-base border-b border-gray-800 pb-2">Messages</h2>
                 <div class="space-y-2">
                     <div class="flex items-center space-x-3 p-2 hover:bg-gray-800/50 rounded-xl cursor-pointer">
@@ -99,7 +113,7 @@
 
         <!-- PROFILE VIEW -->
         <div id="view-profile" class="space-y-4 hidden">
-            <div class="glass-card rounded-2xl p-6 text-center space-y-4">
+            <div class="glass-card rounded-2xl p-6 text-center space-y-4 shadow-xl">
                 <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center font-extrabold text-2xl text-white shadow-xl" id="profile-initial">U</div>
                 <div>
                     <h2 id="profile-name" class="text-xl font-bold">User Name</h2>
@@ -216,6 +230,42 @@
             document.getElementById('media-preview-container').classList.add('hidden');
         }
 
+        // Reel Upload Handler
+        window.handleReelUpload = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showToast("Uploading reel...");
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "ib65_upload");
+
+            try {
+                const res = await fetch("https://api.cloudinary.com/v1_1/mhj8jvag/auto/upload", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.secure_url) {
+                    const currentUser = auth.currentUser;
+                    const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
+                    const newReel = {
+                        id: Date.now().toString(),
+                        authorUid: currentUser?.uid || '',
+                        authorEmail: currentUser?.email || '',
+                        author: currentUser?.displayName || 'User',
+                        videoUrl: data.secure_url
+                    };
+                    reels.unshift(newReel);
+                    localStorage.setItem('ib65_reels', JSON.stringify(reels));
+                    loadReels();
+                    showToast("Reel uploaded successfully!");
+                }
+            } catch (err) {
+                showToast("Reel upload failed!");
+            }
+        }
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('auth-modal').classList.add('hidden');
@@ -227,6 +277,7 @@
                 document.getElementById('profile-name').innerText = user.displayName || 'User Name';
                 document.getElementById('profile-email').innerText = user.email || '';
                 loadPosts();
+                loadReels();
             } else {
                 document.getElementById('auth-modal').classList.remove('hidden');
             }
@@ -314,9 +365,7 @@
             }
             
             container.innerHTML = posts.map(p => {
-                // Check if current user is the owner of this post
                 const isOwner = currentUser && (p.authorUid === currentUser.uid || p.authorEmail === currentUser.email);
-                
                 return `
                 <div class="glass-card rounded-2xl p-4 space-y-3 shadow-lg">
                     <div class="flex justify-between items-center">
@@ -342,6 +391,40 @@
             localStorage.setItem('ib65_posts', JSON.stringify(posts));
             loadPosts();
             showToast("Post deleted!");
+        }
+
+        window.loadReels = function() {
+            const container = document.getElementById('reels-container');
+            const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
+            const currentUser = auth.currentUser;
+
+            if(reels.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 py-8">No reels uploaded yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = reels.map(r => {
+                const isOwner = currentUser && (r.authorUid === currentUser.uid || r.authorEmail === currentUser.email);
+                return `
+                <div class="glass-card rounded-2xl p-4 space-y-3 shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-xs text-white">${r.author[0]}</div>
+                            <span class="font-semibold text-sm text-gray-200">${r.author}</span>
+                        </div>
+                        ${isOwner ? `<button onclick="deleteReel('${r.id}')" class="text-gray-500 hover:text-red-500 text-xs icon-3d"><i class="fa-solid fa-trash"></i> Delete</button>` : ''}
+                    </div>
+                    <video src="${r.videoUrl}" class="rounded-xl w-full max-h-96 object-cover shadow-md" controls></video>
+                </div>
+            `}).join('');
+        }
+
+        window.deleteReel = function(id) {
+            let reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
+            reels = reels.filter(r => r.id !== id);
+            localStorage.setItem('ib65_reels', JSON.stringify(reels));
+            loadReels();
+            showToast("Reel deleted!");
         }
 
         window.filterPosts = function() {}
