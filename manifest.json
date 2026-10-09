@@ -5,10 +5,10 @@
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0b0e14",
-  "theme_color": "#3b82f6",
+  "theme_color": "#e1306c",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=512&auto=format&fit=crop&q=80",
       "sizes": "512x512",
       "type": "image/png"
     }
