@@ -111,12 +111,29 @@
                 <h3 class="font-bold text-sm text-white">Settings and activity</h3>
                 <button onclick="toggleSettingsModal()" class="text-gray-400 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            <div onclick="openArchiveModal()" class="flex items-center space-x-3 p-3 clay-card cursor-pointer">
+                <i class="fa-solid fa-box-archive text-white text-base"></i>
+                <span>Story Archive (24h)</span>
+            </div>
             <div onclick="toggleAccountPrivacy()" class="flex items-center justify-between p-3 clay-card cursor-pointer">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-lock text-white text-base"></i>
                     <span>Account Privacy</span>
                 </div>
                 <span id="privacy-lbl" class="text-gray-400 font-bold">Public</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archive Modal -->
+    <div id="archive-modal" class="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 hidden" onclick="closeArchiveModal()">
+        <div class="clay-card p-5 w-full max-w-md space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
+                <h3 class="font-bold text-xs text-white">Story Archive</h3>
+                <button onclick="closeArchiveModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="archive-grid" class="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+                <div class="text-center text-gray-500 col-span-3 py-6 text-xs">No archived stories</div>
             </div>
         </div>
     </div>
@@ -153,7 +170,7 @@
 
             <!-- Posts Feed -->
             <div id="posts-container" class="space-y-4">
-                <div class="text-center text-gray-500 py-10 text-xs">Loading cloud feed...</div>
+                <div class="text-center text-gray-500 py-10 text-xs">Connecting to Firebase Cloud...</div>
             </div>
         </div>
 
@@ -161,23 +178,23 @@
         <div id="view-search" class="space-y-4 hidden">
             <div class="relative">
                 <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-500"></i>
-                <input type="text" id="global-search" placeholder="Search posts..." class="w-full clay-card pl-11 pr-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none">
+                <input type="text" id="global-search" oninput="handleSearch(event)" placeholder="Search users or posts..." class="w-full clay-card pl-11 pr-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none">
             </div>
             <div id="explore-grid" class="grid grid-cols-3 gap-1.5"></div>
         </div>
 
-        <!-- REELS VIEW (Full Screen with Sound and Comments) -->
+        <!-- REELS VIEW (Full-Screen Vertical Instagram Experience) -->
         <div id="view-reels" class="space-y-4 hidden">
             <div class="flex justify-center space-x-6 text-sm font-bold border-b border-gray-900 pb-2">
                 <span class="text-white border-b-2 border-white pb-1 cursor-pointer">Reels</span>
                 <span class="text-gray-500 cursor-pointer">Friends</span>
             </div>
             <div id="reels-container" class="space-y-6 flex flex-col items-center">
-                <div class="text-center text-gray-500 py-12 text-xs">Loading cloud reels...</div>
+                <div class="text-center text-gray-500 py-12 text-xs">Loading Cloud Reels...</div>
             </div>
         </div>
 
-        <!-- PROFILE VIEW (With Restored Video/Post Grid) -->
+        <!-- PROFILE VIEW (Preserving Zero Count and Feed Tabs) -->
         <div id="view-profile" class="space-y-4 hidden">
             <div class="clay-card p-6 text-center space-y-4 relative">
                 <button onclick="toggleSettingsModal()" class="absolute top-4 right-4 text-white text-xl icon-3d"><i class="fa-solid fa-gear"></i></button>
@@ -194,7 +211,7 @@
                 <button onclick="handleLogout()" class="clay-btn px-6 py-2 text-xs font-bold">Logout</button>
             </div>
 
-            <!-- Profile Tabs (Grid Restored) -->
+            <!-- Profile Tabs (Grid & Saved) -->
             <div class="clay-card p-4 space-y-3">
                 <div class="flex justify-around border-b border-gray-900 pb-2 text-gray-400 text-sm">
                     <button onclick="switchProfileTab('grid')" id="tab-btn-grid" class="text-white border-b-2 border-white pb-1 px-4"><i class="fa-solid fa-table-cells"></i></button>
@@ -208,7 +225,7 @@
 
     </main>
 
-    <!-- Create / Upload Modal -->
+    <!-- Create / Upload Modal with Camera & Gallery -->
     <div id="create-modal-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-gray-900 flex justify-between items-center bg-black">
             <button onclick="closeCreateModalPage()" class="text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -222,442 +239,53 @@
                 <button onclick="setUploadType('reel')" id="up-type-reel" class="text-gray-500 pb-1 px-3">Reel</button>
             </div>
             <input type="text" id="create-title" placeholder="Add caption..." class="w-full clay-card p-3 text-xs text-white placeholder-gray-500 focus:outline-none">
+            
             <div class="grid grid-cols-2 gap-2">
                 <label class="cursor-pointer block clay-card p-4 text-center border border-gray-800 hover:border-white transition">
                     <i class="fa-solid fa-images text-2xl text-white mb-1"></i>
-                    <p class="text-[10px] text-gray-300">Choose Gallery</p>
-                    <input type="file" accept="image/*,video/*" class="hidden" onchange="handleFileSelected(event)">
+                    <p class="text-[10px] text-gray-300">Open Gallery</p>
+                    <input type="file" id="gallery-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelected(event)">
                 </label>
-                <label class="cursor-pointer block clay-card p-4 text-center border border-gray-800 hover:border-white transition">
+                <button onclick="openInAppCamera()" class="clay-card p-4 text-center border border-gray-800 hover:border-white transition">
                     <i class="fa-solid fa-camera text-2xl text-white mb-1"></i>
-                    <p class="text-[10px] text-gray-300">Camera Capture</p>
-                    <input type="file" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleFileSelected(event)">
-                </label>
+                    <p class="text-[10px] text-gray-300">Live Camera</p>
+                </button>
             </div>
+
+            <!-- In-App Instagram Style Photo Editor -->
             <div id="create-preview-box" class="hidden relative space-y-2">
-                <img id="prev-img" class="rounded-2xl max-h-56 w-full object-cover hidden">
-                <video id="prev-vid" class="rounded-2xl max-h-56 w-full object-cover hidden" controls></video>
+                <div class="flex items-center space-x-2 overflow-x-auto py-1">
+                    <span class="text-[10px] text-gray-400">Filter:</span>
+                    <button onclick="applyFilter('none')" class="text-[10px] bg-[#222] px-2.5 py-1 rounded-full">Normal</button>
+                    <button onclick="applyFilter('grayscale(100%)')" class="text-[10px] bg-[#222] px-2.5 py-1 rounded-full">B&W</button>
+                    <button onclick="applyFilter('sepia(100%)')" class="text-[10px] bg-[#222] px-2.5 py-1 rounded-full">Sepia</button>
+                    <button onclick="applyFilter('contrast(160%)')" class="text-[10px] bg-[#222] px-2.5 py-1 rounded-full">Contrast</button>
+                    <button onclick="applyFilter('saturate(200%)')" class="text-[10px] bg-[#222] px-2.5 py-1 rounded-full">Vibrant</button>
+                </div>
+                <img id="prev-img" class="rounded-2xl max-h-64 w-full object-cover hidden">
+                <video id="prev-vid" class="rounded-2xl max-h-64 w-full object-cover hidden" controls playsinline></video>
             </div>
+        </div>
+    </div>
+
+    <!-- Instagram-Style In-App Camera Viewfinder Modal -->
+    <div id="inapp-camera-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
+        <div class="flex justify-between items-center z-10">
+            <button onclick="closeInAppCamera()" class="text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <span class="text-xs font-bold text-white tracking-widest uppercase">IB65 Lens</span>
+            <button onclick="flipCamera()" class="text-white text-lg"><i class="fa-solid fa-camera-rotate"></i></button>
+        </div>
+        <div class="flex-1 relative flex items-center justify-center my-2">
+            <video id="camera-stream" autoplay playsinline muted class="w-full h-full object-cover rounded-3xl"></video>
+            <canvas id="camera-canvas" class="hidden"></canvas>
+        </div>
+        <div class="flex justify-center items-center py-4 z-10">
+            <button onclick="capturePhotoFromCamera()" class="w-20 h-20 rounded-full border-4 border-white p-1 flex items-center justify-center active:scale-90 transition">
+                <div class="w-full h-full bg-white rounded-full"></div>
+            </button>
         </div>
     </div>
 
     <!-- Story Viewer Modal -->
     <div id="story-viewer-modal" class="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4 hidden">
-        <div class="relative w-full max-w-sm h-[480px] bg-black clay-card flex flex-col justify-between p-4">
-            <div class="flex justify-between items-center z-10">
-                <span id="story-author-lbl" class="text-xs font-bold text-white">Story</span>
-                <button onclick="closeStoryViewer()" class="text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <img id="story-media-img" class="w-full h-full object-cover rounded-2xl hidden">
-                <video id="story-media-vid" class="w-full h-full object-cover rounded-2xl hidden" autoplay controls></video>
-            </div>
-        </div>
-    </div>
-
-    <!-- Comments Modal (Instagram Style) -->
-    <div id="comments-modal" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="closeCommentsModal()">
-        <div class="clay-card w-full max-w-xl h-[60vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
-                <span class="font-bold text-xs text-white">Comments</span>
-                <button onclick="closeCommentsModal()" class="text-gray-400 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div id="comments-list" class="flex-1 overflow-y-auto space-y-2 py-2 text-xs">
-                <div class="text-center text-gray-500 py-4">No comments yet</div>
-            </div>
-            <div class="flex space-x-2 pt-2 border-t border-gray-900">
-                <input type="text" id="comment-input" placeholder="Add a comment..." class="flex-1 clay-card p-2 text-xs text-white">
-                <button onclick="postComment()" class="clay-btn px-4 py-2 text-xs font-bold">Post</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Live Stream Modal -->
-    <div id="live-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
-        <div class="flex justify-between items-center clay-card p-3">
-            <div class="flex items-center space-x-2">
-                <span class="bg-red-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold animate-pulse">LIVE</span>
-                <span class="text-xs font-bold text-white">👁️ 42</span>
-            </div>
-            <button onclick="stopLiveStream()" class="text-xs bg-red-600/50 px-3 py-1 rounded-xl">End Live</button>
-        </div>
-        <div class="flex-1 flex flex-col justify-between my-2 relative overflow-hidden">
-            <video id="live-video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover rounded-2xl"></video>
-            <div id="live-chat-stream" class="relative z-10 p-3 space-y-1 max-h-40 overflow-y-auto pointer-events-none text-xs">
-                <div class="bg-black/60 px-2 py-1 rounded-lg w-max"><strong>vickuu:</strong> Live stream start ho gayi!</div>
-            </div>
-        </div>
-        <div class="flex space-x-2 z-20">
-            <input type="text" id="live-comment-input" placeholder="Comment..." class="flex-1 clay-card p-2.5 text-xs text-white">
-            <button onclick="sendLiveComment()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
-            <button onclick="sendLiveHeart()" class="bg-red-600 text-white px-3 py-2 rounded-xl text-sm"><i class="fa-solid fa-heart"></i></button>
-        </div>
-    </div>
-
-    <!-- Bottom Navigation Bar -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-gray-900 py-3 px-6 flex justify-around items-center z-40">
-        <button onclick="switchTab('home')" id="nav-home" class="text-white icon-3d text-xl"><i class="fa-solid fa-house"></i></button>
-        <button onclick="switchTab('search')" id="nav-search" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-compass"></i></button>
-        <button onclick="openCreateModalPage('post')" class="clay-btn w-12 h-12 rounded-full flex items-center justify-center shadow-xl -mt-5 icon-3d text-black font-extrabold text-xl"><i class="fa-solid fa-plus"></i></button>
-        <button onclick="switchTab('reels')" id="nav-reels" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-clapperboard"></i></button>
-        <button onclick="switchTab('profile')" id="nav-profile" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-user"></i></button>
-    </nav>
-
-    <!-- Auth Modal -->
-    <div id="auth-modal" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
-        <div class="clay-card p-6 w-full max-w-sm space-y-4">
-            <h2 class="text-2xl font-extrabold text-center text-white">IB65</h2>
-            <p class="text-xs text-center text-gray-400">Login or create account</p>
-            <input type="text" id="auth-name" placeholder="Full Name" class="w-full clay-card p-3 text-xs text-white">
-            <input type="email" id="auth-email" placeholder="Email" class="w-full clay-card p-3 text-xs text-white">
-            <input type="password" id="auth-password" placeholder="Password (6+ chars)" class="w-full clay-card p-3 text-xs text-white">
-            <div class="flex space-x-2 pt-2">
-                <button onclick="handleLogin()" class="flex-1 clay-card py-2.5 text-xs font-bold text-white">Login</button>
-                <button onclick="handleSignup()" class="flex-1 clay-btn py-2.5 text-xs font-bold">Sign up</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Message -->
-    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white text-xs px-4 py-2 rounded-full border border-gray-800 shadow-2xl hidden z-50"></div>
-
-    <!-- Scripts with Firebase Firestore Cloud Sync -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBlM05NZl4bKjRsrZ0ZUDpjYi0fdPP2-X4",
-            authDomain: "ib65-67f62.firebaseapp.com",
-            projectId: "ib65-67f62",
-            storageBucket: "ib65-67f62.firebasestorage.app",
-            messagingSenderId: "323877271127",
-            appId: "1:323877271127:web:8318d8904784503b061512"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let uploadType = 'post';
-        let selectedFileUrl = '';
-        let selectedFileType = 'image';
-        let activeCommentPostId = null;
-        let liveMediaStream = null;
-
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const intro = document.getElementById('anime-intro');
-                if(intro) { intro.style.opacity = '0'; setTimeout(() => intro.remove(), 700); }
-            }, 1200);
-            loadCloudPosts();
-            loadCloudReels();
-        });
-
-        window.showToast = function(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 3000);
-        }
-
-        window.openFullMessageInbox = function() { document.getElementById('full-msg-page').classList.remove('hidden'); }
-        window.closeFullMessageInbox = function() { document.getElementById('full-msg-page').classList.add('hidden'); }
-        window.toggleSettingsModal = function() { document.getElementById('settings-modal').classList.toggle('hidden'); }
-        window.toggleAccountPrivacy = function() {
-            const lbl = document.getElementById('privacy-lbl');
-            lbl.innerText = lbl.innerText === 'Public' ? 'Private' : 'Public';
-            showToast("Privacy updated");
-        }
-        window.toggleNotifications = function() { document.getElementById('notif-modal').classList.toggle('hidden'); }
-
-        window.openFollowModal = function(type) {
-            document.getElementById('follow-modal-title').innerText = type === 'followers' ? 'Followers' : 'Following';
-            const list = document.getElementById('follow-modal-list');
-            const user = auth.currentUser;
-            const data = JSON.parse(localStorage.getItem('ib65_follow_' + (user?.email || '')) || '{"followers":[], "following":[]}');
-            const items = data[type] || [];
-            list.innerHTML = items.length === 0 ? `<div class="text-center text-gray-500 py-4">No ${type} yet</div>` : items.map(n => `
-                <div class="flex items-center space-x-3 p-2 clay-card"><div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${n[0]}</div><span class="text-white">${n}</span></div>
-            `).join('');
-            document.getElementById('follow-modal').classList.remove('hidden');
-        }
-        window.closeFollowModal = function() { document.getElementById('follow-modal').classList.add('hidden'); }
-
-        window.openCreateModalPage = function(type = 'post') {
-            setUploadType(type);
-            document.getElementById('create-modal-page').classList.remove('hidden');
-        }
-        window.closeCreateModalPage = function() { document.getElementById('create-modal-page').classList.add('hidden'); }
-        window.setUploadType = function(type) {
-            uploadType = type;
-            ['story', 'post', 'reel'].forEach(t => {
-                const btn = document.getElementById('up-type-' + t);
-                if(btn) btn.className = t === type ? 'font-bold text-white pb-1 border-b border-white px-3' : 'text-gray-500 pb-1 px-3';
-            });
-        }
-
-        window.handleFileSelected = async function(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            showToast("Uploading to cloud...");
-            const fd = new FormData();
-            fd.append("file", file);
-            fd.append("upload_preset", "ib65_upload");
-            try {
-                const res = await fetch("https://api.cloudinary.com/v1_1/mhj8jvag/auto/upload", { method: "POST", body: fd });
-                const data = await res.json();
-                if(data.secure_url) {
-                    selectedFileUrl = data.secure_url;
-                    selectedFileType = file.type.includes('video') ? 'video' : 'image';
-                    const box = document.getElementById('create-preview-box');
-                    box.classList.remove('hidden');
-                    if(selectedFileType === 'video') {
-                        document.getElementById('prev-vid').src = selectedFileUrl;
-                        document.getElementById('prev-vid').classList.remove('hidden');
-                        document.getElementById('prev-img').classList.add('hidden');
-                    } else {
-                        document.getElementById('prev-img').src = selectedFileUrl;
-                        document.getElementById('prev-img').classList.remove('hidden');
-                        document.getElementById('prev-vid').classList.add('hidden');
-                    }
-                    showToast("Uploaded successfully!");
-                }
-            } catch(err) { showToast("Upload error!"); }
-        }
-
-        window.publishContent = async function() {
-            const title = document.getElementById('create-title').value;
-            const user = auth.currentUser;
-            if(!user || !selectedFileUrl) { showToast("Please login and select media!"); return; }
-
-            try {
-                if(uploadType === 'reel') {
-                    await addDoc(collection(db, "reels"), {
-                        author: user.displayName || 'User',
-                        authorEmail: user.email,
-                        videoUrl: selectedFileUrl,
-                        likes: [],
-                        comments: [],
-                        createdAt: Date.now()
-                    });
-                    loadCloudReels();
-                    switchTab('reels');
-                } else {
-                    await addDoc(collection(db, "posts"), {
-                        author: user.displayName || 'User',
-                        authorEmail: user.email,
-                        title: title,
-                        mediaUrl: selectedFileUrl,
-                        mediaType: selectedFileType,
-                        likes: [],
-                        comments: [],
-                        savedBy: [],
-                        createdAt: Date.now()
-                    });
-                    loadCloudPosts();
-                    switchTab('home');
-                }
-                closeCreateModalPage();
-                selectedFileUrl = '';
-                document.getElementById('create-title').value = '';
-                document.getElementById('create-preview-box').classList.add('hidden');
-                showToast("Published to Cloud!");
-            } catch(e) { showToast("Publish error: " + e.message); }
-        }
-
-        // Cloud Posts Loader
-        window.loadCloudPosts = async function() {
-            const container = document.getElementById('posts-container');
-            const profileGrid = document.getElementById('profile-grid');
-            try {
-                const querySnapshot = await getDocs(collection(db, "posts"));
-                const posts = [];
-                querySnapshot.forEach(docSnap => posts.push({ id: docSnap.id, ...docSnap.data() }));
-                posts.sort((a,b) => b.createdAt - a.createdAt);
-
-                const user = auth.currentUser;
-                if(user) {
-                    const myPosts = posts.filter(p => p.authorEmail === user.email);
-                    document.getElementById('stat-posts').innerText = myPosts.length;
-                    profileGrid.innerHTML = myPosts.length === 0 ? `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No posts yet</div>` : myPosts.map(p => `
-                        <div class="h-28 clay-card rounded-xl overflow-hidden flex items-center justify-center">
-                            <img src="${p.mediaUrl}" class="w-full h-full object-cover">
-                        </div>
-                    `).join('');
-                }
-
-                if(posts.length === 0) {
-                    container.innerHTML = `<div class="text-center text-gray-500 py-10 text-xs">No cloud posts yet.</div>`;
-                    return;
-                }
-
-                container.innerHTML = posts.map(p => {
-                    const isLiked = user && (p.likes || []).includes(user.email);
-                    return `
-                    <div class="clay-card p-4 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${p.author[0]}</div>
-                                <span class="font-bold text-xs text-white">${p.author}</span>
-                            </div>
-                        </div>
-                        ${p.title ? `<p class="text-xs text-white font-semibold">${p.title}</p>` : ''}
-                        ${p.mediaUrl ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover" autoplay loop muted controls></video>` : `<img src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover">`) : ''}
-                        <div class="flex items-center space-x-4 pt-2 border-t border-gray-900 text-white text-xs">
-                            <button onclick="toggleCloudLike('${p.id}', ${(p.likes || []).length})" class="flex items-center space-x-1 ${isLiked ? 'text-red-500 font-bold' : ''}">
-                                <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-lg"></i>
-                                <span>${(p.likes || []).length}</span>
-                            </button>
-                            <button onclick="openCommentsModal('${p.id}')" class="flex items-center space-x-1">
-                                <i class="fa-regular fa-comment text-lg"></i>
-                                <span>${(p.comments || []).length}</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                }).join('');
-            } catch(e) { container.innerHTML = `<div class="text-center text-red-500 py-10 text-xs">Failed to load feed</div>`; }
-        }
-
-        // Cloud Reels Loader with Sound
-        window.loadCloudReels = async function() {
-            const container = document.getElementById('reels-container');
-            try {
-                const querySnapshot = await getDocs(collection(db, "reels"));
-                const reels = [];
-                querySnapshot.forEach(docSnap => reels.push({ id: docSnap.id, ...docSnap.data() }));
-                reels.sort((a,b) => b.createdAt - a.createdAt);
-
-                if(reels.length === 0) {
-                    container.innerHTML = `<div class="text-center text-gray-500 py-12 text-xs">No cloud reels found.</div>`;
-                    return;
-                }
-                container.innerHTML = reels.map(r => `
-                    <div class="relative w-full max-w-sm h-[75vh] bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-end p-4 border border-gray-900">
-                        <video src="${r.videoUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop controls playsinline></video>
-                        <div class="relative z-10 flex justify-between items-center bg-gradient-to-t from-black/90 p-3 rounded-2xl">
-                            <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${r.author[0]}</div>
-                                <span class="font-bold text-xs text-white">${r.author}</span>
-                            </div>
-                            <button class="bg-white text-black px-4 py-1.5 rounded-full text-xs font-bold clay-btn">Follow</button>
-                        </div>
-                    </div>
-                `).join('');
-            } catch(e) {}
-        }
-
-        window.toggleCloudLike = async function(id, count) {
-            const user = auth.currentUser;
-            if(!user) return;
-            const docRef = doc(db, "posts", id);
-            try {
-                await updateDoc(docRef, { likes: arrayUnion(user.email) });
-                loadCloudPosts();
-            } catch(e) { showToast("Action failed"); }
-        }
-
-        // Comments System
-        window.openCommentsModal = function(id) {
-            activeCommentPostId = id;
-            document.getElementById('comments-modal').classList.remove('hidden');
-            loadComments();
-        }
-        window.closeCommentsModal = function() { document.getElementById('comments-modal').classList.add('hidden'); }
-        window.loadComments = async function() {
-            const list = document.getElementById('comments-list');
-            const querySnapshot = await getDocs(collection(db, "posts"));
-            let comments = [];
-            querySnapshot.forEach(docSnap => {
-                if(docSnap.id === activeCommentPostId) {
-                    comments = docSnap.data().comments || [];
-                }
-            });
-            list.innerHTML = comments.length === 0 ? `<div class="text-center text-gray-500 py-4">No comments yet</div>` : comments.map(c => `
-                <div class="flex space-x-2 text-xs"><strong>${c.user}:</strong> <span>${c.text}</span></div>
-            `).join('');
-        }
-        window.postComment = async function() {
-            const input = document.getElementById('comment-input');
-            const txt = input.value.trim();
-            const user = auth.currentUser;
-            if(!txt || !user || !activeCommentPostId) return;
-            const docRef = doc(db, "posts", activeCommentPostId);
-            try {
-                await updateDoc(docRef, { comments: arrayUnion({ user: user.displayName || 'User', text: txt }) });
-                input.value = '';
-                loadComments();
-                loadCloudPosts();
-            } catch(e) { showToast("Comment failed"); }
-        }
-
-        window.switchProfileTab = function(tab) { loadCloudPosts(); }
-
-        window.startLiveStream = async function() {
-            document.getElementById('live-modal').classList.remove('hidden');
-            try {
-                liveMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                document.getElementById('live-video').srcObject = liveMediaStream;
-            } catch(e) { showToast("Camera access needed"); }
-        }
-        window.stopLiveStream = function() {
-            if(liveMediaStream) liveMediaStream.getTracks().forEach(t => t.stop());
-            document.getElementById('live-modal').classList.add('hidden');
-        }
-        window.sendLiveComment = function() {
-            const input = document.getElementById('live-comment-input');
-            const txt = input.value.trim();
-            if(!txt) return;
-            const stream = document.getElementById('live-chat-stream');
-            stream.innerHTML += `<div class="bg-black/60 px-2 py-1 rounded-lg w-max"><strong>You:</strong> ${txt}</div>`;
-            input.value = '';
-        }
-        window.sendLiveHeart = function() { showToast("❤️ Liked live stream"); }
-
-        onAuthStateChanged(auth, (user) => {
-            if(user) {
-                document.getElementById('auth-modal').classList.add('hidden');
-                document.getElementById('profile-name').innerText = user.displayName || 'User';
-                document.getElementById('profile-username').innerText = '@' + user.email.split('@')[0];
-                document.getElementById('profile-initial').innerText = (user.displayName || 'U')[0].toUpperCase();
-                document.getElementById('stat-followers').innerText = '0';
-                document.getElementById('stat-following').innerText = '0';
-                loadCloudPosts();
-                loadCloudReels();
-            } else {
-                document.getElementById('auth-modal').classList.remove('hidden');
-            }
-        });
-
-        window.handleSignup = async function() {
-            const name = document.getElementById('auth-name').value;
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-password').value;
-            if(!name || !email || pass.length < 6) { showToast("Invalid details"); return; }
-            try {
-                const res = await createUserWithEmailAndPassword(auth, email, pass);
-                await updateProfile(res.user, { displayName: name });
-                showToast("Account created!");
-            } catch(e) { showToast(e.message); }
-        }
-        window.handleLogin = async function() {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-password').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); showToast("Logged in!"); } catch(e) { showToast("Login failed"); }
-        }
-        window.handleLogout = async function() { await signOut(auth); showToast("Logged out"); }
-
-        window.switchTab = function(tab) {
-            ['home', 'search', 'reels', 'profile'].forEach(t => {
-                document.getElementById('view-' + t).classList.add('hidden');
-                document.getElementById('nav-' + t).className = 'text-gray-500 icon-3d text-xl';
-            });
-            document.getElementById('view-' + tab).classList.remove('hidden');
-            document.getElementById('nav-' + tab).className = 'text-white icon-3d text-xl';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    </script>
-</body>
-</html>
+        <div class="relative w-full max-w-sm h-[520px] bg-black clay-card flex flex-
