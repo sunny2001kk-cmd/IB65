@@ -139,9 +139,8 @@
         
         <!-- HOME VIEW -->
         <div id="view-home" class="space-y-4">
-            <!-- Stories Tray -->
             <div class="clay-card p-3 overflow-x-auto flex space-x-3 items-center">
-                <div onclick="openCreateModalPage()" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
+                <div onclick="openCreateModalPage('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
                     <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-white to-gray-500 flex items-center justify-center shadow-lg">
                         <div class="w-full h-full bg-black rounded-full flex items-center justify-center">
                             <i class="fa-solid fa-plus text-white text-lg"></i>
@@ -195,7 +194,7 @@
                 <button onclick="handleLogout()" class="clay-btn px-6 py-2 text-xs font-bold">Logout</button>
             </div>
 
-            <!-- Profile Tabs (Grid & Saved) -->
+            <!-- Profile Tabs -->
             <div class="clay-card p-4 space-y-3">
                 <div class="flex justify-around border-b border-gray-900 pb-2 text-gray-400 text-sm">
                     <button onclick="switchProfileTab('grid')" id="tab-btn-grid" class="text-white border-b-2 border-white pb-1 px-4"><i class="fa-solid fa-table-cells"></i></button>
@@ -209,27 +208,42 @@
 
     </main>
 
-    <!-- Instagram Style Create / Upload Page Modal -->
+    <!-- Instagram Style Create / Upload Modal with Story, Post, Reel tabs -->
     <div id="create-modal-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-gray-900 flex justify-between items-center bg-black">
             <button onclick="closeCreateModalPage()" class="text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <span class="font-bold text-sm text-white">New Post / Reel</span>
+            <span class="font-bold text-sm text-white" id="create-modal-title">Create Story / Post / Reel</span>
             <button onclick="publishContent()" class="clay-btn px-4 py-1 text-xs font-bold">Share</button>
         </div>
         <div class="flex-1 p-4 space-y-4 max-w-lg mx-auto w-full overflow-y-auto">
             <div class="flex space-x-2 border-b border-gray-900 pb-2 text-xs">
+                <button onclick="setUploadType('story')" id="up-type-story" class="text-gray-500 pb-1 px-3">Story</button>
                 <button onclick="setUploadType('post')" id="up-type-post" class="font-bold text-white pb-1 border-b border-white px-3">Post</button>
                 <button onclick="setUploadType('reel')" id="up-type-reel" class="text-gray-500 pb-1 px-3">Reel</button>
             </div>
             <input type="text" id="create-title" placeholder="Add caption..." class="w-full clay-card p-3 text-xs text-white placeholder-gray-500 focus:outline-none">
             <label class="cursor-pointer block clay-card p-8 text-center border-dashed border-2 border-gray-800 hover:border-white transition">
                 <i class="fa-solid fa-cloud-arrow-up text-3xl text-white mb-2"></i>
-                <p class="text-xs text-gray-300">Tap to choose Photo or Video</p>
+                <p class="text-xs text-gray-300">Tap to choose Photo or Video from Gallery</p>
                 <input type="file" id="create-file-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelected(event)">
             </label>
             <div id="create-preview-box" class="hidden relative">
                 <img id="prev-img" class="rounded-2xl max-h-56 w-full object-cover hidden">
                 <video id="prev-vid" class="rounded-2xl max-h-56 w-full object-cover hidden" controls></video>
+            </div>
+        </div>
+    </div>
+
+    <!-- Story Viewer Modal -->
+    <div id="story-viewer-modal" class="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4 hidden">
+        <div class="relative w-full max-w-sm h-[480px] bg-black clay-card flex flex-col justify-between p-4">
+            <div class="flex justify-between items-center z-10">
+                <span id="story-author-lbl" class="text-xs font-bold text-white">Story</span>
+                <button onclick="closeStoryViewer()" class="text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <img id="story-media-img" class="w-full h-full object-cover rounded-2xl hidden">
+                <video id="story-media-vid" class="w-full h-full object-cover rounded-2xl hidden" autoplay controls></video>
             </div>
         </div>
     </div>
@@ -265,7 +279,7 @@
     <nav class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-gray-900 py-3 px-6 flex justify-around items-center z-40">
         <button onclick="switchTab('home')" id="nav-home" class="text-white icon-3d text-xl"><i class="fa-solid fa-house"></i></button>
         <button onclick="switchTab('search')" id="nav-search" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-compass"></i></button>
-        <button onclick="openCreateModalPage()" class="clay-btn w-12 h-12 rounded-full flex items-center justify-center shadow-xl -mt-5 icon-3d text-black font-extrabold text-xl"><i class="fa-solid fa-plus"></i></button>
+        <button onclick="openCreateModalPage('post')" class="clay-btn w-12 h-12 rounded-full flex items-center justify-center shadow-xl -mt-5 icon-3d text-black font-extrabold text-xl"><i class="fa-solid fa-plus"></i></button>
         <button onclick="switchTab('reels')" id="nav-reels" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-clapperboard"></i></button>
         <button onclick="switchTab('profile')" id="nav-profile" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-user"></i></button>
     </nav>
@@ -316,6 +330,7 @@
                 const intro = document.getElementById('anime-intro');
                 if(intro) { intro.style.opacity = '0'; setTimeout(() => intro.remove(), 700); }
             }, 1200);
+            loadStories();
             loadPosts();
             loadReels();
         });
@@ -337,7 +352,6 @@
         }
         window.toggleNotifications = function() { document.getElementById('notif-modal').classList.toggle('hidden'); }
 
-        // Followers / Following Pop-up list
         window.openFollowModal = function(type) {
             document.getElementById('follow-modal-title').innerText = type === 'followers' ? 'Followers' : 'Following';
             const list = document.getElementById('follow-modal-list');
@@ -359,20 +373,26 @@
         }
         window.closeFollowModal = function() { document.getElementById('follow-modal').classList.add('hidden'); }
 
-        window.openCreateModalPage = function() { document.getElementById('create-modal-page').classList.remove('hidden'); }
+        window.openCreateModalPage = function(type = 'post') {
+            setUploadType(type);
+            document.getElementById('create-modal-page').classList.remove('hidden');
+        }
         window.closeCreateModalPage = function() { document.getElementById('create-modal-page').classList.add('hidden'); }
+        
         window.setUploadType = function(type) {
             uploadType = type;
-            ['post', 'reel'].forEach(t => {
+            ['story', 'post', 'reel'].forEach(t => {
                 const btn = document.getElementById('up-type-' + t);
-                btn.className = t === type ? 'font-bold text-white pb-1 border-b border-white px-3' : 'text-gray-500 pb-1 px-3';
+                if(btn) {
+                    btn.className = t === type ? 'font-bold text-white pb-1 border-b border-white px-3' : 'text-gray-500 pb-1 px-3';
+                }
             });
         }
 
         window.handleFileSelected = async function(e) {
             const file = e.target.files[0];
             if(!file) return;
-            showToast("Uploading media...");
+            showToast("Uploading media from gallery...");
             const fd = new FormData();
             fd.append("file", file);
             fd.append("upload_preset", "ib65_upload");
@@ -393,9 +413,9 @@
                         document.getElementById('prev-img').classList.remove('hidden');
                         document.getElementById('prev-vid').classList.add('hidden');
                     }
-                    showToast("Uploaded successfully!");
+                    showToast("File uploaded successfully!");
                 }
-            } catch(err) { showToast("Upload error"); }
+            } catch(err) { showToast("Upload error!"); }
         }
 
         window.publishContent = function() {
@@ -403,27 +423,63 @@
             const user = auth.currentUser;
             if(!selectedFileUrl) { showToast("Please select media first!"); return; }
 
-            if(uploadType === 'reel') {
+            if(uploadType === 'story') {
+                const stories = JSON.parse(localStorage.getItem('ib65_stories') || '[]');
+                stories.unshift({ id: Date.now().toString(), author: user?.displayName || 'User', authorEmail: user?.email, mediaUrl: selectedFileUrl, mediaType: selectedFileType, timestamp: Date.now() });
+                localStorage.setItem('ib65_stories', JSON.stringify(stories));
+                loadStories();
+                switchTab('home');
+                showToast("Story posted successfully!");
+            } else if(uploadType === 'reel') {
                 const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
                 reels.unshift({ id: Date.now().toString(), author: user?.displayName || 'User', authorEmail: user?.email, videoUrl: selectedFileUrl, likes: [] });
                 localStorage.setItem('ib65_reels', JSON.stringify(reels));
                 loadReels();
                 switchTab('reels');
+                showToast("Reel posted successfully!");
             } else {
                 const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
                 posts.unshift({ id: Date.now().toString(), author: user?.displayName || 'User', authorEmail: user?.email, title, mediaUrl: selectedFileUrl, mediaType: selectedFileType, likes: [], savedBy: [] });
                 localStorage.setItem('ib65_posts', JSON.stringify(posts));
                 loadPosts();
                 switchTab('home');
+                showToast("Post published successfully!");
             }
             closeCreateModalPage();
             selectedFileUrl = '';
             document.getElementById('create-title').value = '';
             document.getElementById('create-preview-box').classList.add('hidden');
-            showToast("Published successfully!");
         }
 
-        // Like / Save / Follow Actions
+        // Stories Tray & Viewer
+        window.loadStories = function() {
+            const tray = document.getElementById('stories-tray');
+            const stories = JSON.parse(localStorage.getItem('ib65_stories') || '[]');
+            if(stories.length === 0) { tray.innerHTML = `<span class="text-xs text-gray-500 px-2">No active stories</span>`; return; }
+            tray.innerHTML = stories.map(s => `
+                <div class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0" onclick="viewStory('${s.mediaUrl}', '${s.author}')">
+                    <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-white to-gray-500 flex items-center justify-center shadow-md">
+                        <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
+                            ${s.mediaType === 'video' ? `<video src="${s.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${s.mediaUrl}" class="w-full h-full object-cover">`}
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-gray-300 truncate w-14 text-center">${s.author}</span>
+                </div>
+            `).join('');
+        }
+        window.viewStory = function(url, author) {
+            document.getElementById('story-author-lbl').innerText = author + "'s Story";
+            document.getElementById('story-viewer-modal').classList.remove('hidden');
+            const img = document.getElementById('story-media-img');
+            const vid = document.getElementById('story-media-vid');
+            if(url.includes('.mp4') || url.includes('video')) {
+                vid.src = url; vid.classList.remove('hidden'); img.classList.add('hidden');
+            } else {
+                img.src = url; img.classList.remove('hidden'); vid.classList.add('hidden');
+            }
+        }
+        window.closeStoryViewer = function() { document.getElementById('story-viewer-modal').classList.add('hidden'); }
+
         window.toggleLike = function(id) {
             const user = auth.currentUser;
             if(!user) return;
@@ -438,6 +494,22 @@
             });
             localStorage.setItem('ib65_posts', JSON.stringify(posts));
             loadPosts();
+        }
+
+        window.toggleReelLike = function(id) {
+            const user = auth.currentUser;
+            if(!user) return;
+            let reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
+            reels = reels.map(r => {
+                if(r.id === id) {
+                    if(!r.likes) r.likes = [];
+                    if(r.likes.includes(user.email)) r.likes = r.likes.filter(e => e !== user.email);
+                    else r.likes.push(user.email);
+                }
+                return r;
+            });
+            localStorage.setItem('ib65_reels', JSON.stringify(reels));
+            loadReels();
         }
 
         window.toggleSavePost = function(id) {
@@ -573,12 +645,31 @@
             }
             container.innerHTML = reels.map(r => {
                 const isFollowing = followData.following.includes(r.author);
+                const isLiked = user && (r.likes || []).includes(user.email);
                 return `
-                <div class="relative w-full max-w-sm h-[480px] clay-card overflow-hidden flex flex-col justify-between p-4">
-                    <video src="${r.videoUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop muted controls></video>
-                    <div class="relative z-10 flex justify-between items-center bg-black/60 p-2 rounded-xl">
-                        <span class="font-bold text-xs text-white">${r.author}</span>
-                        <button onclick="toggleFollowUser('${r.author}', '${r.authorEmail}')" class="bg-white text-black px-3 py-1 rounded-full text-[10px] font-bold">${isFollowing ? 'Following' : 'Follow'}</button>
+                <div class="relative w-full max-w-sm h-[75vh] bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-end p-4 border border-gray-900">
+                    <video src="${r.videoUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop muted playsinline></video>
+                    
+                    <div class="absolute right-3 bottom-20 flex flex-col items-center space-y-4 z-20 text-white">
+                        <button onclick="toggleReelLike('${r.id}')" class="flex flex-col items-center space-y-1 icon-3d ${isLiked ? 'text-red-500' : ''}">
+                            <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-2xl"></i>
+                            <span class="text-[10px] font-bold">${(r.likes || []).length}</span>
+                        </button>
+                        <button onclick="showToast('Comments')" class="flex flex-col items-center space-y-1 icon-3d">
+                            <i class="fa-regular fa-comment text-2xl"></i>
+                            <span class="text-[10px] font-bold">0</span>
+                        </button>
+                        <button onclick="openShareModal('${r.id}')" class="flex flex-col items-center space-y-1 icon-3d">
+                            <i class="fa-solid fa-share text-2xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="relative z-10 flex justify-between items-center bg-gradient-to-t from-black/90 p-3 rounded-2xl">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${r.author[0]}</div>
+                            <span class="font-bold text-xs text-white">${r.author}</span>
+                        </div>
+                        <button onclick="toggleFollowUser('${r.author}', '${r.authorEmail}')" class="bg-white text-black px-4 py-1.5 rounded-full text-xs font-bold clay-btn">${isFollowing ? 'Following' : 'Follow'}</button>
                     </div>
                 </div>
             `;
@@ -608,6 +699,7 @@
                 document.getElementById('stat-followers').innerText = followData.followers.length;
                 document.getElementById('stat-following').innerText = followData.following.length;
 
+                loadStories();
                 loadPosts();
                 loadReels();
             } else {
