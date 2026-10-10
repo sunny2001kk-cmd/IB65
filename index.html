@@ -4,232 +4,186 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IB65 — Next Gen Social Universe</title>
-    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0e14; color: #f3f4f6; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000000; color: #ffffff; }
+        
+        /* 3D Claymorphism & Shadow Styles */
+        .clay-card {
+            background: #121212;
+            border: 1px solid #262626;
+            box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+            border-radius: 24px;
+        }
+        .clay-btn {
+            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+            color: #000000;
+            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+            border-radius: 16px;
+        }
+        .clay-btn:active { transform: scale(0.92); }
         .icon-3d {
-            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4)) drop-shadow(0 1px 3px rgba(225, 48, 108, 0.5));
-            transition: transform 0.2s ease, filter 0.2s ease;
+            filter: drop-shadow(0 4px 6px rgba(255, 255, 255, 0.2));
+            transition: transform 0.2s ease;
         }
         .icon-3d:active { transform: scale(0.85); }
-        .glass-card { background: rgba(17, 24, 39, 0.92); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        
-        /* Anime Intro Splash Animation */
+
+        /* Anime Intro Splash */
         @keyframes animeZoom {
             0% { transform: scale(0.2); opacity: 0; filter: blur(20px); }
             50% { transform: scale(1.1); opacity: 1; filter: blur(0); }
             100% { transform: scale(1); opacity: 1; }
         }
-        .anime-splash {
-            animation: animeZoom 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
+        .anime-splash { animation: animeZoom 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #0b0e14; }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
     </style>
 </head>
 <body class="min-h-screen pb-24">
 
     <!-- Anime Intro Splash Screen -->
-    <div id="anime-intro" class="fixed inset-0 z-50 bg-[#0b0e14] flex flex-col items-center justify-center space-y-4 transition-opacity duration-700">
+    <div id="anime-intro" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center space-y-4 transition-opacity duration-700">
         <div class="anime-splash text-center space-y-2">
-            <h1 class="text-6xl font-extrabold bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 bg-clip-text text-transparent tracking-widest drop-shadow-[0_10px_20px_rgba(225,48,108,0.5)]">IB65</h1>
-            <p class="text-xs tracking-widest text-gray-400 uppercase font-semibold">Next Gen Social Universe</p>
+            <h1 class="text-6xl font-extrabold bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent tracking-widest">IB65</h1>
+            <p class="text-xs tracking-widest text-gray-400 uppercase font-bold">3D Universe</p>
         </div>
     </div>
 
-    <!-- Top Header (Instagram Style) -->
-    <header class="sticky top-0 z-40 glass-card border-b border-gray-800 px-4 py-3 flex justify-between items-center shadow-lg">
-        <div class="flex items-center space-x-2">
-            <h1 class="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent tracking-wider">IB65</h1>
-        </div>
+    <!-- Top Header (Pure Black & White with Live, Notifications & Top-Right DM Icon) -->
+    <header class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-gray-900 px-4 py-3 flex justify-between items-center">
+        <h1 class="text-2xl font-extrabold tracking-wider text-white">IB65</h1>
         <div class="flex items-center space-x-4">
             <!-- Live Streaming Shortcut Button -->
-            <button onclick="startLiveStream()" class="bg-red-600/80 hover:bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 icon-3d shadow-md animate-pulse">
+            <button onclick="startLiveStream()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 shadow-lg animate-pulse">
                 <i class="fa-solid fa-broadcast-tower"></i>
                 <span>LIVE</span>
             </button>
             <!-- Notification Bell -->
-            <button onclick="toggleNotifications()" class="relative text-gray-300 icon-3d text-xl">
+            <button onclick="toggleNotifications()" class="relative text-white text-xl">
                 <i id="notif-bell-icon" class="fa-solid fa-bell"></i>
                 <span id="notif-badge" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full hidden"></span>
             </button>
-            <div id="header-user-avatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-white text-sm shadow-md cursor-pointer" onclick="switchTab('profile')">U</div>
+            <!-- Direct Message Top-Right Icon (Opens Full Page DM) -->
+            <button onclick="openFullMessageInbox()" class="text-white text-xl relative">
+                <i class="fa-brands fa-facebook-messenger"></i>
+                <span class="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full"></span>
+            </button>
         </div>
     </header>
 
-    <!-- Notification Panel Modal -->
-    <div id="notif-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-end hidden" onclick="toggleNotifications()">
-        <div class="glass-card w-80 h-full p-4 space-y-4 shadow-2xl border-l border-gray-800 overflow-y-auto" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h3 class="font-bold text-base text-gray-200">Notifications</h3>
-                <button onclick="toggleNotifications()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    <!-- Full-Page Message Inbox (Dedicated DM Page) -->
+    <div id="full-msg-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
+        <div class="p-4 border-b border-gray-900 flex justify-between items-center bg-black">
+            <div class="flex items-center space-x-3">
+                <button onclick="closeFullMessageInbox()" class="text-white text-lg"><i class="fa-solid fa-arrow-left"></i></button>
+                <span id="dm-page-username" class="font-bold text-sm">Chats</span>
             </div>
-            <div id="notif-list" class="space-y-3">
-                <div class="text-center text-gray-500 text-xs py-6">No new notifications</div>
+            <button onclick="showToast('New message request settings')" class="text-xs text-gray-400">Requests (0)</button>
+        </div>
+        <div class="p-4 border-b border-gray-900">
+            <input type="text" placeholder="Search chats..." class="w-full bg-[#121212] border border-gray-800 rounded-2xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none">
+        </div>
+        <div id="dm-chats-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <div onclick="openActiveChat('AI Assistant', 'ai@ib65.com')" class="clay-card p-3 flex items-center space-x-3 cursor-pointer">
+                <div class="w-12 h-12 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-sm shadow-md">AI</div>
+                <div class="flex-1">
+                    <p class="font-bold text-xs text-white">AI Assistant</p>
+                    <p class="text-[10px] text-gray-400">Welcome to IB65 3D Universe!</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Settings & Activity Modal (Top-Right Profile Menu) -->
+    <!-- Active Chat Modal (Inside DM Page) -->
+    <div id="active-chat-room" class="fixed inset-0 z-50 bg-black flex flex-col justify-between hidden">
+        <div class="p-4 border-b border-gray-900 flex items-center space-x-3 bg-black">
+            <button onclick="closeActiveChat()" class="text-white"><i class="fa-solid fa-arrow-left"></i></button>
+            <div class="w-9 h-9 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs" id="room-user-init">U</div>
+            <span id="room-user-name" class="font-bold text-xs">User</span>
+        </div>
+        <div id="room-msgs" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs"></div>
+        <div class="p-3 border-t border-gray-900 bg-black flex space-x-2">
+            <input type="text" id="room-input" placeholder="Message..." class="flex-1 bg-[#121212] border border-gray-800 rounded-2xl px-4 py-2.5 text-xs text-white">
+            <button onclick="sendRoomMsg()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notif-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end hidden" onclick="toggleNotifications()">
+        <div class="clay-card w-80 h-full p-4 space-y-4 shadow-2xl overflow-y-auto" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-gray-900 pb-3">
+                <h3 class="font-bold text-sm text-white">Notifications</h3>
+                <button onclick="toggleNotifications()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="notif-list" class="space-y-3 text-xs">
+                <div class="text-center text-gray-500 py-6">No notifications</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
     <div id="settings-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end hidden" onclick="toggleSettingsModal()">
-        <div class="glass-card w-full max-w-sm h-full p-5 space-y-5 shadow-2xl border-l border-gray-800 overflow-y-auto text-gray-200 text-sm" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h3 class="font-bold text-base">Settings and activity</h3>
-                <button onclick="toggleSettingsModal()" class="text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+        <div class="clay-card w-full max-w-sm h-full p-5 space-y-4 shadow-2xl overflow-y-auto text-xs" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-gray-900 pb-3">
+                <h3 class="font-bold text-sm text-white">Settings and activity</h3>
+                <button onclick="toggleSettingsModal()" class="text-gray-400 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
-            <!-- Search inside settings -->
-            <div class="relative">
-                <i class="fa-solid fa-search absolute left-3 top-3 text-gray-500 text-xs"></i>
-                <input type="text" placeholder="Search settings" class="w-full bg-gray-900 border border-gray-700 rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none focus:border-rose-500">
+            <div onclick="openArchiveModal()" class="flex items-center space-x-3 p-3 clay-card cursor-pointer">
+                <i class="fa-solid fa-box-archive text-white text-base"></i>
+                <span>Archive (Stories)</span>
             </div>
-
-            <!-- Your Account Section -->
-            <div class="space-y-1">
-                <p class="text-[11px] text-gray-400 uppercase font-bold tracking-wider">Your account</p>
-                <div onclick="openAccountsCenter()" class="flex items-center space-x-3 p-2.5 hover:bg-gray-800/60 rounded-xl cursor-pointer">
-                    <i class="fa-solid fa-circle-user text-rose-500 text-lg"></i>
-                    <div>
-                        <p class="font-semibold text-xs">Accounts Center</p>
-                        <p class="text-[10px] text-gray-400">Password, security, personal details</p>
-                    </div>
+            <div onclick="toggleAccountPrivacy()" class="flex items-center justify-between p-3 clay-card cursor-pointer">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-lock text-white text-base"></i>
+                    <span>Account Privacy</span>
                 </div>
+                <span id="privacy-lbl" class="text-gray-400 font-bold">Public</span>
             </div>
-
-            <!-- How you use IB65 / Instagram section -->
-            <div class="space-y-1 pt-2 border-t border-gray-800">
-                <p class="text-[11px] text-gray-400 uppercase font-bold tracking-wider">How you use IB65</p>
-                <div onclick="showToast('Saved items')" class="flex items-center space-x-3 p-2.5 hover:bg-gray-800/60 rounded-xl cursor-pointer">
-                    <i class="fa-solid fa-bookmark text-amber-500"></i>
-                    <span class="text-xs font-medium">Saved</span>
-                </div>
-                <div onclick="openArchiveModal()" class="flex items-center space-x-3 p-2.5 hover:bg-gray-800/60 rounded-xl cursor-pointer">
-                    <i class="fa-solid fa-box-archive text-purple-500"></i>
-                    <span class="text-xs font-medium">Archive (Stories)</span>
-                </div>
-                <div onclick="showToast('Your activity log')" class="flex items-center space-x-3 p-2.5 hover:bg-gray-800/60 rounded-xl cursor-pointer">
-                    <i class="fa-solid fa-chart-line text-blue-500"></i>
-                    <span class="text-xs font-medium">Your activity</span>
-                </div>
-                <div onclick="toggleNotifications()" class="flex items-center space-x-3 p-2.5 hover:bg-gray-800/60 rounded-xl cursor-pointer">
-                    <i class="fa-solid fa-bell text-rose-400"></i>
-                    <span class="text-xs font-medium">Notifications</span>
-                </div>
-            </div>
-
-            <!-- Who can see your content -->
-            <div class="space-y-1 pt-2 border-t border-gray-800">
-                <p class="text-[11px] text-gray-400 uppercase font-bold tracking-wider">Who can see your content</p>
-                <div class="flex justify-between items-center p-2.5 hover:bg-gray-800/60 rounded-xl cursor-pointer">
-                    <div class="flex items-center space-x-3">
-                        <i class="fa-solid fa-lock text-emerald-400"></i>
-                        <span class="text-xs font-medium">Account privacy</span>
-                    </div>
-                    <span id="privacy-status-label" class="text-[10px] text-gray-400 font-bold">Public</span>
-                </div>
-                <div onclick="toggleAccountPrivacy()" class="text-right text-[11px] text-rose-400 font-semibold cursor-pointer px-2">Change Private/Public</div>
-            </div>
-
-            <!-- Insights and Tools & Monetization -->
-            <div class="space-y-1 pt-2 border-t border-gray-800">
-                <p class="text-[11px] text-gray-400 uppercase font-bold tracking-wider">Your insights and tools</p>
-                <div onclick="toggleProfessionalMode()" class="flex items-center space-x-3 p-2.5 hover:bg-gray-800/60 rounded-xl cursor-pointer">
-                    <i class="fa-solid fa-chart-pie text-amber-400"></i>
-                    <div>
-                        <p class="font-semibold text-xs" id="mode-title-label">Professional Dashboard</p>
-                        <p class="text-[10px] text-gray-400">Switch between Personal / Professional</p>
-                    </div>
-                </div>
-                <div onclick="showToast('Ads payments & Monetization architecture active')" class="flex items-center space-x-3 p-2.5 hover:bg-gray-800/60 rounded-xl cursor-pointer">
-                    <i class="fa-solid fa-credit-card text-emerald-500"></i>
-                    <div>
-                        <p class="font-semibold text-xs">Ads payments & Monetization</p>
-                        <p class="text-[10px] text-gray-400">Free tier active (Earnings ready)</p>
-                    </div>
-                </div>
+            <div onclick="toggleProfessionalMode()" class="flex items-center space-x-3 p-3 clay-card cursor-pointer">
+                <i class="fa-solid fa-chart-pie text-white text-base"></i>
+                <span id="prof-mode-lbl">Professional Dashboard</span>
             </div>
         </div>
     </div>
 
-    <!-- Archive Modal for Stories -->
-    <div id="archive-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 hidden" onclick="closeArchiveModal()">
-        <div class="glass-card rounded-3xl p-5 w-full max-w-md space-y-4 shadow-2xl" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                <h3 class="font-bold text-sm text-gray-200">Story Archive (24h Expired)</h3>
-                <button onclick="closeArchiveModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    <!-- Archive Modal -->
+    <div id="archive-modal" class="fixed inset-0 z-50 bg-black/9output flex items-center justify-center p-4 hidden" onclick="closeArchiveModal()">
+        <div class="clay-card p-5 w-full max-w-md space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
+                <h3 class="font-bold text-xs text-white">Story Archive (24h)</h3>
+                <button onclick="closeArchiveModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="archive-grid" class="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto">
-                <div class="text-center text-gray-500 col-span-3 py-8 text-xs">No archived stories yet</div>
+                <div class="text-center text-gray-500 col-span-3 py-6 text-xs">No archived stories</div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Area -->
+    <!-- Main Content Body -->
     <main class="max-w-xl mx-auto p-4 space-y-4">
         
         <!-- HOME VIEW -->
         <div id="view-home" class="space-y-4">
-            
-            <!-- Instagram Style Stories Bar -->
-            <div class="glass-card rounded-2xl p-3 shadow-lg overflow-x-auto flex space-x-3 items-center">
-                <div onclick="openStoryUpload()" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
-                    <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 p-0.5 flex items-center justify-center shadow-md">
-                        <div class="w-full h-full bg-gray-900 rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-plus text-rose-500 text-lg"></i>
+            <!-- Stories Tray -->
+            <div class="clay-card p-3 overflow-x-auto flex space-x-3 items-center">
+                <div onclick="openStoryUploadModal()" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
+                    <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-white to-gray-500 flex items-center justify-center shadow-lg">
+                        <div class="w-full h-full bg-black rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-plus text-white text-lg"></i>
                         </div>
                     </div>
-                    <span class="text-[11px] text-gray-300 font-medium">Your story</span>
+                    <span class="text-[10px] text-gray-300">Your story</span>
                 </div>
-                <div id="stories-tray" class="flex space-x-3">
-                    <!-- Dynamic Stories Tray -->
-                </div>
+                <div id="stories-tray" class="flex space-x-3"></div>
             </div>
 
-            <!-- Create Post Box (With Title & Description support) -->
-            <section class="glass-card rounded-2xl p-4 shadow-xl space-y-3">
-                <div class="flex space-x-3">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-white shadow-md" id="user-initial">U</div>
-                    <div class="flex-1 space-y-2">
-                        <input type="text" id="post-title" placeholder="Post Title (for search)..." class="w-full bg-gray-900/60 border border-gray-700/60 rounded-xl px-3 py-1.5 text-xs text-gray-100 placeholder-gray-500 focus:outline-none focus:border-rose-500">
-                        <textarea id="post-text" rows="2" placeholder="Write description or what's on your mind..." class="w-full bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none resize-none text-xs"></textarea>
-                        
-                        <!-- Media Preview -->
-                        <div id="media-preview-container" class="relative mt-2 hidden">
-                            <img id="image-preview" class="rounded-xl max-h-48 w-full object-cover hidden shadow-md">
-                            <video id="video-preview" class="rounded-xl max-h-48 w-full object-cover hidden shadow-md" controls></video>
-                            <button onclick="removeMedia()" class="absolute top-2 right-2 bg-black/70 text-white rounded-full p-1 px-2 text-xs hover:bg-red-600 transition"><i class="fa-solid fa-xmark"></i> Remove</button>
-                        </div>
-
-                        <!-- Trimming / Merging Helper Notes -->
-                        <div class="text-[10px] text-gray-400 flex items-center space-x-1">
-                            <i class="fa-solid fa-scissors text-amber-400"></i>
-                            <span>Videos auto-optimized / trim support enabled</span>
-                        </div>
-
-                        <div class="flex justify-between items-center pt-2 border-t border-gray-800">
-                            <div class="flex space-x-4">
-                                <label class="cursor-pointer text-rose-500 hover:text-rose-400 icon-3d flex items-center space-x-1 text-sm font-medium" title="Upload Image">
-                                    <i class="fa-solid fa-image text-xl"></i>
-                                    <input type="file" id="media-file-img" accept="image/*" class="hidden" onchange="handleMediaSelect(event, 'image')">
-                                </label>
-                                <label class="cursor-pointer text-amber-500 hover:text-amber-400 icon-3d flex items-center space-x-1 text-sm font-medium" title="Upload Video (Max 59s)">
-                                    <i class="fa-solid fa-video text-xl"></i>
-                                    <input type="file" id="media-file-vid" accept="video/*" class="hidden" onchange="handleMediaSelect(event, 'video')">
-                                </label>
-                            </div>
-                            <button onclick="createPost()" class="bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-semibold px-5 py-2 rounded-xl text-xs shadow-lg shadow-rose-500/30 hover:opacity-90 transition icon-3d">Post</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Posts Feed (Auto-Play Video & Smooth Scroll) -->
+            <!-- Posts Feed -->
             <div id="posts-container" class="space-y-4">
-                <div class="text-center text-gray-500 py-8 text-xs">Loading posts...</div>
+                <div class="text-center text-gray-500 py-10 text-xs">Loading feed...</div>
             </div>
         </div>
 
@@ -237,253 +191,189 @@
         <div id="view-search" class="space-y-4 hidden">
             <div class="relative">
                 <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-500"></i>
-                <input type="text" id="global-search" placeholder="Search by title, description or username..." oninput="globalSearch()" class="w-full glass-card rounded-xl pl-11 pr-4 py-3 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-rose-500 shadow-inner">
+                <input type="text" id="global-search" placeholder="Search posts or users..." oninput="globalSearch()" class="w-full clay-card pl-11 pr-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none">
             </div>
-            <!-- Explore Grid -->
-            <div id="explore-grid" class="grid grid-cols-3 gap-1.5">
-                <div class="text-center text-gray-500 col-span-3 py-10 text-xs">Explore feed is empty</div>
-            </div>
+            <div id="explore-grid" class="grid grid-cols-3 gap-1.5"></div>
         </div>
 
-        <!-- REELS VIEW (Vertical Swipe/Scroll Style) -->
+        <!-- REELS VIEW (Instagram Style with Reels & Friends Tabs) -->
         <div id="view-reels" class="space-y-4 hidden">
-            <div class="flex justify-between items-center px-1">
-                <h2 class="text-lg font-bold bg-gradient-to-r from-amber-500 to-rose-500 bg-clip-text text-transparent">Reels Feed</h2>
-                <label class="cursor-pointer bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white text-xs font-semibold px-3 py-1.5 rounded-xl shadow-md icon-3d flex items-center space-x-1">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Upload Reel</span>
-                    <input type="file" accept="video/*" class="hidden" onchange="handleReelUpload(event)">
-                </label>
+            <div class="flex justify-center space-x-6 text-sm font-bold border-b border-gray-900 pb-2">
+                <span class="text-white border-b-2 border-white pb-1 cursor-pointer">Reels</span>
+                <span class="text-gray-500 cursor-pointer" onclick="showToast('Friends reels feed')">Friends</span>
             </div>
             <div id="reels-container" class="space-y-6 flex flex-col items-center">
-                <div class="text-center text-gray-500 py-12 text-xs">No reels yet.</div>
+                <div class="text-center text-gray-500 py-12 text-xs">No reels found.</div>
             </div>
         </div>
 
-        <!-- CHAT VIEW (Instagram DM Style) -->
-        <div id="view-chat" class="space-y-4 hidden">
-            <div id="chat-inbox-view" class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
-                <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                    <h2 class="font-bold text-sm">Direct Messages</h2>
-                    <div class="flex space-x-3 text-xs">
-                        <span class="text-rose-400 font-bold border-b border-rose-500 pb-0.5">Primary</span>
-                        <span class="text-gray-400 cursor-pointer">Requests</span>
-                        <span class="text-gray-400 cursor-pointer">General</span>
-                    </div>
-                </div>
-                <div id="chat-users-list" class="space-y-2">
-                    <div onclick="openChat('AI Support', 'support@ib65.com')" class="flex items-center space-x-3 p-2 hover:bg-gray-800/50 rounded-xl cursor-pointer">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center font-bold text-white text-sm shadow-md">AI</div>
-                        <div class="flex-1">
-                            <p class="font-semibold text-xs text-gray-200">AI Support</p>
-                            <p class="text-[10px] text-gray-400">Welcome to IB65!</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Active Chat Box -->
-            <div id="active-chat-box" class="glass-card rounded-2xl p-4 space-y-3 shadow-xl hidden">
-                <div class="flex items-center space-x-3 border-b border-gray-800 pb-2">
-                    <button onclick="closeChat()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-arrow-left"></i></button>
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-white text-xs shadow-md" id="chat-with-initial">U</div>
-                    <span id="chat-with-name" class="font-bold text-xs">Chat User</span>
-                </div>
-                <div id="chat-messages-container" class="space-y-3 h-64 overflow-y-auto p-2 text-xs"></div>
-                <div class="flex space-x-2 pt-2 border-t border-gray-800">
-                    <input type="text" id="chat-input" placeholder="Message..." class="flex-1 bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-2 text-xs text-gray-100 placeholder-gray-500 focus:outline-none focus:border-rose-500">
-                    <button onclick="sendChatMessage()" class="bg-gradient-to-r from-amber-500 to-rose-600 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md icon-3d"><i class="fa-solid fa-paper-plane"></i></button>
-                </div>
-            </div>
-        </div>
-
-        <!-- PROFILE VIEW (Instagram Style with Main Grid & Tabs) -->
+        <!-- PROFILE VIEW (Instagram Style with Main Grid, Saved Tab, Followers Pop-up) -->
         <div id="view-profile" class="space-y-4 hidden">
-            <div class="glass-card rounded-2xl p-6 text-center space-y-4 shadow-xl relative">
-                <!-- Top Right Settings Gear Button -->
-                <button onclick="toggleSettingsModal()" class="absolute top-4 right-4 text-gray-300 hover:text-rose-500 icon-3d text-xl"><i class="fa-solid fa-gear"></i></button>
-
-                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center font-extrabold text-2xl text-white shadow-xl" id="profile-initial">U</div>
+            <div class="clay-card p-6 text-center space-y-4 relative">
+                <button onclick="toggleSettingsModal()" class="absolute top-4 right-4 text-white text-xl icon-3d"><i class="fa-solid fa-gear"></i></button>
+                <div class="w-20 h-20 mx-auto rounded-full bg-white text-black font-extrabold text-2xl flex items-center justify-center shadow-2xl" id="profile-initial">U</div>
                 <div>
-                    <h2 id="profile-name" class="text-lg font-bold">User Name</h2>
-                    <p id="profile-username" class="text-xs text-rose-400 font-semibold mt-0.5">@username</p>
-                    <p id="profile-email" class="text-xs text-gray-400 mt-0.5">user@email.com</p>
+                    <h2 id="profile-name" class="text-lg font-bold text-white">User</h2>
+                    <p id="profile-username" class="text-xs text-gray-400">@username</p>
                 </div>
-                
-                <!-- Followers / Following Stats Bar -->
-                <div class="flex justify-around py-2 border-y border-gray-800 text-xs">
-                    <div>
-                        <span id="stat-posts-count" class="font-bold block text-sm">0</span>
-                        <span class="text-gray-400 text-[10px]">Posts</span>
-                    </div>
-                    <div>
-                        <span id="stat-followers-count" class="font-bold block text-sm">1.2K</span>
-                        <span class="text-gray-400 text-[10px]">Followers</span>
-                    </div>
-                    <div>
-                        <span id="stat-following-count" class="font-bold block text-sm">340</span>
-                        <span class="text-gray-400 text-[10px]">Following</span>
-                    </div>
+                <div class="flex justify-around py-2 border-y border-gray-900 text-xs">
+                    <div><span id="stat-posts" class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Posts</span></div>
+                    <div onclick="openFollowersModal('followers')" class="cursor-pointer"><span class="font-bold block text-sm text-white">1.2K</span><span class="text-gray-500 text-[10px]">Followers</span></div>
+                    <div onclick="openFollowersModal('following')" class="cursor-pointer"><span class="font-bold block text-sm text-white">340</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
-
-                <div class="flex justify-center space-x-2">
-                    <button onclick="toggleEditProfile()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold px-4 py-1.5 rounded-xl text-xs transition icon-3d">Edit Profile</button>
-                    <button onclick="handleLogout()" class="bg-red-600/80 hover:bg-red-600 text-white font-semibold px-4 py-1.5 rounded-xl text-xs transition shadow-lg icon-3d">Logout</button>
-                </div>
-
-                <div id="edit-profile-box" class="hidden space-y-3 pt-3 border-t border-gray-800 text-left">
-                    <input type="text" id="edit-name-input" placeholder="New Name" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-100">
-                    <button onclick="saveProfile()" class="w-full bg-gradient-to-r from-amber-500 to-rose-600 text-white font-semibold py-2 rounded-xl text-xs shadow-md">Save Changes</button>
-                </div>
+                <button onclick="handleLogout()" class="clay-btn px-6 py-2 text-xs font-bold">Logout</button>
             </div>
 
-            <!-- Profile Grid Tabs (Instagram Style Mixed All Posts & Videos Grid) -->
-            <div class="glass-card rounded-2xl p-4 space-y-3 shadow-xl">
-                <div class="flex justify-around border-b border-gray-800 pb-2 text-gray-400 text-sm">
-                    <button class="text-rose-500 font-bold border-b-2 border-rose-500 pb-1 px-4"><i class="fa-solid fa-table-cells"></i></button>
-                    <button class="hover:text-gray-200 pb-1 px-4"><i class="fa-solid fa-clapperboard"></i></button>
-                    <button class="hover:text-gray-200 pb-1 px-4"><i class="fa-solid fa-bookmark"></i></button>
+            <!-- Profile Tabs (Grid & Saved Tabs) -->
+            <div class="clay-card p-4 space-y-3">
+                <div class="flex justify-around border-b border-gray-900 pb-2 text-gray-400 text-sm">
+                    <button onclick="switchProfileTab('grid')" id="tab-btn-grid" class="text-white border-b-2 border-white pb-1 px-4"><i class="fa-solid fa-table-cells"></i></button>
+                    <button onclick="switchProfileTab('reels')" id="tab-btn-reels" class="pb-1 px-4"><i class="fa-solid fa-clapperboard"></i></button>
+                    <button onclick="switchProfileTab('saved')" id="tab-btn-saved" class="pb-1 px-4"><i class="fa-solid fa-bookmark"></i></button>
                 </div>
-                <div id="my-posts-grid" class="grid grid-cols-3 gap-1.5">
-                    <div class="text-center text-gray-500 col-span-3 py-6 text-xs">No posts yet</div>
+                <div id="profile-dynamic-grid" class="grid grid-cols-3 gap-1.5">
+                    <div class="text-center text-gray-500 col-span-3 py-6 text-xs">No items</div>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- Advanced Share Sheet Modal (WhatsApp, Story, Copy Link, In-App Direct Share) -->
-    <div id="share-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center hidden" onclick="closeShareModal()">
-        <div class="glass-card w-full max-w-xl rounded-t-3xl p-5 space-y-4 shadow-2xl border-t border-gray-700 text-gray-200 text-xs" onclick="event.stopPropagation()">
-            <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto"></div>
-            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                <span class="font-bold text-sm">Share to...</span>
-                <span class="text-[10px] text-gray-400">Links are unique to you</span>
+    <!-- Followers / Following List Modal -->
+    <div id="followers-modal" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 hidden" onclick="closeFollowersModal()">
+        <div class="clay-card p-5 w-full max-w-sm space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
+                <h3 id="followers-modal-title" class="font-bold text-xs text-white">Followers</h3>
+                <button onclick="closeFollowersModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
-            <div class="relative">
-                <i class="fa-solid fa-search absolute left-3 top-3 text-gray-500"></i>
-                <input type="text" placeholder="Search friends..." class="w-full bg-gray-900 border border-gray-700 rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none focus:border-rose-500">
-            </div>
-
-            <!-- Horizontal Friends Avatar List -->
-            <div id="share-friends-list" class="flex space-x-4 overflow-x-auto py-2">
-                <div class="flex flex-col items-center space-y-1 flex-shrink-0 cursor-pointer" onclick="showToast('Shared with vickuu__')">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-rose-500 to-amber-500 flex items-center justify-center font-bold text-white text-xs">V</div>
-                    <span class="text-[10px]">vickuu</span>
+            <div class="space-y-2 max-h-60 overflow-y-auto text-xs">
+                <div class="flex items-center space-x-3 p-2 clay-card">
+                    <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">V</div>
+                    <span>vickuu__</span>
                 </div>
-                <div class="flex flex-col items-center space-y-1 flex-shrink-0 cursor-pointer" onclick="showToast('Shared with Saruav')">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center font-bold text-white text-xs">S</div>
-                    <span class="text-[10px]">Saruav</span>
-                </div>
-                <div class="flex flex-col items-center space-y-1 flex-shrink-0 cursor-pointer" onclick="showToast('Shared with Deepu')">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center font-bold text-white text-xs">D</div>
-                    <span class="text-[10px]">DEEPU</span>
-                </div>
-            </div>
-
-            <!-- Bottom Share Options Bar -->
-            <div class="grid grid-cols-5 gap-2 pt-3 border-t border-gray-800 text-center">
-                <div onclick="showToast('Added to your story!')" class="cursor-pointer space-y-1">
-                    <div class="w-10 h-10 mx-auto rounded-full bg-gray-800 flex items-center justify-center text-rose-400"><i class="fa-solid fa-plus-circle text-lg"></i></div>
-                    <span class="text-[10px]">Add to story</span>
-                </div>
-                <div onclick="window.open('https://api.whatsapp.com/send?text=Check%20out%20this%20awesome%20post%20on%20IB65')" class="cursor-pointer space-y-1">
-                    <div class="w-10 h-10 mx-auto rounded-full bg-emerald-600/20 flex items-center justify-center text-emerald-400"><i class="fa-brands fa-whatsapp text-lg"></i></div>
-                    <span class="text-[10px]">WhatsApp</span>
-                </div>
-                <div onclick="copyShareLink()" class="cursor-pointer space-y-1">
-                    <div class="w-10 h-10 mx-auto rounded-full bg-gray-800 flex items-center justify-center text-blue-400"><i class="fa-solid fa-link text-base"></i></div>
-                    <span class="text-[10px]">Copy link</span>
-                </div>
-                <div onclick="showToast('Opened native share sheet')" class="cursor-pointer space-y-1">
-                    <div class="w-10 h-10 mx-auto rounded-full bg-gray-800 flex items-center justify-center text-purple-400"><i class="fa-solid fa-share-nodes text-base"></i></div>
-                    <span class="text-[10px]">Share</span>
-                </div>
-                <div onclick="window.open('https://api.whatsapp.com/send?text=Status%20share%20via%20IB65')" class="cursor-pointer space-y-1">
-                    <div class="w-10 h-10 mx-auto rounded-full bg-emerald-600/20 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-circle-notch text-lg"></i></div>
-                    <span class="text-[10px]">WA Status</span>
+                <div class="flex items-center space-x-3 p-2 clay-card">
+                    <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">S</div>
+                    <span>Saruav Ghaziabad</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Live Stream Modal UI -->
-    <div id="live-stream-modal" class="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between p-4 hidden">
-        <div class="flex justify-between items-center bg-gray-900/60 p-3 rounded-2xl">
+    <!-- Instagram Style Create / Upload Page Modal -->
+    <div id="create-modal-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
+        <div class="p-4 border-b border-gray-900 flex justify-between items-center bg-black">
+            <button onclick="closeCreateModalPage()" class="text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <span class="font-bold text-sm text-white">New Post / Reel / Story</span>
+            <button onclick="publishContent()" class="clay-btn px-4 py-1 text-xs font-bold">Share</button>
+        </div>
+        <div class="flex-1 p-4 space-y-4 max-w-lg mx-auto w-full overflow-y-auto">
+            <div class="flex space-x-2 border-b border-gray-900 pb-2 text-xs">
+                <button onclick="setUploadType('post')" id="up-type-post" class="font-bold text-white pb-1 border-b border-white px-3">Post</button>
+                <button onclick="setUploadType('reel')" id="up-type-reel" class="text-gray-500 pb-1 px-3">Reel</button>
+                <button onclick="setUploadType('story')" id="up-type-story" class="text-gray-500 pb-1 px-3">Story</button>
+            </div>
+            <input type="text" id="create-title" placeholder="Add title or caption..." class="w-full clay-card p-3 text-xs text-white placeholder-gray-500 focus:outline-none">
+            <label class="cursor-pointer block clay-card p-8 text-center border-dashed border-2 border-gray-800 hover:border-white transition">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-white mb-2"></i>
+                <p class="text-xs text-gray-300">Tap to choose Photo or Video</p>
+                <input type="file" id="create-file-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelected(event)">
+            </label>
+            <div id="create-preview-box" class="hidden relative">
+                <img id="prev-img" class="rounded-2xl max-h-56 w-full object-cover hidden">
+                <video id="prev-vid" class="rounded-2xl max-h-56 w-full object-cover hidden" controls></video>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Share Sheet Modal -->
+    <div id="share-modal" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="closeShareModal()">
+        <div class="clay-card w-full max-w-xl rounded-t-3xl p-5 space-y-4 text-xs" onclick="event.stopPropagation()">
+            <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto"></div>
+            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
+                <span class="font-bold text-sm text-white">Share to...</span>
+            </div>
+            <div class="flex space-x-4 overflow-x-auto py-2">
+                <div class="flex flex-col items-center space-y-1 cursor-pointer" onclick="shareToDM('vickuu__')">
+                    <div class="w-12 h-12 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">V</div>
+                    <span>vickuu</span>
+                </div>
+                <div class="flex flex-col items-center space-y-1 cursor-pointer" onclick="shareToDM('Saruav')">
+                    <div class="w-12 h-12 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">S</div>
+                    <span>Saruav</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-4 gap-2 pt-3 border-t border-gray-900 text-center">
+                <div onclick="window.open('https://api.whatsapp.com/send?text=Check%20out%20IB65')" class="cursor-pointer"><i class="fa-brands fa-whatsapp text-xl text-emerald-400"></i><p class="text-[10px]">WhatsApp</p></div>
+                <div onclick="copyShareLink()" class="cursor-pointer"><i class="fa-solid fa-link text-xl text-blue-400"></i><p class="text-[10px]">Copy Link</p></div>
+                <div onclick="showToast('Added to story')" class="cursor-pointer"><i class="fa-solid fa-plus-circle text-xl text-white"></i><p class="text-[10px]">Add to story</p></div>
+                <div onclick="showToast('Shared successfully')" class="cursor-pointer"><i class="fa-solid fa-share-nodes text-xl text-purple-400"></i><p class="text-[10px]">Share</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Stream Modal -->
+    <div id="live-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
+        <div class="flex justify-between items-center clay-card p-3">
             <div class="flex items-center space-x-2">
                 <span class="bg-red-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold animate-pulse">LIVE</span>
-                <span id="live-host-name" class="text-xs font-bold text-white">Host</span>
+                <span class="text-xs font-bold text-white" id="live-viewer-count">👁️ 14 Viewers</span>
             </div>
-            <button onclick="stopLiveStream()" class="text-gray-300 hover:text-white bg-red-600/50 px-3 py-1 rounded-xl text-xs"><i class="fa-solid fa-xmark"></i> End Live</button>
+            <button onclick="stopLiveStream()" class="text-xs bg-red-600/50 px-3 py-1 rounded-xl">End Live</button>
         </div>
-        <div class="flex-1 flex items-center justify-center relative my-2">
-            <video id="live-video-preview" autoplay playsinline muted class="rounded-2xl max-h-[60vh] w-full object-cover shadow-2xl border border-gray-800"></video>
-            <div class="absolute bottom-4 left-4 right-4 space-y-2 max-h-32 overflow-y-auto pointer-events-none">
-                <div class="bg-black/50 backdrop-blur-sm px-3 py-1 rounded-xl text-[10px] text-gray-200">AI Support joined live</div>
-                <div class="bg-black/50 backdrop-blur-sm px-3 py-1 rounded-xl text-[10px] text-gray-200">vickuu__ sent a heart ❤️</div>
-            </div>
+        <div class="flex-1 flex items-center justify-center my-2 relative">
+            <video id="live-video" autoplay playsinline muted class="rounded-2xl max-h-[60vh] w-full object-cover border border-gray-900"></video>
         </div>
         <div class="flex space-x-2">
-            <input type="text" id="live-comment-input" placeholder="Say something to live viewers..." class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-xs text-gray-100">
-            <button onclick="sendLiveComment()" class="bg-gradient-to-r from-amber-500 to-rose-600 text-white px-4 py-2 rounded-xl text-xs font-semibold">Send</button>
+            <input type="text" placeholder="Say something..." class="flex-1 clay-card p-2.5 text-xs text-white">
+            <button onclick="showToast('Comment sent')" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
         </div>
     </div>
 
-    <!-- Story Creator / Upload Modal -->
-    <div id="story-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden">
-        <div class="glass-card rounded-3xl p-5 w-full max-w-sm space-y-4 text-center">
-            <h3 class="font-bold text-sm">Upload Story (Photo 10s / Video Max 59s)</h3>
-            <label class="cursor-pointer block border-2 border-dashed border-gray-700 rounded-2xl p-6 hover:border-rose-500 transition">
-                <i class="fa-solid fa-cloud-arrow-up text-3xl text-rose-500 mb-2"></i>
-                <p class="text-xs text-gray-300">Click to choose Photo or Video</p>
-                <input type="file" accept="image/*,video/*" class="hidden" onchange="handleStoryUpload(event)">
-            </label>
-            <button onclick="closeStoryUpload()" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl text-xs w-full">Cancel</button>
+    <!-- Story Viewer Modal -->
+    <div id="story-viewer-modal" class="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4 hidden">
+        <div class="relative w-full max-w-sm h-[480px] bg-black clay-card flex flex-col justify-between p-4">
+            <div class="flex justify-between items-center z-10">
+                <span id="story-author-lbl" class="text-xs font-bold text-white">Story</span>
+                <button onclick="closeStoryViewer()" class="text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <img id="story-media-img" class="w-full h-full object-cover hidden">
+                <video id="story-media-vid" class="w-full h-full object-cover hidden" autoplay controls></video>
+            </div>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar (Instagram Style) -->
-    <nav class="fixed bottom-0 left-0 right-0 glass-card border-t border-gray-800 py-3 px-6 flex justify-around items-center z-40 shadow-2xl">
-        <button onclick="switchTab('home')" id="nav-home" class="text-rose-500 icon-3d flex flex-col items-center"><i class="fa-solid fa-house text-xl"></i></button>
-        <button onclick="switchTab('search')" id="nav-search" class="text-gray-400 hover:text-rose-400 icon-3d flex flex-col items-center"><i class="fa-solid fa-compass text-xl"></i></button>
-        <button onclick="openCreateModal()" class="bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg shadow-rose-500/40 icon-3d -mt-5"><i class="fa-solid fa-plus text-xl"></i></button>
-        <button onclick="switchTab('reels')" id="nav-reels" class="text-gray-400 hover:text-rose-400 icon-3d flex flex-col items-center"><i class="fa-solid fa-clapperboard text-xl"></i></button>
-        <button onclick="switchTab('profile')" id="nav-profile" class="text-gray-400 hover:text-rose-400 icon-3d flex flex-col items-center"><i class="fa-solid fa-user text-xl"></i></button>
+    <!-- Bottom Navigation Bar (Pure Black & White with Center Create '+' Button) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-gray-900 py-3 px-6 flex justify-around items-center z-40">
+        <button onclick="switchTab('home')" id="nav-home" class="text-white icon-3d text-xl"><i class="fa-solid fa-house"></i></button>
+        <button onclick="switchTab('search')" id="nav-search" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-compass"></i></button>
+        <button onclick="openCreateModalPage()" class="clay-btn w-12 h-12 rounded-full flex items-center justify-center shadow-xl -mt-5 icon-3d text-black font-extrabold text-xl"><i class="fa-solid fa-plus"></i></button>
+        <button onclick="switchTab('reels')" id="nav-reels" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-clapperboard"></i></button>
+        <button onclick="switchTab('profile')" id="nav-profile" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-user"></i></button>
     </nav>
 
-    <!-- Auth Modal (Signup with Unique Username) -->
-    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="glass-card rounded-3xl p-6 w-full max-w-sm space-y-5 shadow-2xl border border-gray-700">
-            <div class="text-center space-y-1">
-                <h2 class="text-3xl font-extrabold bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">IB65</h2>
-                <p class="text-xs text-gray-400">Login or create unique username account</p>
-            </div>
-
-            <div class="space-y-3 text-xs">
-                <input type="text" id="auth-name" placeholder="Full Name" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-rose-500">
-                <input type="text" id="auth-username" placeholder="Username (unique e.g. manish_65)" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-rose-500">
-                <input type="email" id="auth-email" placeholder="Email" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-rose-500">
-                <input type="password" id="auth-password" placeholder="Password (6+ chars)" class="w-full bg-gray-900/60 border border-gray-700 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-rose-500">
-                
-                <div class="flex space-x-2 pt-2">
-                    <button onclick="handleLogin()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-2.5 rounded-xl transition icon-3d">Login</button>
-                    <button onclick="handleSignup()" class="flex-1 bg-gradient-to-r from-amber-500 to-rose-600 text-white font-semibold py-2.5 rounded-xl transition icon-3d shadow-lg shadow-rose-600/30">Sign up</button>
-                </div>
-                <div class="text-center pt-1">
-                    <button onclick="handleForgotPassword()" class="text-[11px] text-rose-400 hover:underline">Forgot Password?</button>
-                </div>
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
+        <div class="clay-card p-6 w-full max-w-sm space-y-4">
+            <h2 class="text-2xl font-extrabold text-center text-white">IB65</h2>
+            <p class="text-xs text-center text-gray-400">Login or create account</p>
+            <input type="text" id="auth-name" placeholder="Full Name" class="w-full clay-card p-3 text-xs text-white">
+            <input type="email" id="auth-email" placeholder="Email" class="w-full clay-card p-3 text-xs text-white">
+            <input type="password" id="auth-password" placeholder="Password (6+ chars)" class="w-full clay-card p-3 text-xs text-white">
+            <div class="flex space-x-2 pt-2">
+                <button onclick="handleLogin()" class="flex-1 clay-card py-2.5 text-xs font-bold text-white">Login</button>
+                <button onclick="handleSignup()" class="flex-1 clay-btn py-2.5 text-xs font-bold">Sign up</button>
             </div>
         </div>
     </div>
 
     <!-- Toast Message -->
-    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-900/95 text-white text-xs px-4 py-2 rounded-full border border-gray-700 shadow-xl hidden z-50"></div>
+    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white text-xs px-4 py-2 rounded-full border border-gray-800 shadow-2xl hidden z-50"></div>
 
     <!-- Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBlM05NZl4bKjRsrZ0ZUDpjYi0fdPP2-X4",
@@ -496,20 +386,18 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        let selectedFileUrl = "";
-        let selectedFileType = "";
-        let currentChatUser = "";
-        let activeSharePostId = "";
-        let liveStreamMediaStream = null;
 
-        // Hide Anime Intro after 1.2s
+        let uploadType = 'post';
+        let selectedFileUrl = '';
+        let selectedFileType = 'image';
+        let activeSharePostId = '';
+        let currentActiveChatUser = '';
+        let liveMediaStream = null;
+
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const intro = document.getElementById('anime-intro');
-                if(intro) {
-                    intro.style.opacity = '0';
-                    setTimeout(() => intro.remove(), 700);
-                }
+                if(intro) { intro.style.opacity = '0'; setTimeout(() => intro.remove(), 700); }
             }, 1200);
             checkAndExpireStories();
         });
@@ -521,348 +409,336 @@
             setTimeout(() => t.classList.add('hidden'), 3000);
         }
 
-        // Settings Modal & Features
-        window.toggleSettingsModal = function() {
-            document.getElementById('settings-modal').classList.toggle('hidden');
+        // Full Page Message Inbox
+        window.openFullMessageInbox = function() {
+            document.getElementById('full-msg-page').classList.remove('hidden');
+        }
+        window.closeFullMessageInbox = function() {
+            document.getElementById('full-msg-page').classList.add('hidden');
+        }
+        window.openActiveChat = function(name, email) {
+            currentActiveChatUser = email;
+            document.getElementById('active-chat-room').classList.remove('hidden');
+            document.getElementById('room-user-name').innerText = name;
+            document.getElementById('room-user-init').innerText = name[0].toUpperCase();
+            loadRoomMessages();
+        }
+        window.closeActiveChat = function() {
+            document.getElementById('active-chat-room').classList.add('hidden');
+        }
+        window.sendRoomMsg = function() {
+            const input = document.getElementById('room-input');
+            const txt = input.value.trim();
+            if(!txt) return;
+            const chats = JSON.parse(localStorage.getItem('ib65_chats') || '{}');
+            const key = [auth.currentUser.email, currentActiveChatUser].sort().join('_');
+            if(!chats[key]) chats[key] = [];
+            chats[key].push({ sender: auth.currentUser.email, text: txt });
+            localStorage.setItem('ib65_chats', JSON.stringify(chats));
+            input.value = '';
+            loadRoomMessages();
+        }
+        window.loadRoomMessages = function() {
+            const container = document.getElementById('room-msgs');
+            const chats = JSON.parse(localStorage.getItem('ib65_chats') || '{}');
+            const key = [auth.currentUser.email, currentActiveChatUser].sort().join('_');
+            const msgs = chats[key] || [];
+            container.innerHTML = msgs.map(m => `
+                <div class="flex flex-col ${m.sender === auth.currentUser.email ? 'items-end' : 'items-start'}">
+                    <div class="p-3 rounded-2xl max-w-[75%] ${m.sender === auth.currentUser.email ? 'bg-white text-black' : 'clay-card text-white'}">${m.text}</div>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
         }
 
-        window.openAccountsCenter = function() {
-            showToast("Accounts Center: Password, Security & Personal Details");
-        }
-
+        // Settings & Archive
+        window.toggleSettingsModal = function() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         window.toggleAccountPrivacy = function() {
-            const label = document.getElementById('privacy-status-label');
-            if(label.innerText === 'Public') {
-                label.innerText = 'Private';
-                showToast("Account mode set to Private");
-            } else {
-                label.innerText = 'Public';
-                showToast("Account mode set to Public");
-            }
+            const lbl = document.getElementById('privacy-lbl');
+            lbl.innerText = lbl.innerText === 'Public' ? 'Private' : 'Public';
+            showToast("Account privacy updated");
         }
-
-        window.toggleProfessionalMode = function() {
-            const title = document.getElementById('mode-title-label');
-            if(title.innerText.includes('Professional')) {
-                title.innerText = 'Personal Dashboard (Switched)';
-                showToast("Switched to Personal Mode");
-            } else {
-                title.innerText = 'Professional Dashboard';
-                showToast("Switched to Professional Creator Mode");
-            }
-        }
-
+        window.toggleProfessionalMode = function() { showToast("Switched professional/personal mode"); }
         window.openArchiveModal = function() {
             document.getElementById('settings-modal').classList.add('hidden');
             document.getElementById('archive-modal').classList.remove('hidden');
-            loadArchiveStories();
+            loadArchiveGrid();
+        }
+        window.closeArchiveModal = function() { document.getElementById('archive-modal').classList.add('hidden'); }
+        window.loadArchiveGrid = function() {
+            const grid = document.getElementById('archive-grid');
+            const archive = JSON.parse(localStorage.getItem('ib65_archive') || '[]');
+            if(archive.length === 0) { grid.innerHTML = `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No archive items</div>`; return; }
+            grid.innerHTML = archive.map(a => `<div class="h-28 clay-card overflow-hidden flex items-center justify-center"><img src="${a.mediaUrl}" class="w-full h-full object-cover"></div>`).join('');
         }
 
-        window.closeArchiveModal = function() {
-            document.getElementById('archive-modal').classList.add('hidden');
+        // Followers / Following Pop-up
+        window.openFollowersModal = function(type) {
+            document.getElementById('followers-modal-title').innerText = type === 'followers' ? 'Followers' : 'Following';
+            document.getElementById('followers-modal').classList.remove('hidden');
         }
+        window.closeFollowersModal = function() { document.getElementById('followers-modal').classList.add('hidden'); }
 
         // Notifications
         window.toggleNotifications = function() {
-            const modal = document.getElementById('notif-modal');
-            modal.classList.toggle('hidden');
-            if(!modal.classList.contains('hidden')) {
-                loadNotifications();
-                document.getElementById('notif-badge').classList.add('hidden');
-                document.getElementById('notif-bell-icon').style.color = '#d1d5db';
-            }
+            document.getElementById('notif-modal').classList.toggle('hidden');
+            document.getElementById('notif-badge').classList.add('hidden');
         }
 
-        window.addNotification = function(text, targetEmail) {
-            const notifs = JSON.parse(localStorage.getItem('ib65_notifs') || '[]');
-            notifs.unshift({ text, targetEmail, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-            localStorage.setItem('ib65_notifs', JSON.stringify(notifs));
+        // Create / Upload Flow (Instagram Style)
+        window.openCreateModalPage = function() { document.getElementById('create-modal-page').classList.remove('hidden'); }
+        window.closeCreateModalPage = function() { document.getElementById('create-modal-page').classList.add('hidden'); }
+        window.setUploadType = function(type) {
+            uploadType = type;
+            ['post', 'reel', 'story'].forEach(t => {
+                const btn = document.getElementById('up-type-' + t);
+                btn.className = t === type ? 'font-bold text-white pb-1 border-b border-white px-3' : 'text-gray-500 pb-1 px-3';
+            });
         }
-
-        window.loadNotifications = function() {
-            const container = document.getElementById('notif-list');
-            const notifs = JSON.parse(localStorage.getItem('ib65_notifs') || '[]');
-            const user = auth.currentUser;
-            const myNotifs = notifs.filter(n => !user || n.targetEmail === user.email || n.targetEmail === 'all');
-            
-            if(myNotifs.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 text-xs py-6">No notifications</div>`;
-                return;
-            }
-            container.innerHTML = myNotifs.map(n => `
-                <div class="glass-card p-2.5 rounded-xl text-xs space-y-1">
-                    <p class="text-gray-200">${n.text}</p>
-                    <span class="text-[10px] text-gray-400">${n.time}</span>
-                </div>
-            `).join('');
-        }
-
-        window.checkUnreadNotifs = function() {
-            const notifs = JSON.parse(localStorage.getItem('ib65_notifs') || '[]');
-            const user = auth.currentUser;
-            const myNotifs = notifs.filter(n => !user || n.targetEmail === user.email);
-            if(myNotifs.length > 0) {
-                document.getElementById('notif-badge').classList.remove('hidden');
-                document.getElementById('notif-bell-icon').style.color = '#ef4444';
-            }
-        }
-
-        // Media Upload & Trimming Support
-        window.handleMediaSelect = async function(event, type) {
-            const file = event.target.files[0];
-            if (!file) return;
-            showToast("Uploading " + type + " (Auto trimming/merging ready)...");
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", "ib65_upload");
-
-            try {
-                const res = await fetch("https://api.cloudinary.com/v1_1/mhj8jvag/auto/upload", {
-                    method: "POST",
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.secure_url) {
-                    selectedFileUrl = data.secure_url;
-                    selectedFileType = type;
-                    if(type === 'video') {
-                        document.getElementById('video-preview').src = selectedFileUrl;
-                        document.getElementById('video-preview').classList.remove('hidden');
-                        document.getElementById('image-preview').classList.add('hidden');
-                    } else {
-                        document.getElementById('image-preview').src = selectedFileUrl;
-                        document.getElementById('image-preview').classList.remove('hidden');
-                        document.getElementById('video-preview').classList.add('hidden');
-                    }
-                    document.getElementById('media-preview-container').classList.remove('hidden');
-                    showToast("Uploaded successfully!");
-                }
-            } catch (err) {
-                showToast("Upload failed!");
-            }
-        }
-
-        window.removeMedia = function() {
-            selectedFileUrl = "";
-            selectedFileType = "";
-            document.getElementById('media-preview-container').classList.add('hidden');
-        }
-
-        // Reels Upload
-        window.handleReelUpload = async function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            showToast("Uploading reel...");
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", "ib65_upload");
-
-            try {
-                const res = await fetch("https://api.cloudinary.com/v1_1/mhj8jvag/auto/upload", {
-                    method: "POST",
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.secure_url) {
-                    const currentUser = auth.currentUser;
-                    const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
-                    const newReel = {
-                        id: Date.now().toString(),
-                        authorUid: currentUser?.uid || 'guest',
-                        authorEmail: currentUser?.email || '',
-                        author: currentUser?.displayName || 'User',
-                        videoUrl: data.secure_url,
-                        likes: []
-                    };
-                    reels.unshift(newReel);
-                    localStorage.setItem('ib65_reels', JSON.stringify(reels));
-                    loadReels();
-                    showToast("Reel uploaded successfully!");
-                }
-            } catch (err) {
-                showToast("Reel upload failed!");
-            }
-        }
-
-        // Stories Feature (24hr expiry, archive saving, owner-only delete, 10s photo / 59s video limit)
-        window.openStoryUpload = function() {
-            document.getElementById('story-modal').classList.remove('hidden');
-        }
-        window.closeStoryUpload = function() {
-            document.getElementById('story-modal').classList.add('hidden');
-        }
-
-        window.handleStoryUpload = async function(event) {
-            const file = event.target.files[0];
+        window.handleFileSelected = async function(e) {
+            const file = e.target.files[0];
             if(!file) return;
-            showToast("Uploading story...");
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", "ib65_upload");
-
+            showToast("Uploading media...");
+            const fd = new FormData();
+            fd.append("file", file);
+            fd.append("upload_preset", "ib65_upload");
             try {
-                const res = await fetch("https://api.cloudinary.com/v1_1/mhj8jvag/auto/upload", {
-                    method: "POST",
-                    body: formData
-                });
+                const res = await fetch("https://api.cloudinary.com/v1_1/mhj8jvag/auto/upload", { method: "POST", body: fd });
                 const data = await res.json();
                 if(data.secure_url) {
-                    const currentUser = auth.currentUser;
-                    const stories = JSON.parse(localStorage.getItem('ib65_stories') || '[]');
-                    const newStory = {
-                        id: Date.now().toString(),
-                        authorUid: currentUser?.uid || 'guest',
-                        authorEmail: currentUser?.email || '',
-                        author: currentUser?.displayName || 'User',
-                        mediaUrl: data.secure_url,
-                        mediaType: file.type.includes('video') ? 'video' : 'image',
-                        timestamp: Date.now()
-                    };
-                    stories.unshift(newStory);
-                    localStorage.setItem('ib65_stories', JSON.stringify(stories));
-                    closeStoryUpload();
-                    loadStories();
-                    showToast("Story uploaded successfully!");
+                    selectedFileUrl = data.secure_url;
+                    selectedFileType = file.type.includes('video') ? 'video' : 'image';
+                    const box = document.getElementById('create-preview-box');
+                    box.classList.remove('hidden');
+                    if(selectedFileType === 'video') {
+                        document.getElementById('prev-vid').src = selectedFileUrl;
+                        document.getElementById('prev-vid').classList.remove('hidden');
+                        document.getElementById('prev-img').classList.add('hidden');
+                    } else {
+                        document.getElementById('prev-img').src = selectedFileUrl;
+                        document.getElementById('prev-img').classList.remove('hidden');
+                        document.getElementById('prev-vid').classList.add('hidden');
+                    }
+                    showToast("Uploaded successfully!");
                 }
-            } catch(e) {
-                showToast("Story upload failed!");
-            }
+            } catch(err) { showToast("Upload error"); }
         }
 
+        window.publishContent = function() {
+            const title = document.getElementById('create-title').value;
+            const user = auth.currentUser;
+            if(uploadType === 'story') {
+                const stories = JSON.parse(localStorage.getItem('ib65_stories') || '[]');
+                stories.unshift({ id: Date.now().toString(), author: user?.displayName || 'User', authorEmail: user?.email, mediaUrl: selectedFileUrl, mediaType: selectedFileType, timestamp: Date.now() });
+                localStorage.setItem('ib65_stories', JSON.stringify(stories));
+                loadStories();
+            } else if(uploadType === 'reel') {
+                const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
+                reels.unshift({ id: Date.now().toString(), author: user?.displayName || 'User', authorEmail: user?.email, videoUrl: selectedFileUrl, likes: [], comments: [] });
+                localStorage.setItem('ib65_reels', JSON.stringify(reels));
+                loadReels();
+            } else {
+                const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+                posts.unshift({ id: Date.now().toString(), author: user?.displayName || 'User', authorEmail: user?.email, title, mediaUrl: selectedFileUrl, mediaType: selectedFileType, likes: [], comments: [], savedBy: [] });
+                localStorage.setItem('ib65_posts', JSON.stringify(posts));
+                loadPosts();
+            }
+            closeCreateModalPage();
+            showToast("Published successfully!");
+        }
+
+        // Stories 24hr Expiry Check
         window.checkAndExpireStories = function() {
             let stories = JSON.parse(localStorage.getItem('ib65_stories') || '[]');
             let archive = JSON.parse(localStorage.getItem('ib65_archive') || '[]');
             const now = Date.now();
-            const activeStories = [];
-
+            const active = [];
             stories.forEach(s => {
-                // 24 hours = 86400000 ms
-                if(now - s.timestamp < 86400000) {
-                    activeStories.push(s);
-                } else {
-                    archive.unshift(s);
-                }
+                if(now - s.timestamp < 86400000) active.push(s);
+                else archive.unshift(s);
             });
-            localStorage.setItem('ib65_stories', JSON.stringify(activeStories));
+            localStorage.setItem('ib65_stories', JSON.stringify(active));
             localStorage.setItem('ib65_archive', JSON.stringify(archive));
             loadStories();
         }
-
         window.loadStories = function() {
             const tray = document.getElementById('stories-tray');
             const stories = JSON.parse(localStorage.getItem('ib65_stories') || '[]');
-            if(stories.length === 0) {
-                tray.innerHTML = `<span class="text-xs text-gray-500 px-2">No active stories</span>`;
-                return;
-            }
+            if(stories.length === 0) { tray.innerHTML = `<span class="text-xs text-gray-500 px-2">No active stories</span>`; return; }
             tray.innerHTML = stories.map(s => `
-                <div class="flex flex-col items-center space-y-1 flex-shrink-0 cursor-pointer" onclick="viewStory('${s.mediaUrl}', '${s.author}', '${s.id}', '${s.authorEmail}')">
-                    <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-0.5 flex items-center justify-center shadow-md">
-                        <div class="w-full h-full bg-gray-900 rounded-full overflow-hidden flex items-center justify-center">
+                <div class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0" onclick="viewStory('${s.mediaUrl}', '${s.author}')">
+                    <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-white to-gray-500 flex items-center justify-center shadow-md">
+                        <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
                             ${s.mediaType === 'video' ? `<video src="${s.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${s.mediaUrl}" class="w-full h-full object-cover">`}
                         </div>
                     </div>
-                    <span class="text-[11px] text-gray-300 font-medium truncate w-14 text-center">${s.author}</span>
+                    <span class="text-[10px] text-gray-300 truncate w-14 text-center">${s.author}</span>
                 </div>
             `).join('');
         }
+        window.viewStory = function(url, author) {
+            document.getElementById('story-author-lbl').innerText = author + "'s Story";
+            document.getElementById('story-viewer-modal').classList.remove('hidden');
+            document.getElementById('story-media-img').src = url;
+            document.getElementById('story-media-img').classList.remove('hidden');
+        }
+        window.closeStoryViewer = function() { document.getElementById('story-viewer-modal').classList.add('hidden'); }
 
-        window.viewStory = function(url, author, id, authorEmail) {
-            const currentUser = auth.currentUser;
-            const isOwner = currentUser && currentUser.email === authorEmail;
-            let delHtml = isOwner ? `<button onclick="deleteStory('${id}')" class="bg-red-600 text-white px-3 py-1 rounded-xl text-xs">Delete Story</button>` : '';
-            
-            const div = document.createElement('div');
-            div.className = 'fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4';
-            div.innerHTML = `
-                <div class="relative w-full max-w-sm h-[480px] bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between p-4 border border-gray-800">
-                    <div class="flex justify-between items-center z-10 bg-black/50 p-2 rounded-xl">
-                        <span class="text-xs font-bold text-white">${author}'s Story</span>
-                        <div class="flex space-x-2">
-                            ${delHtml}
-                            <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        // Posts Feed & Save / Bookmark Feature
+        window.loadPosts = function() {
+            const container = document.getElementById('posts-container');
+            const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+            const user = auth.currentUser;
+            document.getElementById('stat-posts').innerText = posts.filter(p => user && p.authorEmail === user.email).length;
+
+            if(posts.length === 0) { container.innerHTML = `<div class="text-center text-gray-500 py-10 text-xs">No posts yet.</div>`; return; }
+
+            container.innerHTML = posts.map(p => {
+                const isLiked = user && p.likes.includes(user.email);
+                const isSaved = user && (p.savedBy || []).includes(user.email);
+                return `
+                <div class="clay-card p-4 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${p.author[0]}</div>
+                            <span class="font-bold text-xs text-white">${p.author}</span>
                         </div>
                     </div>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <img src="${url}" class="w-full h-full object-cover">
+                    ${p.title ? `<p class="text-xs text-white font-semibold">${p.title}</p>` : ''}
+                    ${p.mediaUrl ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover" autoplay loop muted controls></video>` : `<img src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover">`) : ''}
+                    <div class="flex items-center space-x-4 pt-2 border-t border-gray-900 text-white text-xs">
+                        <button onclick="toggleLike('${p.id}')" class="flex items-center space-x-1 ${isLiked ? 'text-red-500 font-bold' : ''}">
+                            <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-lg"></i>
+                            <span>${p.likes.length}</span>
+                        </button>
+                        <button onclick="openShareModal('${p.id}')"><i class="fa-solid fa-share text-lg"></i></button>
+                        <button onclick="toggleSavePost('${p.id}')" class="ml-auto ${isSaved ? 'text-white' : 'text-gray-400'}">
+                            <i class="${isSaved ? 'fa-solid' : 'fa-regular'} fa-bookmark text-lg"></i>
+                        </button>
                     </div>
                 </div>
             `;
-            document.body.appendChild(div);
+            }).join('');
+            loadProfileDynamicGrid('grid');
         }
 
-        window.deleteStory = function(id) {
-            let stories = JSON.parse(localStorage.getItem('ib65_stories') || '[]');
-            stories = stories.filter(s => s.id !== id);
-            localStorage.setItem('ib65_stories', JSON.stringify(stories));
-            document.querySelector('.fixed.inset-0.z-50.bg-black\\/95')?.remove();
-            loadStories();
-            showToast("Story deleted by owner!");
+        window.toggleLike = function(id) {
+            const user = auth.currentUser;
+            if(!user) return;
+            let posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+            posts = posts.map(p => {
+                if(p.id === id) {
+                    if(p.likes.includes(user.email)) p.likes = p.likes.filter(e => e !== user.email);
+                    else p.likes.push(user.email);
+                }
+                return p;
+            });
+            localStorage.setItem('ib65_posts', JSON.stringify(posts));
+            loadPosts();
         }
 
-        window.loadArchiveStories = function() {
-            const grid = document.getElementById('archive-grid');
-            const archive = JSON.parse(localStorage.getItem('ib65_archive') || '[]');
-            if(archive.length === 0) {
-                grid.innerHTML = `<div class="text-center text-gray-500 col-span-3 py-8 text-xs">No archived stories</div>`;
+        window.toggleSavePost = function(id) {
+            const user = auth.currentUser;
+            if(!user) return;
+            let posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+            posts = posts.map(p => {
+                if(p.id === id) {
+                    if(!p.savedBy) p.savedBy = [];
+                    if(p.savedBy.includes(user.email)) {
+                        p.savedBy = p.savedBy.filter(e => e !== user.email);
+                        showToast("Removed from saved");
+                    } else {
+                        p.savedBy.push(user.email);
+                        showToast("Saved to your collection!");
+                    }
+                }
+                return p;
+            });
+            localStorage.setItem('ib65_posts', JSON.stringify(posts));
+            loadPosts();
+        }
+
+        // Profile Dynamic Tabs (Grid, Reels, Saved)
+        window.switchProfileTab = function(tab) {
+            ['grid', 'reels', 'saved'].forEach(t => {
+                document.getElementById('tab-btn-' + t).className = t === tab ? 'text-white border-b-2 border-white pb-1 px-4' : 'text-gray-500 pb-1 px-4';
+            });
+            loadProfileDynamicGrid(tab);
+        }
+
+        window.loadProfileDynamicGrid = function(tab) {
+            const grid = document.getElementById('profile-dynamic-grid');
+            const user = auth.currentUser;
+            if(!user) return;
+            const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+            const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
+
+            let items = [];
+            if(tab === 'grid') {
+                items = posts.filter(p => p.authorEmail === user.email);
+            } else if(tab === 'saved') {
+                items = posts.filter(p => (p.savedBy || []).includes(user.email));
+            } else {
+                items = reels.filter(r => r.authorEmail === user.email);
+            }
+
+            if(items.length === 0) {
+                grid.innerHTML = `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No items in ${tab}</div>`;
                 return;
             }
-            grid.innerHTML = archive.map(a => `
-                <div class="h-28 rounded-xl overflow-hidden glass-card flex items-center justify-center">
-                    <img src="${a.mediaUrl}" class="w-full h-full object-cover">
+            grid.innerHTML = items.map(item => `
+                <div class="h-28 clay-card rounded-xl overflow-hidden flex items-center justify-center">
+                    <img src="${item.mediaUrl || item.videoUrl || 'https://via.placeholder.com/150'}" class="w-full h-full object-cover">
                 </div>
             `).join('');
         }
 
-        // Live Stream Functions
+        // Reels Section (Instagram Style)
+        window.loadReels = function() {
+            const container = document.getElementById('reels-container');
+            const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
+            if(reels.length === 0) { container.innerHTML = `<div class="text-center text-gray-500 py-12 text-xs">No reels found.</div>`; return; }
+            container.innerHTML = reels.map(r => `
+                <div class="relative w-full max-w-sm h-[480px] clay-card overflow-hidden flex flex-col justify-between p-4">
+                    <video src="${r.videoUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop muted controls></video>
+                    <div class="relative z-10 flex justify-between items-center bg-black/60 p-2 rounded-xl">
+                        <span class="font-bold text-xs text-white">${r.author}</span>
+                        <button class="bg-white text-black px-3 py-1 rounded-full text-[10px] font-bold">Follow</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Share Sheet
+        window.openShareModal = function(id) { activeSharePostId = id; document.getElementById('share-modal').classList.remove('hidden'); }
+        window.closeShareModal = function() { document.getElementById('share-modal').classList.add('hidden'); }
+        window.shareToDM = function(name) { showToast("Shared with " + name); closeShareModal(); }
+        window.copyShareLink = function() { navigator.clipboard.writeText(window.location.href); showToast("Link copied!"); closeShareModal(); }
+
+        // Live Stream
         window.startLiveStream = async function() {
-            document.getElementById('live-stream-modal').classList.remove('hidden');
-            const user = auth.currentUser;
-            document.getElementById('live-host-name').innerText = user?.displayName || 'Host';
+            document.getElementById('live-modal').classList.remove('hidden');
             try {
-                liveStreamMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                document.getElementById('live-video-preview').srcObject = liveStreamMediaStream;
-                showToast("Live stream started successfully!");
-            } catch(e) {
-                showToast("Camera access denied or unavailable");
-            }
+                liveMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                document.getElementById('live-video').srcObject = liveMediaStream;
+            } catch(e) { showToast("Camera access needed"); }
         }
-
         window.stopLiveStream = function() {
-            if(liveStreamMediaStream) {
-                liveStreamMediaStream.getTracks().forEach(track => track.stop());
-            }
-            document.getElementById('live-stream-modal').classList.add('hidden');
-            showToast("Live stream ended");
+            if(liveMediaStream) liveMediaStream.getTracks().forEach(t => t.stop());
+            document.getElementById('live-modal').classList.add('hidden');
         }
 
-        window.sendLiveComment = function() {
-            const input = document.getElementById('live-comment-input');
-            if(!input.value) return;
-            showToast("Comment sent: " + input.value);
-            input.value = '';
-        }
-
-        // Auth state watcher
+        // Auth Watcher
         onAuthStateChanged(auth, (user) => {
-            if (user) {
+            if(user) {
                 document.getElementById('auth-modal').classList.add('hidden');
-                const initial = user.displayName ? user.displayName[0].toUpperCase() : 'U';
-                document.getElementById('user-initial').innerText = initial;
-                document.getElementById('header-user-avatar').innerText = initial;
-                document.getElementById('profile-initial').innerText = initial;
                 document.getElementById('profile-name').innerText = user.displayName || 'User';
-                
-                const users = JSON.parse(localStorage.getItem('ib65_users') || '{}');
-                const uname = users[user.email] || '@' + user.email.split('@')[0];
-                document.getElementById('profile-username').innerText = uname;
-                document.getElementById('profile-email').innerText = user.email || '';
-
+                document.getElementById('profile-username').innerText = '@' + user.email.split('@')[0];
+                const init = (user.displayName || 'U')[0].toUpperCase();
+                document.getElementById('profile-initial').innerText = init;
                 loadPosts();
                 loadReels();
                 loadStories();
-                loadExploreGrid();
-                checkUnreadNotifs();
             } else {
                 document.getElementById('auth-modal').classList.remove('hidden');
             }
@@ -870,430 +746,32 @@
 
         window.handleSignup = async function() {
             const name = document.getElementById('auth-name').value;
-            const username = document.getElementById('auth-username').value.trim();
             const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-
-            if(!name || !username || !email || password.length < 6) {
-                showToast("Sabhi details bharein (Username zaroori hai)");
-                return;
-            }
-
-            const formattedUname = username.startsWith('@') ? username : '@' + username;
-            const users = JSON.parse(localStorage.getItem('ib65_users') || '{}');
-            
-            if(Object.values(users).includes(formattedUname)) {
-                showToast("Ye username pehle se taken hai! Doosra chunein.");
-                return;
-            }
-
+            const pass = document.getElementById('auth-password').value;
+            if(!name || !email || pass.length < 6) { showToast("Invalid details"); return; }
             try {
-                const res = await createUserWithEmailAndPassword(auth, email, password);
+                const res = await createUserWithEmailAndPassword(auth, email, pass);
                 await updateProfile(res.user, { displayName: name });
-                users[email] = formattedUname;
-                localStorage.setItem('ib65_users', JSON.stringify(users));
-                showToast("Account ban gaya!");
-            } catch(e) {
-                showToast(e.message);
-            }
+                showToast("Account created!");
+            } catch(e) { showToast(e.message); }
         }
-
         window.handleLogin = async function() {
             const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                showToast("Login successful!");
-            } catch(e) {
-                showToast("Login failed: " + e.message);
-            }
+            const pass = document.getElementById('auth-password').value;
+            try { await signInWithEmailAndPassword(auth, email, pass); showToast("Logged in!"); } catch(e) { showToast("Login failed"); }
         }
-
-        window.handleForgotPassword = async function() {
-            const email = document.getElementById('auth-email').value;
-            if(!email) {
-                showToast("Pehle apna email enter karein!");
-                return;
-            }
-            try {
-                await sendPasswordResetEmail(auth, email);
-                showToast("Password reset link bhej di gayi hai!");
-            } catch(e) {
-                showToast("Error: " + e.message);
-            }
-        }
-
-        window.handleLogout = async function() {
-            await signOut(auth);
-            showToast("Logged out successfully");
-        }
-
-        window.toggleEditProfile = function() {
-            document.getElementById('edit-profile-box').classList.toggle('hidden');
-        }
-
-        window.saveProfile = async function() {
-            const newName = document.getElementById('edit-name-input').value;
-            if(!newName) return;
-            try {
-                await updateProfile(auth.currentUser, { displayName: newName });
-                document.getElementById('profile-name').innerText = newName;
-                document.getElementById('user-initial').innerText = newName[0].toUpperCase();
-                document.getElementById('header-user-avatar').innerText = newName[0].toUpperCase();
-                toggleEditProfile();
-                showToast("Profile updated!");
-                loadPosts();
-            } catch(e) {
-                showToast("Failed: " + e.message);
-            }
-        }
-
-        // Post Creation with Title & Description
-        window.createPost = function() {
-            const title = document.getElementById('post-title').value;
-            const text = document.getElementById('post-text').value;
-            if(!title && !text && !selectedFileUrl) {
-                showToast("Kuch text ya media dalein!");
-                return;
-            }
-
-            const currentUser = auth.currentUser;
-            const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
-            const newPost = {
-                id: Date.now().toString(),
-                authorUid: currentUser?.uid || 'guest',
-                authorEmail: currentUser?.email || '',
-                author: currentUser?.displayName || 'User',
-                title: title,
-                text: text,
-                mediaUrl: selectedFileUrl,
-                mediaType: selectedFileType,
-                likes: [],
-                comments: []
-            };
-            posts.unshift(newPost);
-            localStorage.setItem('ib65_posts', JSON.stringify(posts));
-            
-            document.getElementById('post-title').value = '';
-            document.getElementById('post-text').value = '';
-            removeMedia();
-            loadPosts();
-            loadExploreGrid();
-            showToast("Post published!");
-        }
-
-        window.loadPosts = function() {
-            const container = document.getElementById('posts-container');
-            const gridContainer = document.getElementById('my-posts-grid');
-            const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
-            const currentUser = auth.currentUser;
-
-            document.getElementById('stat-posts-count').innerText = posts.filter(p => currentUser && (p.authorUid === currentUser.uid || p.authorEmail === currentUser.email)).length;
-
-            if(posts.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 py-8 text-xs">No posts yet.</div>`;
-            } else {
-                container.innerHTML = posts.map(p => {
-                    const isOwner = currentUser && (p.authorUid === currentUser.uid || p.authorEmail === currentUser.email);
-                    const isLiked = currentUser && p.likes.includes(currentUser.email);
-                    return `
-                    <div class="glass-card rounded-2xl p-4 space-y-3 shadow-lg">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-xs text-white shadow-md">${p.author[0]}</div>
-                                <span class="font-semibold text-xs text-gray-200">${p.author}</span>
-                            </div>
-                            ${isOwner ? `
-                                <div id="del-btn-wrap-${p.id}">
-                                    <button onclick="confirmDelete('${p.id}', 'post')" class="text-gray-400 hover:text-red-500 text-xs icon-3d"><i class="fa-solid fa-ellipsis-vertical text-base"></i></button>
-                                </div>
-                            ` : ''}
-                        </div>
-                        ${p.title ? `<h3 class="font-bold text-xs text-rose-400">${p.title}</h3>` : ''}
-                        ${p.text ? `<p class="text-xs text-gray-300">${p.text}</p>` : ''}
-                        ${p.mediaUrl ? (
-                            p.mediaType === 'video' ? 
-                            `<video src="${p.mediaUrl}" class="rounded-xl w-full max-h-64 object-cover shadow-md" autoplay loop muted controls></video>` :
-                            `<img src="${p.mediaUrl}" class="rounded-xl w-full max-h-64 object-cover shadow-md">`
-                        ) : ''}
-                        
-                        <!-- Action Bar -->
-                        <div class="flex items-center space-x-4 pt-2 border-t border-gray-800 text-gray-300 text-xs">
-                            <button onclick="toggleLike('${p.id}', 'post')" class="flex items-center space-x-1 icon-3d ${isLiked ? 'text-red-500 font-bold' : ''}">
-                                <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-base"></i>
-                                <span>${p.likes.length}</span>
-                            </button>
-                            <button onclick="toggleCommentBox('${p.id}')" class="flex items-center space-x-1 icon-3d">
-                                <i class="fa-regular fa-comment text-base"></i>
-                                <span>${p.comments.length}</span>
-                            </button>
-                            <button onclick="openShareModal('${p.id}')" class="icon-3d ml-auto"><i class="fa-solid fa-share text-base"></i></button>
-                        </div>
-
-                        <!-- Comments Section -->
-                        <div id="comment-box-${p.id}" class="hidden space-y-2 pt-2 border-t border-gray-800/60">
-                            <div class="space-y-1 max-h-28 overflow-y-auto">
-                                ${p.comments.map(c => `<p class="text-[11px] text-gray-300"><strong class="text-rose-400">${c.user}:</strong>${c.text}</p>`).join('')}
-                            </div>
-                            <div class="flex space-x-2">
-                                <input type="text" id="comment-input-${p.id}" placeholder="Add a comment..." class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-3 py-1 text-[11px] text-gray-100">
-                                <button onclick="addComment('${p.id}', 'post')" class="bg-rose-600 text-white px-3 py-1 rounded-xl text-[11px] font-semibold shadow-md">Post</button>
-                            </div>
-                        </div>
-                    </div>
-                `}).join('');
-            }
-
-            // My Profile Mixed Main Grid (Photos & Videos)
-            if(currentUser) {
-                const myPosts = posts.filter(p => p.authorUid === currentUser.uid || p.authorEmail === currentUser.email);
-                if(myPosts.length === 0) {
-                    gridContainer.innerHTML = `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No posts yet</div>`;
-                } else {
-                    gridContainer.innerHTML = myPosts.map(p => `
-                        <div class="relative rounded-lg overflow-hidden glass-card h-28 flex items-center justify-center">
-                            ${p.mediaUrl ? (
-                                p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${p.mediaUrl}" class="w-full h-full object-cover">`
-                            ) : `<div class="p-2 text-[10px] text-gray-300 text-center">${p.title || p.text}</div>`}
-                        </div>
-                    `).join('');
-                }
-            }
-        }
-
-        // Safe Confirmation Deletion
-        window.confirmDelete = function(id, type) {
-            const wrap = document.getElementById(`del-btn-wrap-${id}`);
-            wrap.innerHTML = `
-                <div class="flex space-x-1">
-                    <button onclick="deleteItem('${id}', '${type}')" class="bg-red-600 text-white px-2 py-0.5 rounded-lg text-[10px] font-semibold shadow-md">Delete?</button>
-                    <button onclick="loadPosts()" class="bg-gray-700 text-gray-300 px-2 py-0.5 rounded-lg text-[10px]">Cancel</button>
-                </div>
-            `;
-        }
-
-        window.deleteItem = function(id, type) {
-            if(type === 'post') {
-                let posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
-                posts = posts.filter(p => p.id !== id);
-                localStorage.setItem('ib65_posts', JSON.stringify(posts));
-                loadPosts();
-                loadExploreGrid();
-            } else {
-                let reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
-                reels = reels.filter(r => r.id !== id);
-                localStorage.setItem('ib65_reels', JSON.stringify(reels));
-                loadReels();
-            }
-            showToast("Deleted successfully!");
-        }
-
-        window.toggleLike = function(id, type) {
-            const currentUser = auth.currentUser;
-            if(!currentUser) return;
-            const key = type === 'post' ? 'ib65_posts' : 'ib65_reels';
-            let items = JSON.parse(localStorage.getItem(key) || '[]');
-            
-            items = items.map(item => {
-                if(item.id === id) {
-                    if(item.likes.includes(currentUser.email)) {
-                        item.likes = item.likes.filter(e => e !== currentUser.email);
-                    } else {
-                        item.likes.push(currentUser.email);
-                        if(currentUser.email !== item.authorEmail) {
-                            addNotification(`${currentUser.displayName} liked your ${type}.`, item.authorEmail);
-                        }
-                    }
-                }
-                return item;
-            });
-            localStorage.setItem(key, JSON.stringify(items));
-            type === 'post' ? loadPosts() : loadReels();
-            checkUnreadNotifs();
-        }
-
-        window.toggleCommentBox = function(id) {
-            const box = document.getElementById(`comment-box-${id}`);
-            box.classList.toggle('hidden');
-        }
-
-        window.addComment = function(id, type) {
-            const currentUser = auth.currentUser;
-            const input = document.getElementById(`comment-input-${id}`);
-            const text = input.value.trim();
-            if(!text || !currentUser) return;
-
-            const key = type === 'post' ? 'ib65_posts' : 'ib65_reels';
-            let items = JSON.parse(localStorage.getItem(key) || '[]');
-
-            items = items.map(item => {
-                if(item.id === id) {
-                    item.comments.push({ user: currentUser.displayName, text });
-                    if(currentUser.email !== item.authorEmail) {
-                        addNotification(`${currentUser.displayName} commented on your ${type}.`, item.authorEmail);
-                    }
-                }
-                return item;
-            });
-            localStorage.setItem(key, JSON.stringify(items));
-            input.value = '';
-            type === 'post' ? loadPosts() : loadReels();
-            checkUnreadNotifs();
-        }
-
-        // Advanced Share Sheet Actions
-        window.openShareModal = function(id) {
-            activeSharePostId = id;
-            document.getElementById('share-modal').classList.remove('hidden');
-        }
-        window.closeShareModal = function() {
-            document.getElementById('share-modal').classList.add('hidden');
-        }
-        window.copyShareLink = function() {
-            navigator.clipboard.writeText(window.location.href);
-            showToast("Link copied to clipboard!");
-            closeShareModal();
-        }
-
-        window.loadReels = function() {
-            const container = document.getElementById('reels-container');
-            const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
-            const currentUser = auth.currentUser;
-
-            if(reels.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 py-12 text-xs">No reels yet.</div>`;
-                return;
-            }
-
-            container.innerHTML = reels.map(r => {
-                const isOwner = currentUser && (r.authorUid === currentUser.uid || r.authorEmail === currentUser.email);
-                const isLiked = currentUser && r.likes.includes(currentUser.email);
-                return `
-                <div class="relative w-full max-w-sm h-[480px] bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between p-4 border border-gray-800">
-                    <video src="${r.videoUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop muted controls></video>
-                    <div class="relative z-10 flex justify-between items-center bg-black/40 backdrop-blur-md px-3 py-2 rounded-xl">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-bold text-xs text-white shadow-md">${r.author[0]}</div>
-                            <span class="font-semibold text-xs text-white">${r.author}</span>
-                        </div>
-                        ${isOwner ? `<button onclick="deleteItem('${r.id}', 'reel')" class="text-gray-300 hover:text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
-                    </div>
-                    <div class="relative z-10 flex justify-between items-end bg-gradient-to-t from-black/80 p-2">
-                        <div class="flex space-x-4 text-white">
-                            <button onclick="toggleLike('${r.id}', 'reel')" class="flex items-center space-x-1 ${isLiked ? 'text-red-500' : ''}">
-                                <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-2xl"></i>
-                                <span class="text-xs">${r.likes.length}</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `}).join('');
-        }
-
-        window.loadExploreGrid = function(query = '') {
-            const grid = document.getElementById('explore-grid');
-            const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
-            const filtered = posts.filter(p => (p.title || '').toLowerCase().includes(query.toLowerCase()) || (p.text || '').toLowerCase().includes(query.toLowerCase()) || (p.author || '').toLowerCase().includes(query.toLowerCase()));
-            
-            if(filtered.length === 0) {
-                grid.innerHTML = `<div class="text-center text-gray-500 col-span-3 py-10 text-xs">No results found</div>`;
-                return;
-            }
-            grid.innerHTML = filtered.map(p => `
-                <div class="relative h-28 bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center shadow-md">
-                    ${p.mediaUrl ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${p.mediaUrl}" class="w-full h-full object-cover">`) : `<p class="text-[10px] text-center p-1 text-gray-200">${p.title || p.text}</p>`}
-                </div>
-            `).join('');
-        }
-
-        window.globalSearch = function() {
-            const q = document.getElementById('global-search').value;
-            loadExploreGrid(q);
-        }
-
-        // Chat System
-        window.openChat = function(name, email) {
-            currentChatUser = email;
-            document.getElementById('chat-inbox-view').classList.add('hidden');
-            document.getElementById('active-chat-box').classList.remove('hidden');
-            document.getElementById('chat-with-name').innerText = name;
-            document.getElementById('chat-with-initial').innerText = name[0].toUpperCase();
-            loadChatMessages();
-        }
-
-        window.closeChat = function() {
-            document.getElementById('active-chat-box').classList.add('hidden');
-            document.getElementById('chat-inbox-view').classList.remove('hidden');
-        }
-
-        window.sendChatMessage = function() {
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            if(!text || !currentChatUser) return;
-
-            const currentUser = auth.currentUser;
-            const chats = JSON.parse(localStorage.getItem('ib65_chats') || '{}');
-            const key = [currentUser.email, currentChatUser].sort().join('_');
-            if(!chats[key]) chats[key] = [];
-
-            chats[key].push({ sender: currentUser.email, text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-            localStorage.setItem('ib65_chats', JSON.stringify(chats));
-            input.value = '';
-            loadChatMessages();
-        }
-
-        window.loadChatMessages = function() {
-            const container = document.getElementById('chat-messages-container');
-            const currentUser = auth.currentUser;
-            const chats = JSON.parse(localStorage.getItem('ib65_chats') || '{}');
-            const key = [currentUser.email, currentChatUser].sort().join('_');
-            const msgs = chats[key] || [];
-
-            if(msgs.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 text-xs py-4">No messages yet.</div>`;
-                return;
-            }
-
-            container.innerHTML = msgs.map(m => {
-                const isMe = m.sender === currentUser.email;
-                return `
-                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1">
-                    <div class="max-w-[75%] px-3 py-2 rounded-2xl text-xs shadow-md ${isMe ? 'bg-gradient-to-r from-amber-500 to-rose-600 text-white rounded-br-none' : 'glass-card text-gray-200 rounded-bl-none'}">
-                        ${m.text}
-                    </div>
-                </div>
-            `}).join('');
-            container.scrollTop = container.scrollHeight;
-        }
+        window.handleLogout = async function() { await signOut(auth); showToast("Logged out"); }
 
         window.switchTab = function(tab) {
-            const tabs = ['home', 'search', 'reels', 'chat', 'profile'];
-            tabs.forEach(t => {
-                const viewEl = document.getElementById('view-' + t);
-                const navEl = document.getElementById('nav-' + t);
-                if(viewEl) viewEl.classList.add('hidden');
-                if(navEl) {
-                    navEl.classList.remove('text-rose-500');
-                    navEl.classList.add('text-gray-400');
-                }
+            ['home', 'search', 'reels', 'profile'].forEach(t => {
+                document.getElementById('view-' + t).classList.add('hidden');
+                document.getElementById('nav-' + t).className = 'text-gray-500 icon-3d text-xl';
             });
-
-            const activeView = document.getElementById('view-' + tab);
-            const activeNav = document.getElementById('nav-' + tab);
-            if(activeView) activeView.classList.remove('hidden');
-            if(activeNav) {
-                activeNav.classList.remove('text-gray-400');
-                activeNav.classList.add('text-rose-500');
-            }
-            if(tab === 'search') loadExploreGrid();
+            document.getElementById('view-' + tab).classList.remove('hidden');
+            document.getElementById('nav-' + tab).className = 'text-white icon-3d text-xl';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        window.openCreateModal = function() {
-            switchTab('home');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            document.getElementById('post-title').focus();
-        }
+        window.globalSearch = function() {}
     </script>
 </body>
 </html>
