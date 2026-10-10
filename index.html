@@ -111,12 +111,29 @@
                 <h3 class="font-bold text-sm text-white">Settings and activity</h3>
                 <button onclick="toggleSettingsModal()" class="text-gray-400 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            <div onclick="openArchiveModal()" class="flex items-center space-x-3 p-3 clay-card cursor-pointer">
+                <i class="fa-solid fa-box-archive text-white text-base"></i>
+                <span>Story Archive (24h)</span>
+            </div>
             <div onclick="toggleAccountPrivacy()" class="flex items-center justify-between p-3 clay-card cursor-pointer">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-lock text-white text-base"></i>
                     <span>Account Privacy</span>
                 </div>
                 <span id="privacy-lbl" class="text-gray-400 font-bold">Public</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archive Modal -->
+    <div id="archive-modal" class="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 hidden" onclick="closeArchiveModal()">
+        <div class="clay-card p-5 w-full max-w-md space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
+                <h3 class="font-bold text-xs text-white">Story Archive</h3>
+                <button onclick="closeArchiveModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="archive-grid" class="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+                <div class="text-center text-gray-500 col-span-3 py-6 text-xs">No archived stories</div>
             </div>
         </div>
     </div>
@@ -208,7 +225,7 @@
 
     </main>
 
-    <!-- Instagram Style Create / Upload Modal with Story, Post, Reel tabs -->
+    <!-- Create / Upload Modal with Camera & Gallery Support -->
     <div id="create-modal-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-gray-900 flex justify-between items-center bg-black">
             <button onclick="closeCreateModalPage()" class="text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -222,12 +239,27 @@
                 <button onclick="setUploadType('reel')" id="up-type-reel" class="text-gray-500 pb-1 px-3">Reel</button>
             </div>
             <input type="text" id="create-title" placeholder="Add caption..." class="w-full clay-card p-3 text-xs text-white placeholder-gray-500 focus:outline-none">
-            <label class="cursor-pointer block clay-card p-8 text-center border-dashed border-2 border-gray-800 hover:border-white transition">
-                <i class="fa-solid fa-cloud-arrow-up text-3xl text-white mb-2"></i>
-                <p class="text-xs text-gray-300">Tap to choose Photo or Video from Gallery</p>
-                <input type="file" id="create-file-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelected(event)">
-            </label>
-            <div id="create-preview-box" class="hidden relative">
+            
+            <div class="grid grid-cols-2 gap-2">
+                <label class="cursor-pointer block clay-card p-4 text-center border border-gray-800 hover:border-white transition">
+                    <i class="fa-solid fa-images text-2xl text-white mb-1"></i>
+                    <p class="text-[10px] text-gray-300">Choose from Gallery</p>
+                    <input type="file" id="gallery-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelected(event)">
+                </label>
+                <label class="cursor-pointer block clay-card p-4 text-center border border-gray-800 hover:border-white transition">
+                    <i class="fa-solid fa-camera text-2xl text-white mb-1"></i>
+                    <p class="text-[10px] text-gray-300">Capture with Camera</p>
+                    <input type="file" id="camera-input" accept="image/*,video/*" capture="environment" class="hidden" onchange="handleFileSelected(event)">
+                </label>
+            </div>
+
+            <div id="create-preview-box" class="hidden relative space-y-2">
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] text-gray-400">Editor Filter:</span>
+                    <button onclick="applyFilter('none')" class="text-[10px] bg-gray-800 px-2 py-1 rounded">Normal</button>
+                    <button onclick="applyFilter('grayscale(100%)')" class="text-[10px] bg-gray-800 px-2 py-1 rounded">B&W</button>
+                    <button onclick="applyFilter('contrast(150%)')" class="text-[10px] bg-gray-800 px-2 py-1 rounded">Contrast</button>
+                </div>
                 <img id="prev-img" class="rounded-2xl max-h-56 w-full object-cover hidden">
                 <video id="prev-vid" class="rounded-2xl max-h-56 w-full object-cover hidden" controls></video>
             </div>
@@ -264,14 +296,26 @@
         </div>
     </div>
 
-    <!-- Live Stream Modal -->
+    <!-- Live Stream Modal with Views & Comments -->
     <div id="live-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
         <div class="flex justify-between items-center clay-card p-3">
-            <span class="bg-red-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold animate-pulse">LIVE</span>
+            <div class="flex items-center space-x-2">
+                <span class="bg-red-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold animate-pulse">LIVE</span>
+                <span id="live-viewers-count" class="text-xs font-bold text-white">👁️ 24</span>
+            </div>
             <button onclick="stopLiveStream()" class="text-xs bg-red-600/50 px-3 py-1 rounded-xl">End Live</button>
         </div>
-        <div class="flex-1 flex items-center justify-center my-2 relative">
-            <video id="live-video" autoplay playsinline muted class="rounded-2xl max-h-[60vh] w-full object-cover border border-gray-900"></video>
+        <div class="flex-1 flex flex-col justify-between my-2 relative overflow-hidden">
+            <video id="live-video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover rounded-2xl border border-gray-900"></video>
+            <div id="live-chat-stream" class="relative z-10 p-3 space-y-1 max-h-40 overflow-y-auto pointer-events-none text-xs">
+                <div class="bg-black/60 px-2 py-1 rounded-lg w-max"><strong>vickuu:</strong> Hello live!</div>
+                <div class="bg-black/60 px-2 py-1 rounded-lg w-max"><strong>Saruav:</strong> 🔥🔥🔥</div>
+            </div>
+        </div>
+        <div class="flex space-x-2 z-20">
+            <input type="text" id="live-comment-input" placeholder="Comment..." class="flex-1 clay-card p-2.5 text-xs text-white">
+            <button onclick="sendLiveComment()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
+            <button onclick="sendLiveHeart()" class="bg-red-600 text-white px-3 py-2 rounded-xl text-sm"><i class="fa-solid fa-heart"></i></button>
         </div>
     </div>
 
@@ -330,7 +374,7 @@
                 const intro = document.getElementById('anime-intro');
                 if(intro) { intro.style.opacity = '0'; setTimeout(() => intro.remove(), 700); }
             }, 1200);
-            loadStories();
+            checkAndExpireStories();
             loadPosts();
             loadReels();
         });
@@ -351,6 +395,17 @@
             showToast("Privacy updated");
         }
         window.toggleNotifications = function() { document.getElementById('notif-modal').classList.toggle('hidden'); }
+
+        // Archive Modal
+        window.openArchiveModal = function() {
+            document.getElementById('settings-modal').classList.add('hidden');
+            document.getElementById('archive-modal').classList.remove('hidden');
+            const grid = document.getElementById('archive-grid');
+            const archive = JSON.parse(localStorage.getItem('ib65_archive') || '[]');
+            if(archive.length === 0) { grid.innerHTML = `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No archived stories</div>`; return; }
+            grid.innerHTML = archive.map(a => `<div class="h-28 clay-card overflow-hidden flex items-center justify-center"><img src="${a.mediaUrl}" class="w-full h-full object-cover"></div>`).join('');
+        }
+        window.closeArchiveModal = function() { document.getElementById('archive-modal').classList.add('hidden'); }
 
         window.openFollowModal = function(type) {
             document.getElementById('follow-modal-title').innerText = type === 'followers' ? 'Followers' : 'Following';
@@ -392,7 +447,7 @@
         window.handleFileSelected = async function(e) {
             const file = e.target.files[0];
             if(!file) return;
-            showToast("Uploading media from gallery...");
+            showToast("Uploading media...");
             const fd = new FormData();
             fd.append("file", file);
             fd.append("upload_preset", "ib65_upload");
@@ -413,9 +468,17 @@
                         document.getElementById('prev-img').classList.remove('hidden');
                         document.getElementById('prev-vid').classList.add('hidden');
                     }
-                    showToast("File uploaded successfully!");
+                    showToast("Uploaded successfully!");
                 }
             } catch(err) { showToast("Upload error!"); }
+        }
+
+        window.applyFilter = function(filterStyle) {
+            const img = document.getElementById('prev-img');
+            const vid = document.getElementById('prev-vid');
+            if(img) img.style.filter = filterStyle;
+            if(vid) vid.style.filter = filterStyle;
+            showToast("Filter applied");
         }
 
         window.publishContent = function() {
@@ -451,7 +514,21 @@
             document.getElementById('create-preview-box').classList.add('hidden');
         }
 
-        // Stories Tray & Viewer
+        // Stories 24hr Expiry Check & Viewer
+        window.checkAndExpireStories = function() {
+            let stories = JSON.parse(localStorage.getItem('ib65_stories') || '[]');
+            let archive = JSON.parse(localStorage.getItem('ib65_archive') || '[]');
+            const now = Date.now();
+            const active = [];
+            stories.forEach(s => {
+                if(now - s.timestamp < 86400000) active.push(s);
+                else archive.unshift(s);
+            });
+            localStorage.setItem('ib65_stories', JSON.stringify(active));
+            localStorage.setItem('ib65_archive', JSON.stringify(archive));
+            loadStories();
+        }
+
         window.loadStories = function() {
             const tray = document.getElementById('stories-tray');
             const stories = JSON.parse(localStorage.getItem('ib65_stories') || '[]');
@@ -676,6 +753,7 @@
             }).join('');
         }
 
+        // Live Streaming with Live Comments & Likes
         window.startLiveStream = async function() {
             document.getElementById('live-modal').classList.remove('hidden');
             try {
@@ -686,6 +764,22 @@
         window.stopLiveStream = function() {
             if(liveMediaStream) liveMediaStream.getTracks().forEach(t => t.stop());
             document.getElementById('live-modal').classList.add('hidden');
+        }
+        window.sendLiveComment = function() {
+            const input = document.getElementById('live-comment-input');
+            const txt = input.value.trim();
+            if(!txt) return;
+            const stream = document.getElementById('live-chat-stream');
+            const user = auth.currentUser?.displayName || 'You';
+            stream.innerHTML += `<div class="bg-black/60 px-2 py-1 rounded-lg w-max"><strong>${user}:</strong> ${txt}</div>`;
+            input.value = '';
+            stream.scrollTop = stream.scrollHeight;
+        }
+        window.sendLiveHeart = function() {
+            showToast("❤️ Liked live stream");
+            const stream = document.getElementById('live-chat-stream');
+            stream.innerHTML += `<div class="text-red-500 font-bold">❤️ Loved the stream</div>`;
+            stream.scrollTop = stream.scrollHeight;
         }
 
         onAuthStateChanged(auth, (user) => {
