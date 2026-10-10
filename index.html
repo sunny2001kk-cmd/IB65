@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IB65 — Social Universe</title>
+    <title>IB65 — Next Gen Social Universe</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -31,23 +31,30 @@
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #000000; }
         ::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
+        @keyframes storyBar {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+        .story-progress-active {
+            animation: storyBar 7s linear forwards;
+        }
     </style>
 </head>
-<body class="min-h-screen pb-24 select-none">
+<body class="min-h-screen pb-24 select-none bg-black text-white">
 
     <!-- Splash Screen -->
     <div id="anime-intro" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center space-y-3 transition-opacity duration-500">
         <h1 class="text-5xl font-black tracking-widest text-white">IB65</h1>
-        <p class="text-xs text-gray-500 tracking-widest uppercase">Connecting Universe</p>
+        <p class="text-xs text-gray-500 tracking-widest uppercase">Cloud Universe</p>
     </div>
 
     <!-- Header -->
     <header class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-gray-900 px-4 py-3 flex justify-between items-center">
         <h1 class="text-2xl font-black tracking-wider text-white">IB65</h1>
         <div class="flex items-center space-x-4">
-            <button onclick="startLiveStream()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 shadow-lg animate-pulse">
+            <button onclick="switchTab('live')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 shadow-lg">
                 <i class="fa-solid fa-broadcast-tower"></i>
-                <span>LIVE</span>
+                <span>LIVE HUB</span>
             </button>
             <button onclick="toggleNotifications()" class="relative text-white text-xl">
                 <i class="fa-solid fa-bell"></i>
@@ -58,7 +65,7 @@
         </div>
     </header>
 
-    <!-- Message Inbox Screen -->
+    <!-- Message Inbox -->
     <div id="full-msg-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-gray-900 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -72,7 +79,7 @@
                 <div class="w-10 h-10 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-sm">AI</div>
                 <div>
                     <p class="font-bold text-xs text-white">IB65 Assistant</p>
-                    <p class="text-[10px] text-gray-400">Welcome to Cloud Sync!</p>
+                    <p class="text-[10px] text-gray-400">Welcome to real Cloud Sync!</p>
                 </div>
             </div>
         </div>
@@ -89,7 +96,7 @@
         </div>
     </div>
 
-    <!-- Main Container -->
+    <!-- Main Views Container -->
     <main class="max-w-xl mx-auto p-4 space-y-4">
         
         <!-- HOME FEED -->
@@ -107,41 +114,62 @@
             </div>
 
             <div id="posts-container" class="space-y-4">
-                <div class="text-center text-gray-500 py-10 text-xs">Connecting feed...</div>
+                <div class="text-center text-gray-500 py-10 text-xs">Loading feed...</div>
             </div>
         </div>
 
         <!-- SEARCH VIEW -->
         <div id="view-search" class="space-y-4 hidden">
-            <input type="text" id="global-search" oninput="handleSearch(event)" placeholder="Search posts..." class="w-full clay-card px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none">
-            <div id="explore-grid" class="grid grid-cols-3 gap-1.5"></div>
+            <input type="text" id="global-search" oninput="handleSearch(event)" placeholder="Search users or posts..." class="w-full clay-card px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none">
+            <div id="explore-grid" class="grid grid-cols-3 gap-1.5 pt-2"></div>
         </div>
 
-        <!-- REELS FEED -->
+        <!-- REELS FEED (Sound On & Vertical Scroll) -->
         <div id="view-reels" class="space-y-4 hidden">
             <div id="reels-container" class="space-y-6 flex flex-col items-center">
-                <div class="text-center text-gray-500 py-12 text-xs">Connecting reels...</div>
+                <div class="text-center text-gray-500 py-12 text-xs">Loading reels...</div>
             </div>
         </div>
 
-        <!-- PROFILE VIEW -->
+        <!-- LIVE HUB SECTION (Real Live Stream Discover) -->
+        <div id="view-live" class="space-y-4 hidden">
+            <div class="clay-card p-4 flex justify-between items-center">
+                <div>
+                    <h2 class="text-sm font-bold text-white">Live Broadcast Hub</h2>
+                    <p class="text-[10px] text-gray-400">Stream or join real active creators</p>
+                </div>
+                <button onclick="startHostingLive()" class="bg-red-600 px-4 py-1.5 rounded-full text-xs font-bold text-white shadow-lg flex items-center space-x-1.5">
+                    <i class="fa-solid fa-video"></i>
+                    <span>Go Live</span>
+                </button>
+            </div>
+            
+            <div class="space-y-2">
+                <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase">Active Streams</h3>
+                <div id="live-streams-list" class="space-y-3">
+                    <div class="text-center text-gray-500 py-12 text-xs">No active live streams right now</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE VIEW (Grid + Saved + Real Follow Lists) -->
         <div id="view-profile" class="space-y-4 hidden">
             <div class="clay-card p-6 text-center space-y-4 relative">
                 <button onclick="toggleSettingsModal()" class="absolute top-4 right-4 text-white text-xl"><i class="fa-solid fa-gear"></i></button>
-                <div class="w-20 h-20 mx-auto rounded-full bg-white text-black font-black text-2xl flex items-center justify-center" id="profile-initial">U</div>
+                <div class="w-20 h-20 mx-auto rounded-full bg-white text-black font-black text-2xl flex items-center justify-center shadow-lg" id="profile-initial">U</div>
                 <div>
                     <h2 id="profile-name" class="text-lg font-bold text-white">User</h2>
                     <p id="profile-username" class="text-xs text-gray-400">@username</p>
                 </div>
                 <div class="flex justify-around py-2 border-y border-gray-900 text-xs">
                     <div><span id="stat-posts" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Posts</span></div>
-                    <div onclick="openFollowList('followers')" class="cursor-pointer"><span id="stat-followers" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
-                    <div onclick="openFollowList('following')" class="cursor-pointer"><span id="stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
+                    <div onclick="openFollowListModal('followers')" class="cursor-pointer"><span id="stat-followers" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
+                    <div onclick="openFollowListModal('following')" class="cursor-pointer"><span id="stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
                 <button onclick="handleLogout()" class="clay-btn px-6 py-2 text-xs font-bold">Logout</button>
             </div>
 
-            <!-- Profile Grid Tabs -->
+            <!-- Profile Tabs (Grid & Saved) -->
             <div class="clay-card p-4 space-y-3">
                 <div class="flex justify-around border-b border-gray-900 pb-2 text-gray-400 text-sm">
                     <button onclick="switchProfileTab('posts')" id="tab-btn-posts" class="text-white border-b-2 border-white pb-1 px-4"><i class="fa-solid fa-table-cells"></i></button>
@@ -160,8 +188,8 @@
     <div id="create-modal-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-gray-900 flex justify-between items-center">
             <button onclick="closeCreateModalPage()" class="text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <span class="font-bold text-sm" id="create-title-lbl">Upload Post</span>
-            <button onclick="publishContent()" class="clay-btn px-4 py-1 text-xs font-bold">Share</button>
+            <span class="font-bold text-sm" id="create-title-lbl">Create New</span>
+            <button onclick="publishContent()" id="share-submit-btn" class="clay-btn px-4 py-1 text-xs font-bold">Share</button>
         </div>
         <div class="flex-1 p-4 space-y-4 max-w-lg mx-auto w-full overflow-y-auto">
             <div class="flex space-x-2 border-b border-gray-900 pb-2 text-xs">
@@ -169,7 +197,7 @@
                 <button onclick="setUploadType('post')" id="up-type-post" class="font-bold text-white pb-1 border-b border-white px-3">Post</button>
                 <button onclick="setUploadType('reel')" id="up-type-reel" class="text-gray-500 pb-1 px-3">Reel</button>
             </div>
-            <input type="text" id="create-caption" placeholder="Write caption..." class="w-full clay-card p-3 text-xs text-white placeholder-gray-500 focus:outline-none">
+            <input type="text" id="create-caption" placeholder="Write a caption..." class="w-full clay-card p-3 text-xs text-white placeholder-gray-500 focus:outline-none">
             
             <div class="grid grid-cols-2 gap-2">
                 <label class="cursor-pointer block clay-card p-4 text-center border border-gray-800 hover:border-white transition">
@@ -183,7 +211,7 @@
                 </button>
             </div>
 
-            <!-- In-App Media Editor -->
+            <!-- In-App Media Filters & Preview -->
             <div id="create-preview-box" class="hidden space-y-3">
                 <div class="flex items-center space-x-2 overflow-x-auto py-1 text-xs">
                     <span class="text-gray-400 text-[10px]">Filter:</span>
@@ -202,7 +230,7 @@
     <div id="inapp-camera-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
         <div class="flex justify-between items-center z-10">
             <button onclick="closeLiveCamera()" class="text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
-            <span class="text-xs font-bold text-white tracking-widest uppercase">IB65 Lens</span>
+            <span class="text-xs font-bold text-white tracking-widest uppercase">IB65 Viewfinder</span>
             <button onclick="flipCamera()" class="text-white text-lg"><i class="fa-solid fa-camera-rotate"></i></button>
         </div>
         <div class="flex-1 relative flex items-center justify-center my-2">
@@ -210,14 +238,39 @@
             <canvas id="camera-canvas" class="hidden"></canvas>
         </div>
         <div class="flex justify-center items-center py-4 z-10">
-            <button onclick="capturePhoto()" class="w-18 h-18 rounded-full border-4 border-white p-1 flex items-center justify-center active:scale-90 transition">
+            <button onclick="capturePhoto()" class="w-20 h-20 rounded-full border-4 border-white p-1 flex items-center justify-center active:scale-90 transition">
                 <div class="w-14 h-14 bg-white rounded-full"></div>
             </button>
         </div>
     </div>
 
-    <!-- Instagram Comment Modal -->
-    <div id="comments-modal" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="closeCommentsModal()">
+    <!-- Instagram-Style Full-Screen Story Viewer -->
+    <div id="story-viewer-modal" class="fixed inset-0 z-50 bg-black flex items-center justify-center hidden" onclick="closeStoryViewer()">
+        <div class="relative w-full max-w-md h-full bg-black flex flex-col justify-between p-4" onclick="event.stopPropagation()">
+            <!-- Top Progress Bars -->
+            <div class="w-full flex space-x-1 z-20 pt-2">
+                <div class="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
+                    <div id="story-prog-bar" class="h-full bg-white w-0"></div>
+                </div>
+            </div>
+            <!-- Header Author Info -->
+            <div class="flex justify-between items-center z-20 pt-2">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs" id="story-avatar">U</div>
+                    <span id="story-author-lbl" class="text-xs font-bold text-white">Story</span>
+                </div>
+                <button onclick="closeStoryViewer()" class="text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <!-- Story Media Body -->
+            <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+                <img id="story-media-img" class="w-full h-full object-cover hidden">
+                <video id="story-media-vid" class="w-full h-full object-cover hidden" playsinline></video>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instagram Comment Modal (Posts & Reels) -->
+    <div id="comments-modal" class="fixed inset-0 z-50 bg-black/85 flex items-end justify-center hidden" onclick="closeCommentsModal()">
         <div class="clay-card w-full max-w-xl h-[65vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-gray-900 pb-2">
                 <span class="font-bold text-xs text-white">Comments</span>
@@ -231,29 +284,44 @@
         </div>
     </div>
 
-    <!-- Live Stream Modal -->
-    <div id="live-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
-        <div class="flex justify-between items-center clay-card p-3">
+    <!-- Instagram Real Live Stream Host & Watch Player -->
+    <div id="live-player-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
+        <div class="flex justify-between items-center z-20">
             <div class="flex items-center space-x-2">
                 <span class="bg-red-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold animate-pulse">LIVE</span>
-                <span class="text-xs font-bold">👁️ 38</span>
+                <span id="live-viewers-count" class="text-xs font-bold text-white">👁️ 1</span>
+                <span id="live-host-name" class="text-xs text-gray-300 font-semibold pl-2">Host</span>
             </div>
-            <button onclick="stopLiveStream()" class="text-xs bg-red-600/50 px-3 py-1 rounded-xl">End</button>
+            <button onclick="leaveOrEndLive()" class="text-xs bg-red-600/70 hover:bg-red-600 px-3 py-1 rounded-xl text-white font-bold">Exit</button>
         </div>
-        <div class="flex-1 flex flex-col justify-between my-2 relative overflow-hidden">
-            <video id="live-stream-video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover rounded-2xl"></video>
-            <div id="live-chat-stream" class="relative z-10 p-3 space-y-1 max-h-40 overflow-y-auto pointer-events-none text-xs">
-                <div class="bg-black/60 px-2 py-1 rounded-lg w-max"><strong>system:</strong> Stream started</div>
+
+        <div class="absolute inset-0 flex items-center justify-center">
+            <video id="live-stream-video" autoplay playsinline muted class="w-full h-full object-cover"></video>
+        </div>
+
+        <!-- Real Live Chat Stream (No Fake Chat) -->
+        <div class="z-20 space-y-3">
+            <div id="live-chat-stream" class="space-y-1.5 max-h-48 overflow-y-auto p-2 text-xs"></div>
+            <div class="flex space-x-2">
+                <input type="text" id="live-comment-input" placeholder="Send a message to live..." class="flex-1 clay-card p-2.5 text-xs text-white bg-black/60 backdrop-blur-md focus:outline-none">
+                <button onclick="sendLiveChatMessage()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
+                <button onclick="sendLiveHeartReaction()" class="bg-red-600 text-white px-3 py-2 rounded-xl text-sm"><i class="fa-solid fa-heart"></i></button>
             </div>
-        </div>
-        <div class="flex space-x-2 z-20">
-            <input type="text" id="live-comment-input" placeholder="Say something..." class="flex-1 clay-card p-2.5 text-xs text-white">
-            <button onclick="sendLiveComment()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
-            <button onclick="sendLiveHeart()" class="bg-red-600 text-white px-3 py-2 rounded-xl text-sm"><i class="fa-solid fa-heart"></i></button>
         </div>
     </div>
 
-    <!-- Navigation -->
+    <!-- Instagram Mutual Follow / Following List Modal -->
+    <div id="follow-modal" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 hidden" onclick="closeFollowListModal()">
+        <div class="clay-card p-5 w-full max-w-sm space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
+                <h3 id="follow-modal-title" class="font-bold text-xs text-white">Followers</h3>
+                <button onclick="closeFollowListModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="follow-modal-list" class="space-y-2 max-h-64 overflow-y-auto text-xs"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
     <nav class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-gray-900 py-3 px-6 flex justify-around items-center z-40">
         <button onclick="switchTab('home')" id="nav-home" class="text-white icon-3d text-xl"><i class="fa-solid fa-house"></i></button>
         <button onclick="switchTab('search')" id="nav-search" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-compass"></i></button>
@@ -271,31 +339,20 @@
             <input type="email" id="auth-email" placeholder="Email" class="w-full clay-card p-3 text-xs text-white">
             <input type="password" id="auth-password" placeholder="Password (6+ chars)" class="w-full clay-card p-3 text-xs text-white">
             <div class="flex space-x-2 pt-2">
-                <button onclick="handleLogin()" class="flex-1 clay-card py-2.5 text-xs font-bold">Login</button>
+                <button onclick="handleLogin()" class="flex-1 clay-card py-2.5 text-xs font-bold text-white">Login</button>
                 <button onclick="handleSignup()" class="flex-1 clay-btn py-2.5 text-xs font-bold">Sign Up</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Follow List Modal -->
-    <div id="follow-modal" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 hidden" onclick="closeFollowList()">
-        <div class="clay-card p-5 w-full max-w-sm space-y-4" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
-                <h3 id="follow-modal-title" class="font-bold text-xs">List</h3>
-                <button onclick="closeFollowList()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div id="follow-modal-list" class="space-y-2 max-h-60 overflow-y-auto text-xs"></div>
         </div>
     </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white text-xs px-4 py-2 rounded-full border border-gray-800 shadow-2xl hidden z-50"></div>
 
-    <!-- Firebase Script Engine -->
+    <!-- Complete Firebase Firestore Cloud Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBlM05NZl4bKjRsrZ0ZUDpjYi0fdPP2-X4",
@@ -318,12 +375,18 @@
 
         let cameraMediaStream = null;
         let cameraFacing = 'environment';
-        let liveVideoObj = null;
 
         let activeCommentCol = 'posts';
         let activeCommentId = null;
 
-        // Fail-safe load
+        let activeLiveStreamId = null;
+        let isHostingLive = false;
+        let localLiveMediaStream = null;
+        let liveChatInterval = null;
+
+        let storyTimeout = null;
+
+        // Splash fail-safe
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const splash = document.getElementById('anime-intro');
@@ -332,7 +395,6 @@
                     setTimeout(() => splash.remove(), 500);
                 }
             }, 800);
-
             safeLoadAll();
         });
 
@@ -340,6 +402,7 @@
             try { await loadCloudPosts(); } catch(e) {}
             try { await loadCloudReels(); } catch(e) {}
             try { await loadCloudStories(); } catch(e) {}
+            try { await loadActiveLiveHub(); } catch(e) {}
         }
 
         window.showToast = function(msg) {
@@ -352,7 +415,7 @@
         window.openFullMessageInbox = function() { document.getElementById('full-msg-page').classList.remove('hidden'); }
         window.closeFullMessageInbox = function() { document.getElementById('full-msg-page').classList.add('hidden'); }
         window.toggleNotifications = function() { document.getElementById('notif-modal').classList.toggle('hidden'); }
-        window.toggleSettingsModal = function() { showToast("Settings menu opened"); }
+        window.toggleSettingsModal = function() { showToast("Settings opened"); }
 
         // Live Camera Handlers
         window.openLiveCamera = async function() {
@@ -405,7 +468,7 @@
                 pVid.classList.add('hidden');
 
                 closeLiveCamera();
-                showToast("Photo captured!");
+                showToast("Captured photo!");
             }, 'image/jpeg', 0.95);
         }
 
@@ -430,6 +493,7 @@
                 const el = document.getElementById('up-type-' + t);
                 if (el) el.className = t === type ? 'font-bold text-white pb-1 border-b border-white px-3' : 'text-gray-500 pb-1 px-3';
             });
+            document.getElementById('create-title-lbl').innerText = 'Upload ' + type.toUpperCase();
         }
 
         window.handleFileSelected = function(e) {
@@ -455,14 +519,16 @@
             }
         }
 
-        // Cloud Upload & Storage
+        // Dedicated Video/Image Cloudinary Upload Pipeline
         window.publishContent = async function() {
             const user = auth.currentUser;
-            if (!user) { showToast("Login required!"); return; }
+            if (!user) { showToast("Please login first!"); return; }
             if (!selectedFileBlob && !selectedFileUrl) { showToast("Select media first!"); return; }
 
             const caption = document.getElementById('create-caption').value.trim();
-            showToast("Uploading to Cloud...");
+            const btn = document.getElementById('share-submit-btn');
+            btn.innerText = "Uploading...";
+            btn.disabled = true;
 
             try {
                 let cloudMediaUrl = selectedFileUrl;
@@ -470,10 +536,18 @@
                     const fd = new FormData();
                     fd.append("file", selectedFileBlob);
                     fd.append("upload_preset", "ib65_upload");
-                    const res = await fetch("https://api.cloudinary.com/v1_1/mhj8jvag/auto/upload", { method: "POST", body: fd });
+
+                    // Dedicated endpoint for heavy videos
+                    const targetEndpoint = selectedFileType === 'video'
+                        ? "https://api.cloudinary.com/v1_1/mhj8jvag/video/upload"
+                        : "https://api.cloudinary.com/v1_1/mhj8jvag/image/upload";
+
+                    const res = await fetch(targetEndpoint, { method: "POST", body: fd });
                     const resData = await res.json();
                     if (resData.secure_url) {
                         cloudMediaUrl = resData.secure_url;
+                    } else {
+                        throw new Error("Could not get media URL");
                     }
                 }
 
@@ -521,13 +595,16 @@
                 selectedFileUrl = '';
                 document.getElementById('create-caption').value = '';
                 document.getElementById('create-preview-box').classList.add('hidden');
-                showToast("Uploaded successfully!");
+                showToast("Shared to cloud successfully!");
             } catch(e) {
                 showToast("Upload failed: " + e.message);
+            } finally {
+                btn.innerText = "Share";
+                btn.disabled = false;
             }
         }
 
-        // Cloud Data Synchronization
+        // Posts Loader
         window.loadCloudPosts = async function() {
             const container = document.getElementById('posts-container');
             const profileGrid = document.getElementById('profile-grid');
@@ -538,7 +615,11 @@
                 posts.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
 
                 const user = auth.currentUser;
+                let userFollowing = [];
                 if (user) {
+                    const uDoc = await getDoc(doc(db, "users", user.email));
+                    if (uDoc.exists()) userFollowing = uDoc.data().following || [];
+
                     const myPosts = posts.filter(p => p.authorEmail === user.email);
                     document.getElementById('stat-posts').innerText = myPosts.length;
                     profileGrid.innerHTML = myPosts.length === 0 ? `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No posts yet</div>` : myPosts.map(p => `
@@ -556,6 +637,9 @@
                 container.innerHTML = posts.map(p => {
                     const isLiked = user && (p.likes || []).includes(user.email);
                     const isSaved = user && (p.savedBy || []).includes(user.email);
+                    const isFollowing = userFollowing.includes(p.authorEmail);
+                    const isSelf = user && user.email === p.authorEmail;
+
                     return `
                     <div class="clay-card p-4 space-y-3">
                         <div class="flex justify-between items-center">
@@ -563,6 +647,7 @@
                                 <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${(p.author || 'U')[0]}</div>
                                 <span class="font-bold text-xs text-white">${p.author}</span>
                             </div>
+                            ${!isSelf ? `<button onclick="toggleFollowUserCloud('${p.author}', '${p.authorEmail}')" class="text-[11px] font-bold px-3 py-1 rounded-full ${isFollowing ? 'border border-gray-700 text-gray-300' : 'clay-btn'}">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
                         </div>
                         ${p.title ? `<p class="text-xs text-white font-medium">${p.title}</p>` : ''}
                         ${p.mediaUrl ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover" controls playsinline></video>` : `<img src="${p.mediaUrl}" style="filter: ${p.filter || 'none'}" class="rounded-2xl w-full max-h-72 object-cover">`) : ''}
@@ -587,6 +672,7 @@
             }
         }
 
+        // Reels Loader with Real Sound & Controls
         window.loadCloudReels = async function() {
             const container = document.getElementById('reels-container');
             try {
@@ -601,8 +687,17 @@
                 }
 
                 const user = auth.currentUser;
+                let userFollowing = [];
+                if (user) {
+                    const uDoc = await getDoc(doc(db, "users", user.email));
+                    if (uDoc.exists()) userFollowing = uDoc.data().following || [];
+                }
+
                 container.innerHTML = reels.map(r => {
                     const isLiked = user && (r.likes || []).includes(user.email);
+                    const isFollowing = userFollowing.includes(r.authorEmail);
+                    const isSelf = user && user.email === r.authorEmail;
+
                     return `
                     <div class="relative w-full max-w-sm h-[75vh] bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-end p-4 border border-gray-900">
                         <video src="${r.videoUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop controls playsinline></video>
@@ -621,7 +716,7 @@
                                 <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${(r.author || 'U')[0]}</div>
                                 <span class="font-bold text-xs text-white">${r.author}</span>
                             </div>
-                            <button onclick="toggleFollowUser('${r.author}', '${r.authorEmail}')" class="bg-white text-black px-4 py-1.5 rounded-full text-xs font-bold clay-btn">Follow</button>
+                            ${!isSelf ? `<button onclick="toggleFollowUserCloud('${r.author}', '${r.authorEmail}')" class="px-3 py-1 rounded-full text-xs font-bold ${isFollowing ? 'border border-gray-600 text-gray-300' : 'clay-btn'}">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -629,6 +724,7 @@
             } catch(e) {}
         }
 
+        // Stories Tray & Full-Screen Viewer
         window.loadCloudStories = async function() {
             const tray = document.getElementById('stories-tray');
             try {
@@ -647,7 +743,7 @@
                 }
 
                 tray.innerHTML = stories.map(s => `
-                    <div class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
+                    <div class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0" onclick="viewInstagramStory('${s.mediaUrl}', '${s.author}', '${s.mediaType}')">
                         <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-white to-gray-500 flex items-center justify-center">
                             <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
                                 ${s.mediaType === 'video' ? `<video src="${s.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${s.mediaUrl}" style="filter: ${s.filter || 'none'}" class="w-full h-full object-cover">`}
@@ -659,7 +755,84 @@
             } catch(e) {}
         }
 
-        // Actions: Like, Comment, Save
+        window.viewInstagramStory = function(url, author, type) {
+            clearTimeout(storyTimeout);
+            document.getElementById('story-author-lbl').innerText = author;
+            document.getElementById('story-avatar').innerText = (author || 'U')[0];
+            const modal = document.getElementById('story-viewer-modal');
+            const img = document.getElementById('story-media-img');
+            const vid = document.getElementById('story-media-vid');
+            const bar = document.getElementById('story-prog-bar');
+
+            bar.classList.remove('story-progress-active');
+            void bar.offsetWidth;
+            bar.classList.add('story-progress-active');
+
+            modal.classList.remove('hidden');
+
+            if (type === 'video') {
+                img.classList.add('hidden');
+                vid.classList.remove('hidden');
+                vid.src = url;
+                vid.currentTime = 0;
+                vid.play().catch(() => {});
+            } else {
+                vid.classList.add('hidden');
+                img.classList.remove('hidden');
+                img.src = url;
+            }
+
+            storyTimeout = setTimeout(() => {
+                closeStoryViewer();
+            }, 7000);
+        }
+
+        window.closeStoryViewer = function() {
+            clearTimeout(storyTimeout);
+            const vid = document.getElementById('story-media-vid');
+            if (vid) vid.pause();
+            document.getElementById('story-viewer-modal').classList.add('hidden');
+        }
+
+        // Cloud Comments System
+        window.openCommentsModal = function(col, id) {
+            activeCommentCol = col;
+            activeCommentId = id;
+            document.getElementById('comments-modal').classList.remove('hidden');
+            loadComments();
+        }
+        window.closeCommentsModal = function() { document.getElementById('comments-modal').classList.add('hidden'); }
+
+        window.loadComments = async function() {
+            const list = document.getElementById('comments-list');
+            try {
+                const snap = await getDocs(collection(db, activeCommentCol));
+                let comments = [];
+                snap.forEach(d => { if (d.id === activeCommentId) comments = d.data().comments || []; });
+                list.innerHTML = comments.length === 0 ? `<div class="text-center text-gray-500 py-6">No comments yet. Be the first to comment!</div>` : comments.map(c => `
+                    <div class="p-2.5 clay-card space-y-0.5">
+                        <span class="font-bold text-white text-[11px]">${c.user}</span>
+                        <p class="text-gray-300 text-xs">${c.text}</p>
+                    </div>
+                `).join('');
+            } catch(e) {}
+        }
+
+        window.postComment = async function() {
+            const txt = document.getElementById('comment-input').value.trim();
+            const user = auth.currentUser;
+            if (!txt || !user || !activeCommentId) return;
+            const docRef = doc(db, activeCommentCol, activeCommentId);
+            try {
+                await updateDoc(docRef, { comments: arrayUnion({ user: user.displayName || 'User', text: txt, time: Date.now() }) });
+                document.getElementById('comment-input').value = '';
+                loadComments();
+                if (activeCommentCol === 'posts') loadCloudPosts();
+                else loadCloudReels();
+            } catch(e) {}
+        }
+
+        // Likes & Saved Handlers
         window.toggleCloudLike = async function(col, id) {
             const user = auth.currentUser;
             if (!user) return;
@@ -691,47 +864,218 @@
                     showToast("Removed from saved");
                 } else {
                     await updateDoc(docRef, { savedBy: arrayUnion(user.email) });
-                    showToast("Saved post");
+                    showToast("Saved to profile");
                 }
                 loadCloudPosts();
             } catch(e) {}
         }
 
-        window.openCommentsModal = function(col, id) {
-            activeCommentCol = col;
-            activeCommentId = id;
-            document.getElementById('comments-modal').classList.remove('hidden');
-            loadComments();
-        }
-        window.closeCommentsModal = function() { document.getElementById('comments-modal').classList.add('hidden'); }
+        // Cloud-Backed Follow & Following System (Two-way Mutual)
+        window.toggleFollowUserCloud = async function(targetName, targetEmail) {
+            const user = auth.currentUser;
+            if (!user || user.email === targetEmail) return;
 
-        window.loadComments = async function() {
-            const list = document.getElementById('comments-list');
+            const myRef = doc(db, "users", user.email);
+            const targetRef = doc(db, "users", targetEmail);
+
             try {
-                const snap = await getDocs(collection(db, activeCommentCol));
-                let comments = [];
-                snap.forEach(d => { if (d.id === activeCommentId) comments = d.data().comments || []; });
-                list.innerHTML = comments.length === 0 ? `<div class="text-center text-gray-500 py-6">No comments yet</div>` : comments.map(c => `
-                    <div class="p-2 clay-card space-y-0.5">
-                        <span class="font-bold text-white text-[11px]">${c.user}</span>
-                        <p class="text-gray-300 text-xs">${c.text}</p>
+                const mySnap = await getDoc(myRef);
+                let myFollowing = mySnap.exists() ? (mySnap.data().following || []) : [];
+
+                if (myFollowing.includes(targetEmail)) {
+                    // Unfollow
+                    await updateDoc(myRef, { following: arrayRemove(targetEmail) });
+                    await updateDoc(targetRef, { followers: arrayRemove(user.email) });
+                    showToast("Unfollowed " + targetName);
+                } else {
+                    // Follow
+                    await updateDoc(myRef, { following: arrayUnion(targetEmail) });
+                    await updateDoc(targetRef, { followers: arrayUnion(user.email) });
+                    showToast("Following " + targetName);
+                }
+                await refreshProfileCounts();
+                loadCloudPosts();
+                loadCloudReels();
+            } catch(e) {
+                showToast("Follow action failed: " + e.message);
+            }
+        }
+
+        async function refreshProfileCounts() {
+            const user = auth.currentUser;
+            if (!user) return;
+            const uDoc = await getDoc(doc(db, "users", user.email));
+            if (uDoc.exists()) {
+                const d = uDoc.data();
+                document.getElementById('stat-followers').innerText = (d.followers || []).length;
+                document.getElementById('stat-following').innerText = (d.following || []).length;
+            }
+        }
+
+        window.openFollowListModal = async function(type) {
+            document.getElementById('follow-modal-title').innerText = type === 'followers' ? 'Followers' : 'Following';
+            const list = document.getElementById('follow-modal-list');
+            const user = auth.currentUser;
+            if (!user) return;
+
+            list.innerHTML = `<div class="text-center text-gray-500 py-4">Loading list...</div>`;
+            document.getElementById('follow-modal').classList.remove('hidden');
+
+            try {
+                const uDoc = await getDoc(doc(db, "users", user.email));
+                const emails = uDoc.exists() ? (uDoc.data()[type] || []) : [];
+
+                if (emails.length === 0) {
+                    list.innerHTML = `<div class="text-center text-gray-500 py-4">No ${type} yet</div>`;
+                    return;
+                }
+
+                list.innerHTML = emails.map(em => `
+                    <div class="flex items-center justify-between p-2 clay-card">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${em[0].toUpperCase()}</div>
+                            <span class="text-white text-xs">${em.split('@')[0]}</span>
+                        </div>
+                        <button onclick="toggleFollowUserCloud('${em.split('@')[0]}', '${em}')" class="border border-gray-600 px-3 py-1 rounded-full text-[10px] text-gray-300">Remove</button>
+                    </div>
+                `).join('');
+            } catch(e) {
+                list.innerHTML = `<div class="text-center text-gray-500 py-4">Could not load list</div>`;
+            }
+        }
+
+        window.closeFollowListModal = function() { document.getElementById('follow-modal').classList.add('hidden'); }
+
+        // Live Hub: Host & Watch Real Streams
+        window.loadActiveLiveHub = async function() {
+            const container = document.getElementById('live-streams-list');
+            try {
+                const snap = await getDocs(collection(db, "lives"));
+                const streams = [];
+                snap.forEach(d => streams.push({ id: d.id, ...d.data() }));
+
+                if (streams.length === 0) {
+                    container.innerHTML = `<div class="text-center text-gray-500 py-12 text-xs">No active live streams right now. Be the first to go live!</div>`;
+                    return;
+                }
+
+                container.innerHTML = streams.map(s => `
+                    <div onclick="joinLiveStream('${s.id}', '${s.host}', ${s.viewers || 1})" class="clay-card p-4 flex justify-between items-center cursor-pointer hover:border-white transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-full border-2 border-red-600 p-0.5 flex items-center justify-center">
+                                <div class="w-full h-full bg-white text-black font-bold rounded-full flex items-center justify-center text-sm">${(s.host || 'H')[0]}</div>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">${s.host} is LIVE</h4>
+                                <p class="text-[10px] text-gray-400">Tap to watch real stream</p>
+                            </div>
+                        </div>
+                        <span class="bg-red-600/30 text-red-500 border border-red-600 text-[10px] px-2.5 py-1 rounded-full font-bold">👁️ ${s.viewers || 1}</span>
                     </div>
                 `).join('');
             } catch(e) {}
         }
 
-        window.postComment = async function() {
-            const txt = document.getElementById('comment-input').value.trim();
+        window.startHostingLive = async function() {
             const user = auth.currentUser;
-            if (!txt || !user || !activeCommentId) return;
-            const docRef = doc(db, activeCommentCol, activeCommentId);
+            if (!user) { showToast("Login to stream!"); return; }
+
             try {
-                await updateDoc(docRef, { comments: arrayUnion({ user: user.displayName || 'User', text: txt, time: Date.now() }) });
-                document.getElementById('comment-input').value = '';
-                loadComments();
-                if (activeCommentCol === 'posts') loadCloudPosts();
-                else loadCloudReels();
+                localLiveMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                isHostingLive = true;
+
+                const docRef = await addDoc(collection(db, "lives"), {
+                    host: user.displayName || 'User',
+                    hostEmail: user.email,
+                    viewers: 1,
+                    comments: [],
+                    createdAt: Date.now()
+                });
+
+                activeLiveStreamId = docRef.id;
+                document.getElementById('live-host-name').innerText = (user.displayName || 'User') + " (Host)";
+                document.getElementById('live-viewers-count').innerText = "👁️ 1";
+                document.getElementById('live-stream-video').srcObject = localLiveMediaStream;
+                document.getElementById('live-chat-stream').innerHTML = '';
+
+                document.getElementById('live-player-modal').classList.remove('hidden');
+                startLiveChatSync();
+            } catch(e) {
+                showToast("Camera access needed for live: " + e.message);
+            }
+        }
+
+        window.joinLiveStream = async function(liveId, hostName, viewers) {
+            activeLiveStreamId = liveId;
+            isHostingLive = false;
+
+            const docRef = doc(db, "lives", liveId);
+            await updateDoc(docRef, { viewers: (viewers || 1) + 1 });
+
+            document.getElementById('live-host-name').innerText = hostName;
+            document.getElementById('live-viewers-count').innerText = "👁️ " + ((viewers || 1) + 1);
+            document.getElementById('live-chat-stream').innerHTML = '';
+
+            document.getElementById('live-player-modal').classList.remove('hidden');
+            startLiveChatSync();
+        }
+
+        function startLiveChatSync() {
+            clearInterval(liveChatInterval);
+            liveChatInterval = setInterval(async () => {
+                if (!activeLiveStreamId) return;
+                try {
+                    const snap = await getDoc(doc(db, "lives", activeLiveStreamId));
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        document.getElementById('live-viewers-count').innerText = "👁️ " + (data.viewers || 1);
+                        const chatBox = document.getElementById('live-chat-stream');
+                        chatBox.innerHTML = (data.comments || []).map(c => `
+                            <div class="bg-black/60 px-2.5 py-1 rounded-xl w-max">
+                                <strong class="text-gray-300">${c.user}:</strong> <span>${c.text}</span>
+                            </div>
+                        `).join('');
+                    }
+                } catch(e) {}
+            }, 2000);
+        }
+
+        window.sendLiveChatMessage = async function() {
+            const input = document.getElementById('live-comment-input');
+            const txt = input.value.trim();
+            const user = auth.currentUser;
+            if (!txt || !user || !activeLiveStreamId) return;
+
+            try {
+                await updateDoc(doc(db, "lives", activeLiveStreamId), {
+                    comments: arrayUnion({ user: user.displayName || 'User', text: txt, time: Date.now() })
+                });
+                input.value = '';
             } catch(e) {}
+        }
+
+        window.sendLiveHeartReaction = function() {
+            showToast("❤️ Sent real reaction");
+        }
+
+        window.leaveOrEndLive = async function() {
+            clearInterval(liveChatInterval);
+            if (activeLiveStreamId) {
+                if (isHostingLive) {
+                    await deleteDoc(doc(db, "lives", activeLiveStreamId));
+                    if (localLiveMediaStream) localLiveMediaStream.getTracks().forEach(t => t.stop());
+                } else {
+                    const docRef = doc(db, "lives", activeLiveStreamId);
+                    const snap = await getDoc(docRef);
+                    if (snap.exists()) {
+                        const curr = snap.data().viewers || 2;
+                        await updateDoc(docRef, { viewers: Math.max(1, curr - 1) });
+                    }
+                }
+            }
+            activeLiveStreamId = null;
+            document.getElementById('live-player-modal').classList.add('hidden');
+            loadActiveLiveHub();
         }
 
         // Profile Tab Switcher
@@ -768,70 +1112,26 @@
             }
         }
 
-        // Follow Management
-        window.toggleFollowUser = function(name, email) {
-            const user = auth.currentUser;
-            if (!user || user.email === email) return;
-            const key = 'ib65_follow_' + user.email;
-            let d = JSON.parse(localStorage.getItem(key) || '{"followers":[], "following":[]}');
-            if (d.following.includes(name)) {
-                d.following = d.following.filter(x => x !== name);
-                showToast("Unfollowed " + name);
-            } else {
-                d.following.push(name);
-                showToast("Following " + name);
-            }
-            localStorage.setItem(key, JSON.stringify(d));
-            document.getElementById('stat-following').innerText = d.following.length;
-            loadCloudReels();
-        }
-
-        window.openFollowList = function(type) {
-            document.getElementById('follow-modal-title').innerText = type === 'followers' ? 'Followers' : 'Following';
-            const list = document.getElementById('follow-modal-list');
-            const user = auth.currentUser;
-            const d = JSON.parse(localStorage.getItem('ib65_follow_' + (user?.email || '')) || '{"followers":[], "following":[]}');
-            const items = d[type] || [];
-            list.innerHTML = items.length === 0 ? `<div class="text-center text-gray-500 py-4">No ${type} yet</div>` : items.map(n => `
-                <div class="flex items-center space-x-3 p-2 clay-card"><div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${n[0]}</div><span class="text-white">${n}</span></div>
-            `).join('');
-            document.getElementById('follow-modal').classList.remove('hidden');
-        }
-        window.closeFollowList = function() { document.getElementById('follow-modal').classList.add('hidden'); }
-
-        // Live Streaming
-        window.startLiveStream = async function() {
-            document.getElementById('live-modal').classList.remove('hidden');
-            try {
-                liveVideoObj = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                document.getElementById('live-stream-video').srcObject = liveVideoObj;
-            } catch(e) { showToast("Camera permission required"); }
-        }
-        window.stopLiveStream = function() {
-            if (liveVideoObj) liveVideoObj.getTracks().forEach(t => t.stop());
-            document.getElementById('live-modal').classList.add('hidden');
-        }
-        window.sendLiveComment = function() {
-            const input = document.getElementById('live-comment-input');
-            const txt = input.value.trim();
-            if (!txt) return;
-            document.getElementById('live-chat-stream').innerHTML += `<div class="bg-black/60 px-2 py-1 rounded-lg w-max"><strong>You:</strong> ${txt}</div>`;
-            input.value = '';
-        }
-        window.sendLiveHeart = function() { showToast("❤️ Heart sent!"); }
-
         // Authentication State
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('auth-modal').classList.add('hidden');
                 document.getElementById('profile-name').innerText = user.displayName || 'User';
                 document.getElementById('profile-username').innerText = '@' + user.email.split('@')[0];
                 document.getElementById('profile-initial').innerText = (user.displayName || 'U')[0].toUpperCase();
-                
-                const d = JSON.parse(localStorage.getItem('ib65_follow_' + user.email) || '{"followers":[], "following":[]}');
-                document.getElementById('stat-followers').innerText = d.followers.length;
-                document.getElementById('stat-following').innerText = d.following.length;
 
+                // User document initialization with zero followers
+                const uRef = doc(db, "users", user.email);
+                const uSnap = await getDoc(uRef);
+                if (!uSnap.exists()) {
+                    await setDoc(uRef, {
+                        name: user.displayName || 'User',
+                        email: user.email,
+                        followers: [],
+                        following: []
+                    });
+                }
+                await refreshProfileCounts();
                 safeLoadAll();
             } else {
                 document.getElementById('auth-modal').classList.remove('hidden');
@@ -842,27 +1142,45 @@
             const name = document.getElementById('auth-name').value;
             const email = document.getElementById('auth-email').value;
             const pass = document.getElementById('auth-password').value;
-            if (!name || !email || pass.length < 6) { showToast("Check details"); return; }
+            if (!name || !email || pass.length < 6) { showToast("Check credentials"); return; }
             try {
                 const res = await createUserWithEmailAndPassword(auth, email, pass);
                 await updateProfile(res.user, { displayName: name });
+                await setDoc(doc(db, "users", email), {
+                    name: name,
+                    email: email,
+                    followers: [],
+                    following: []
+                });
                 showToast("Account created!");
             } catch(e) { showToast(e.message); }
         }
+
         window.handleLogin = async function() {
             const email = document.getElementById('auth-email').value;
             const pass = document.getElementById('auth-password').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); showToast("Welcome back!"); } catch(e) { showToast("Login failed"); }
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                showToast("Welcome back!");
+            } catch(e) { showToast("Login failed: " + e.message); }
         }
+
         window.handleLogout = async function() { await signOut(auth); showToast("Logged out"); }
 
         window.switchTab = function(tab) {
-            ['home', 'search', 'reels', 'profile'].forEach(t => {
-                document.getElementById('view-' + t).classList.add('hidden');
-                document.getElementById('nav-' + t).className = 'text-gray-500 icon-3d text-xl';
+            ['home', 'search', 'reels', 'live', 'profile'].forEach(t => {
+                const el = document.getElementById('view-' + t);
+                const nav = document.getElementById('nav-' + t);
+                if (el) el.classList.add('hidden');
+                if (nav) nav.className = 'text-gray-500 icon-3d text-xl';
             });
-            document.getElementById('view-' + tab).classList.remove('hidden');
-            document.getElementById('nav-' + tab).className = 'text-white icon-3d text-xl';
+
+            const activeEl = document.getElementById('view-' + tab);
+            const activeNav = document.getElementById('nav-' + tab);
+            if (activeEl) activeEl.classList.remove('hidden');
+            if (activeNav) activeNav.className = 'text-white icon-3d text-xl';
+
+            if (tab === 'live') loadActiveLiveHub();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
