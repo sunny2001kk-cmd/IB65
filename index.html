@@ -121,6 +121,19 @@
         </div>
     </div>
 
+    <!-- Followers / Following Modal -->
+    <div id="follow-modal" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 hidden" onclick="closeFollowModal()">
+        <div class="clay-card p-5 w-full max-w-sm space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
+                <h3 id="follow-modal-title" class="font-bold text-xs text-white">List</h3>
+                <button onclick="closeFollowModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="follow-modal-list" class="space-y-2 max-h-60 overflow-y-auto text-xs">
+                <div class="text-center text-gray-500 py-4">No users found</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content Body -->
     <main class="max-w-xl mx-auto p-4 space-y-4">
         
@@ -165,7 +178,7 @@
             </div>
         </div>
 
-        <!-- PROFILE VIEW (Followers / Following start at 0) -->
+        <!-- PROFILE VIEW -->
         <div id="view-profile" class="space-y-4 hidden">
             <div class="clay-card p-6 text-center space-y-4 relative">
                 <button onclick="toggleSettingsModal()" class="absolute top-4 right-4 text-white text-xl icon-3d"><i class="fa-solid fa-gear"></i></button>
@@ -176,17 +189,17 @@
                 </div>
                 <div class="flex justify-around py-2 border-y border-gray-900 text-xs">
                     <div><span id="stat-posts" class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Posts</span></div>
-                    <div><span class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
-                    <div><span class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
+                    <div onclick="openFollowModal('followers')" class="cursor-pointer"><span id="stat-followers" class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
+                    <div onclick="openFollowModal('following')" class="cursor-pointer"><span id="stat-following" class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
                 <button onclick="handleLogout()" class="clay-btn px-6 py-2 text-xs font-bold">Logout</button>
             </div>
 
-            <!-- Profile Tabs -->
+            <!-- Profile Tabs (Grid & Saved) -->
             <div class="clay-card p-4 space-y-3">
                 <div class="flex justify-around border-b border-gray-900 pb-2 text-gray-400 text-sm">
-                    <button class="text-white border-b-2 border-white pb-1 px-4"><i class="fa-solid fa-table-cells"></i></button>
-                    <button class="pb-1 px-4"><i class="fa-solid fa-bookmark"></i></button>
+                    <button onclick="switchProfileTab('grid')" id="tab-btn-grid" class="text-white border-b-2 border-white pb-1 px-4"><i class="fa-solid fa-table-cells"></i></button>
+                    <button onclick="switchProfileTab('saved')" id="tab-btn-saved" class="pb-1 px-4"><i class="fa-solid fa-bookmark"></i></button>
                 </div>
                 <div id="profile-grid" class="grid grid-cols-3 gap-1.5">
                     <div class="text-center text-gray-500 col-span-3 py-6 text-xs">No posts yet</div>
@@ -217,6 +230,22 @@
             <div id="create-preview-box" class="hidden relative">
                 <img id="prev-img" class="rounded-2xl max-h-56 w-full object-cover hidden">
                 <video id="prev-vid" class="rounded-2xl max-h-56 w-full object-cover hidden" controls></video>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Share Sheet Modal -->
+    <div id="share-modal" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="closeShareModal()">
+        <div class="clay-card w-full max-w-xl rounded-t-3xl p-5 space-y-4 text-xs" onclick="event.stopPropagation()">
+            <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto"></div>
+            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
+                <span class="font-bold text-sm text-white">Share to...</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2 pt-3 text-center">
+                <div onclick="window.open('https://api.whatsapp.com/send?text=Check%20out%20IB65')" class="cursor-pointer"><i class="fa-brands fa-whatsapp text-xl text-emerald-400"></i><p class="text-[10px]">WhatsApp</p></div>
+                <div onclick="copyShareLink()" class="cursor-pointer"><i class="fa-solid fa-link text-xl text-blue-400"></i><p class="text-[10px]">Copy Link</p></div>
+                <div onclick="showToast('Added to story')" class="cursor-pointer"><i class="fa-solid fa-plus-circle text-xl text-white"></i><p class="text-[10px]">Add to story</p></div>
+                <div onclick="showToast('Shared successfully')" class="cursor-pointer"><i class="fa-solid fa-share-nodes text-xl text-purple-400"></i><p class="text-[10px]">Share</p></div>
             </div>
         </div>
     </div>
@@ -279,6 +308,7 @@
         let uploadType = 'post';
         let selectedFileUrl = '';
         let selectedFileType = 'image';
+        let activeSharePostId = '';
         let liveMediaStream = null;
 
         window.addEventListener('load', () => {
@@ -306,6 +336,28 @@
             showToast("Privacy updated");
         }
         window.toggleNotifications = function() { document.getElementById('notif-modal').classList.toggle('hidden'); }
+
+        // Followers / Following Pop-up list
+        window.openFollowModal = function(type) {
+            document.getElementById('follow-modal-title').innerText = type === 'followers' ? 'Followers' : 'Following';
+            const list = document.getElementById('follow-modal-list');
+            const user = auth.currentUser;
+            const data = JSON.parse(localStorage.getItem('ib65_follow_' + (user?.email || '')) || '{"followers":[], "following":[]}');
+            const items = data[type] || [];
+
+            if(items.length === 0) {
+                list.innerHTML = `<div class="text-center text-gray-500 py-4">No ${type} yet</div>`;
+            } else {
+                list.innerHTML = items.map(name => `
+                    <div class="flex items-center space-x-3 p-2 clay-card">
+                        <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${name[0]}</div>
+                        <span class="text-white">${name}</span>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('follow-modal').classList.remove('hidden');
+        }
+        window.closeFollowModal = function() { document.getElementById('follow-modal').classList.add('hidden'); }
 
         window.openCreateModalPage = function() { document.getElementById('create-modal-page').classList.remove('hidden'); }
         window.closeCreateModalPage = function() { document.getElementById('create-modal-page').classList.add('hidden'); }
@@ -359,7 +411,7 @@
                 switchTab('reels');
             } else {
                 const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
-                posts.unshift({ id: Date.now().toString(), author: user?.displayName || 'User', authorEmail: user?.email, title, mediaUrl: selectedFileUrl, mediaType: selectedFileType, likes: [] });
+                posts.unshift({ id: Date.now().toString(), author: user?.displayName || 'User', authorEmail: user?.email, title, mediaUrl: selectedFileUrl, mediaType: selectedFileType, likes: [], savedBy: [] });
                 localStorage.setItem('ib65_posts', JSON.stringify(posts));
                 loadPosts();
                 switchTab('home');
@@ -369,6 +421,73 @@
             document.getElementById('create-title').value = '';
             document.getElementById('create-preview-box').classList.add('hidden');
             showToast("Published successfully!");
+        }
+
+        // Like / Save / Follow Actions
+        window.toggleLike = function(id) {
+            const user = auth.currentUser;
+            if(!user) return;
+            let posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+            posts = posts.map(p => {
+                if(p.id === id) {
+                    if(!p.likes) p.likes = [];
+                    if(p.likes.includes(user.email)) p.likes = p.likes.filter(e => e !== user.email);
+                    else p.likes.push(user.email);
+                }
+                return p;
+            });
+            localStorage.setItem('ib65_posts', JSON.stringify(posts));
+            loadPosts();
+        }
+
+        window.toggleSavePost = function(id) {
+            const user = auth.currentUser;
+            if(!user) return;
+            let posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+            posts = posts.map(p => {
+                if(p.id === id) {
+                    if(!p.savedBy) p.savedBy = [];
+                    if(p.savedBy.includes(user.email)) {
+                        p.savedBy = p.savedBy.filter(e => e !== user.email);
+                        showToast("Removed from saved");
+                    } else {
+                        p.savedBy.push(user.email);
+                        showToast("Saved to collection");
+                    }
+                }
+                return p;
+            });
+            localStorage.setItem('ib65_posts', JSON.stringify(posts));
+            loadPosts();
+        }
+
+        window.toggleFollowUser = function(authorName, authorEmail) {
+            const user = auth.currentUser;
+            if(!user || user.email === authorEmail) return;
+            const key = 'ib65_follow_' + user.email;
+            let data = JSON.parse(localStorage.getItem(key) || '{"followers":[], "following":[]}');
+            
+            if(data.following.includes(authorName)) {
+                data.following = data.following.filter(n => n !== authorName);
+                showToast("Unfollowed " + authorName);
+            } else {
+                data.following.push(authorName);
+                showToast("Following " + authorName);
+            }
+            localStorage.setItem(key, JSON.stringify(data));
+            document.getElementById('stat-following').innerText = data.following.length;
+            loadReels();
+        }
+
+        window.openShareModal = function(id) {
+            activeSharePostId = id;
+            document.getElementById('share-modal').classList.remove('hidden');
+        }
+        window.closeShareModal = function() { document.getElementById('share-modal').classList.add('hidden'); }
+        window.copyShareLink = function() {
+            navigator.clipboard.writeText(window.location.href);
+            showToast("Link copied!");
+            closeShareModal();
         }
 
         window.loadPosts = function() {
@@ -392,7 +511,10 @@
                 return;
             }
 
-            container.innerHTML = posts.map(p => `
+            container.innerHTML = posts.map(p => {
+                const isLiked = user && (p.likes || []).includes(user.email);
+                const isSaved = user && (p.savedBy || []).includes(user.email);
+                return `
                 <div class="clay-card p-4 space-y-3">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center space-x-2">
@@ -402,26 +524,65 @@
                     </div>
                     ${p.title ? `<p class="text-xs text-white font-semibold">${p.title}</p>` : ''}
                     ${p.mediaUrl ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover" autoplay loop muted controls></video>` : `<img src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover">`) : ''}
+                    <div class="flex items-center space-x-4 pt-2 border-t border-gray-900 text-white text-xs">
+                        <button onclick="toggleLike('${p.id}')" class="flex items-center space-x-1 ${isLiked ? 'text-red-500 font-bold' : ''}">
+                            <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-lg"></i>
+                            <span>${(p.likes || []).length}</span>
+                        </button>
+                        <button onclick="openShareModal('${p.id}')"><i class="fa-solid fa-share text-lg"></i></button>
+                        <button onclick="toggleSavePost('${p.id}')" class="ml-auto ${isSaved ? 'text-white' : 'text-gray-400'}">
+                            <i class="${isSaved ? 'fa-solid' : 'fa-regular'} fa-bookmark text-lg"></i>
+                        </button>
+                    </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
+        }
+
+        window.switchProfileTab = function(tab) {
+            const grid = document.getElementById('profile-grid');
+            const user = auth.currentUser;
+            if(!user) return;
+            const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+
+            if(tab === 'saved') {
+                document.getElementById('tab-btn-saved').className = 'text-white border-b-2 border-white pb-1 px-4';
+                document.getElementById('tab-btn-grid').className = 'text-gray-500 pb-1 px-4';
+                const savedPosts = posts.filter(p => (p.savedBy || []).includes(user.email));
+                grid.innerHTML = savedPosts.length === 0 ? `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No saved posts</div>` : savedPosts.map(p => `
+                    <div class="h-28 clay-card rounded-xl overflow-hidden flex items-center justify-center">
+                        <img src="${p.mediaUrl}" class="w-full h-full object-cover">
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('tab-btn-grid').className = 'text-white border-b-2 border-white pb-1 px-4';
+                document.getElementById('tab-btn-saved').className = 'text-gray-500 pb-1 px-4';
+                loadPosts();
+            }
         }
 
         window.loadReels = function() {
             const container = document.getElementById('reels-container');
             const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
+            const user = auth.currentUser;
+            const followData = JSON.parse(localStorage.getItem('ib65_follow_' + (user?.email || '')) || '{"following":[]}');
+
             if(reels.length === 0) {
                 container.innerHTML = `<div class="text-center text-gray-500 py-12 text-xs">No reels found.</div>`;
                 return;
             }
-            container.innerHTML = reels.map(r => `
+            container.innerHTML = reels.map(r => {
+                const isFollowing = followData.following.includes(r.author);
+                return `
                 <div class="relative w-full max-w-sm h-[480px] clay-card overflow-hidden flex flex-col justify-between p-4">
                     <video src="${r.videoUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop muted controls></video>
                     <div class="relative z-10 flex justify-between items-center bg-black/60 p-2 rounded-xl">
                         <span class="font-bold text-xs text-white">${r.author}</span>
-                        <button class="bg-white text-black px-3 py-1 rounded-full text-[10px] font-bold">Follow</button>
+                        <button onclick="toggleFollowUser('${r.author}', '${r.authorEmail}')" class="bg-white text-black px-3 py-1 rounded-full text-[10px] font-bold">${isFollowing ? 'Following' : 'Follow'}</button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         window.startLiveStream = async function() {
@@ -442,6 +603,11 @@
                 document.getElementById('profile-name').innerText = user.displayName || 'User';
                 document.getElementById('profile-username').innerText = '@' + user.email.split('@')[0];
                 document.getElementById('profile-initial').innerText = (user.displayName || 'U')[0].toUpperCase();
+                
+                const followData = JSON.parse(localStorage.getItem('ib65_follow_' + user.email) || '{"followers":[], "following":[]}');
+                document.getElementById('stat-followers').innerText = followData.followers.length;
+                document.getElementById('stat-following').innerText = followData.following.length;
+
                 loadPosts();
                 loadReels();
             } else {
