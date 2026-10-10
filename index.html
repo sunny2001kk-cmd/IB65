@@ -45,7 +45,7 @@
     <div id="anime-intro" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center space-y-4 transition-opacity duration-700">
         <div class="anime-splash text-center space-y-2">
             <h1 class="text-6xl font-extrabold bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent tracking-widest">IB65</h1>
-            <p class="text-xs tracking-widest text-gray-400 uppercase font-bold">Cloud Universe</p>
+            <p class="text-xs tracking-widest text-gray-400 uppercase font-bold">3D Universe</p>
         </div>
     </div>
 
@@ -85,14 +85,14 @@
                 <div class="w-12 h-12 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-sm">AI</div>
                 <div>
                     <p class="font-bold text-xs text-white">AI Assistant</p>
-                    <p class="text-[10px] text-gray-400">Welcome to IB65 Cloud!</p>
+                    <p class="text-[10px] text-gray-400">Welcome to IB65!</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Notification Modal -->
-    <div id="notif-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end hidden" onclick="toggleNotifications()">
+    <div id="notif-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex justify-end hidden" onclick="toggleNotifications()">
         <div class="clay-card w-80 h-full p-4 space-y-4 shadow-2xl overflow-y-auto" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-gray-900 pb-3">
                 <h3 class="font-bold text-sm text-white">Notifications</h3>
@@ -105,7 +105,7 @@
     </div>
 
     <!-- Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end hidden" onclick="toggleSettingsModal()">
+    <div id="settings-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex justify-end hidden" onclick="toggleSettingsModal()">
         <div class="clay-card w-full max-w-sm h-full p-5 space-y-4 shadow-2xl overflow-y-auto text-xs" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-gray-900 pb-3">
                 <h3 class="font-bold text-sm text-white">Settings and activity</h3>
@@ -117,10 +117,6 @@
                     <span>Account Privacy</span>
                 </div>
                 <span id="privacy-lbl" class="text-gray-400 font-bold">Public</span>
-            </div>
-            <div onclick="toggleProfessionalMode()" class="flex items-center space-x-3 p-3 clay-card cursor-pointer">
-                <i class="fa-solid fa-chart-pie text-white text-base"></i>
-                <span id="prof-mode-lbl">Professional Dashboard</span>
             </div>
         </div>
     </div>
@@ -145,7 +141,7 @@
 
             <!-- Posts Feed -->
             <div id="posts-container" class="space-y-4">
-                <div class="text-center text-gray-500 py-10 text-xs">Loading cloud posts...</div>
+                <div class="text-center text-gray-500 py-10 text-xs">Loading feed...</div>
             </div>
         </div>
 
@@ -162,14 +158,14 @@
         <div id="view-reels" class="space-y-4 hidden">
             <div class="flex justify-center space-x-6 text-sm font-bold border-b border-gray-900 pb-2">
                 <span class="text-white border-b-2 border-white pb-1 cursor-pointer">Reels</span>
-                <span class="text-gray-500 cursor-pointer" onclick="showToast('Friends feed')">Friends</span>
+                <span class="text-gray-500 cursor-pointer">Friends</span>
             </div>
             <div id="reels-container" class="space-y-6 flex flex-col items-center">
-                <div class="text-center text-gray-500 py-12 text-xs">No cloud reels found.</div>
+                <div class="text-center text-gray-500 py-12 text-xs">No reels found.</div>
             </div>
         </div>
 
-        <!-- PROFILE VIEW (Followers/Following count starting at 0) -->
+        <!-- PROFILE VIEW (Followers / Following start at 0) -->
         <div id="view-profile" class="space-y-4 hidden">
             <div class="clay-card p-6 text-center space-y-4 relative">
                 <button onclick="toggleSettingsModal()" class="absolute top-4 right-4 text-white text-xl icon-3d"><i class="fa-solid fa-gear"></i></button>
@@ -180,8 +176,8 @@
                 </div>
                 <div class="flex justify-around py-2 border-y border-gray-900 text-xs">
                     <div><span id="stat-posts" class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Posts</span></div>
-                    <div><span id="stat-followers" class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
-                    <div><span id="stat-following" class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
+                    <div><span class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
+                    <div><span class="font-bold block text-sm text-white">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
                 <button onclick="handleLogout()" class="clay-btn px-6 py-2 text-xs font-bold">Logout</button>
             </div>
@@ -189,11 +185,11 @@
             <!-- Profile Tabs -->
             <div class="clay-card p-4 space-y-3">
                 <div class="flex justify-around border-b border-gray-900 pb-2 text-gray-400 text-sm">
-                    <button onclick="switchProfileTab('grid')" id="tab-btn-grid" class="text-white border-b-2 border-white pb-1 px-4"><i class="fa-solid fa-table-cells"></i></button>
-                    <button onclick="switchProfileTab('saved')" id="tab-btn-saved" class="pb-1 px-4"><i class="fa-solid fa-bookmark"></i></button>
+                    <button class="text-white border-b-2 border-white pb-1 px-4"><i class="fa-solid fa-table-cells"></i></button>
+                    <button class="pb-1 px-4"><i class="fa-solid fa-bookmark"></i></button>
                 </div>
-                <div id="profile-dynamic-grid" class="grid grid-cols-3 gap-1.5">
-                    <div class="text-center text-gray-500 col-span-3 py-6 text-xs">No items</div>
+                <div id="profile-grid" class="grid grid-cols-3 gap-1.5">
+                    <div class="text-center text-gray-500 col-span-3 py-6 text-xs">No posts yet</div>
                 </div>
             </div>
         </div>
@@ -263,11 +259,10 @@
     <!-- Toast Message -->
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white text-xs px-4 py-2 rounded-full border border-gray-800 shadow-2xl hidden z-50"></div>
 
-    <!-- Scripts with Firebase Firestore -->
+    <!-- Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBlM05NZl4bKjRsrZ0ZUDpjYi0fdPP2-X4",
@@ -280,7 +275,6 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
 
         let uploadType = 'post';
         let selectedFileUrl = '';
@@ -292,8 +286,8 @@
                 const intro = document.getElementById('anime-intro');
                 if(intro) { intro.style.opacity = '0'; setTimeout(() => intro.remove(), 700); }
             }, 1200);
-            loadCloudPosts();
-            loadCloudReels();
+            loadPosts();
+            loadReels();
         });
 
         window.showToast = function(msg) {
@@ -311,7 +305,6 @@
             lbl.innerText = lbl.innerText === 'Public' ? 'Private' : 'Public';
             showToast("Privacy updated");
         }
-        window.toggleProfessionalMode = function() { showToast("Professional mode active"); }
         window.toggleNotifications = function() { document.getElementById('notif-modal').classList.toggle('hidden'); }
 
         window.openCreateModalPage = function() { document.getElementById('create-modal-page').classList.remove('hidden'); }
@@ -327,7 +320,7 @@
         window.handleFileSelected = async function(e) {
             const file = e.target.files[0];
             if(!file) return;
-            showToast("Uploading to cloud...");
+            showToast("Uploading media...");
             const fd = new FormData();
             fd.append("file", file);
             fd.append("upload_preset", "ib65_upload");
@@ -353,101 +346,82 @@
             } catch(err) { showToast("Upload error"); }
         }
 
-        window.publishContent = async function() {
+        window.publishContent = function() {
             const title = document.getElementById('create-title').value;
             const user = auth.currentUser;
-            if(!user) { showToast("Please login first"); return; }
-            if(!selectedFileUrl) { showToast("Please select media"); return; }
+            if(!selectedFileUrl) { showToast("Please select media first!"); return; }
 
-            try {
-                if(uploadType === 'reel') {
-                    await addDoc(collection(db, "reels"), {
-                        author: user.displayName || 'User',
-                        authorEmail: user.email,
-                        videoUrl: selectedFileUrl,
-                        likes: [],
-                        createdAt: Date.now()
-                    });
-                    loadCloudReels();
-                } else {
-                    await addDoc(collection(db, "posts"), {
-                        author: user.displayName || 'User',
-                        authorEmail: user.email,
-                        title: title,
-                        mediaUrl: selectedFileUrl,
-                        mediaType: selectedFileType,
-                        likes: [],
-                        savedBy: [],
-                        createdAt: Date.now()
-                    });
-                    loadCloudPosts();
-                }
-                closeCreateModalPage();
-                showToast("Published to Cloud!");
-                document.getElementById('create-title').value = '';
-            } catch(e) {
-                showToast("Publish failed: " + e.message);
+            if(uploadType === 'reel') {
+                const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
+                reels.unshift({ id: Date.now().toString(), author: user?.displayName || 'User', authorEmail: user?.email, videoUrl: selectedFileUrl, likes: [] });
+                localStorage.setItem('ib65_reels', JSON.stringify(reels));
+                loadReels();
+                switchTab('reels');
+            } else {
+                const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+                posts.unshift({ id: Date.now().toString(), author: user?.displayName || 'User', authorEmail: user?.email, title, mediaUrl: selectedFileUrl, mediaType: selectedFileType, likes: [] });
+                localStorage.setItem('ib65_posts', JSON.stringify(posts));
+                loadPosts();
+                switchTab('home');
             }
+            closeCreateModalPage();
+            selectedFileUrl = '';
+            document.getElementById('create-title').value = '';
+            document.getElementById('create-preview-box').classList.add('hidden');
+            showToast("Published successfully!");
         }
 
-        window.loadCloudPosts = async function() {
+        window.loadPosts = function() {
             const container = document.getElementById('posts-container');
-            try {
-                const querySnapshot = await getDocs(collection(db, "posts"));
-                const posts = [];
-                querySnapshot.forEach((docSnap) => {
-                    posts.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                
-                const user = auth.currentUser;
-                if(user) {
-                    document.getElementById('stat-posts').innerText = posts.filter(p => p.authorEmail === user.email).length;
-                }
+            const profileGrid = document.getElementById('profile-grid');
+            const posts = JSON.parse(localStorage.getItem('ib65_posts') || '[]');
+            const user = auth.currentUser;
 
-                if(posts.length === 0) {
-                    container.innerHTML = `<div class="text-center text-gray-500 py-10 text-xs">No cloud posts yet.</div>`;
-                    return;
-                }
-
-                container.innerHTML = posts.map(p => `
-                    <div class="clay-card p-4 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${p.author[0]}</div>
-                                <span class="font-bold text-xs text-white">${p.author}</span>
-                            </div>
-                        </div>
-                        ${p.title ? `<p class="text-xs text-white font-semibold">${p.title}</p>` : ''}
-                        ${p.mediaUrl ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover" autoplay loop muted controls></video>` : `<img src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover">`) : ''}
+            if(user) {
+                document.getElementById('stat-posts').innerText = posts.filter(p => p.authorEmail === user.email).length;
+                const myPosts = posts.filter(p => p.authorEmail === user.email);
+                profileGrid.innerHTML = myPosts.length === 0 ? `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No posts yet</div>` : myPosts.map(p => `
+                    <div class="h-28 clay-card rounded-xl overflow-hidden flex items-center justify-center">
+                        <img src="${p.mediaUrl}" class="w-full h-full object-cover">
                     </div>
                 `).join('');
-            } catch(e) {
-                container.innerHTML = `<div class="text-center text-red-500 py-10 text-xs">Failed to load posts</div>`;
             }
+
+            if(posts.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 py-10 text-xs">No posts yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = posts.map(p => `
+                <div class="clay-card p-4 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${p.author[0]}</div>
+                            <span class="font-bold text-xs text-white">${p.author}</span>
+                        </div>
+                    </div>
+                    ${p.title ? `<p class="text-xs text-white font-semibold">${p.title}</p>` : ''}
+                    ${p.mediaUrl ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover" autoplay loop muted controls></video>` : `<img src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover">`) : ''}
+                </div>
+            `).join('');
         }
 
-        window.loadCloudReels = async function() {
+        window.loadReels = function() {
             const container = document.getElementById('reels-container');
-            try {
-                const querySnapshot = await getDocs(collection(db, "reels"));
-                const reels = [];
-                querySnapshot.forEach((docSnap) => {
-                    reels.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                if(reels.length === 0) {
-                    container.innerHTML = `<div class="text-center text-gray-500 py-12 text-xs">No cloud reels found.</div>`;
-                    return;
-                }
-                container.innerHTML = reels.map(r => `
-                    <div class="relative w-full max-w-sm h-[480px] clay-card overflow-hidden flex flex-col justify-between p-4">
-                        <video src="${r.videoUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop muted controls></video>
-                        <div class="relative z-10 flex justify-between items-center bg-black/60 p-2 rounded-xl">
-                            <span class="font-bold text-xs text-white">${r.author}</span>
-                            <button class="bg-white text-black px-3 py-1 rounded-full text-[10px] font-bold">Follow</button>
-                        </div>
+            const reels = JSON.parse(localStorage.getItem('ib65_reels') || '[]');
+            if(reels.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 py-12 text-xs">No reels found.</div>`;
+                return;
+            }
+            container.innerHTML = reels.map(r => `
+                <div class="relative w-full max-w-sm h-[480px] clay-card overflow-hidden flex flex-col justify-between p-4">
+                    <video src="${r.videoUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop muted controls></video>
+                    <div class="relative z-10 flex justify-between items-center bg-black/60 p-2 rounded-xl">
+                        <span class="font-bold text-xs text-white">${r.author}</span>
+                        <button class="bg-white text-black px-3 py-1 rounded-full text-[10px] font-bold">Follow</button>
                     </div>
-                `).join('');
-            } catch(e) {}
+                </div>
+            `).join('');
         }
 
         window.startLiveStream = async function() {
@@ -468,11 +442,8 @@
                 document.getElementById('profile-name').innerText = user.displayName || 'User';
                 document.getElementById('profile-username').innerText = '@' + user.email.split('@')[0];
                 document.getElementById('profile-initial').innerText = (user.displayName || 'U')[0].toUpperCase();
-                // Naye user ke followers & following 0 se shuru honge
-                document.getElementById('stat-followers').innerText = '0';
-                document.getElementById('stat-following').innerText = '0';
-                loadCloudPosts();
-                loadCloudReels();
+                loadPosts();
+                loadReels();
             } else {
                 document.getElementById('auth-modal').classList.remove('hidden');
             }
@@ -486,7 +457,7 @@
             try {
                 const res = await createUserWithEmailAndPassword(auth, email, pass);
                 await updateProfile(res.user, { displayName: name });
-                showToast("Account created successfully!");
+                showToast("Account created!");
             } catch(e) { showToast(e.message); }
         }
         window.handleLogin = async function() {
@@ -505,8 +476,6 @@
             document.getElementById('nav-' + tab).className = 'text-white icon-3d text-xl';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        window.switchProfileTab = function(tab) {}
-        window.globalSearch = function() {}
     </script>
 </body>
 </html>
