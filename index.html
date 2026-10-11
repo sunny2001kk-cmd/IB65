@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IB65 — Next Gen Social Universe</title>
+    <title>IB65 — Social Universe</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -149,7 +149,7 @@
         <div class="flex-1 p-5 space-y-4 max-w-lg mx-auto w-full overflow-y-auto text-xs">
             <div class="text-center space-y-2">
                 <div class="w-20 h-20 mx-auto rounded-full bg-white text-black font-black text-2xl flex items-center justify-center overflow-hidden border border-gray-800" id="edit-avatar-preview">U</div>
-                <input type="text" id="edit-avatar-url" placeholder="Profile Image URL (Optional)" class="w-full clay-card p-2.5 text-xs text-white placeholder-gray-500 focus:outline-none">
+                <input type="text" id="edit-avatar-url" placeholder="Profile Image URL" class="w-full clay-card p-2.5 text-xs text-white placeholder-gray-500 focus:outline-none">
             </div>
             <div>
                 <label class="block text-gray-400 mb-1">Name</label>
@@ -170,7 +170,7 @@
         </div>
     </div>
 
-    <!-- Main Container -->
+    <!-- Main Content Container -->
     <main class="max-w-xl mx-auto p-4 space-y-4">
         
         <!-- HOME FEED -->
@@ -203,10 +203,12 @@
             </div>
         </div>
 
-        <!-- SEARCH VIEW -->
+        <!-- SEARCH / EXPLORE VIEW (Auto-Playing Popular Feed & Unified Search) -->
         <div id="view-search" class="space-y-4 hidden">
-            <input type="text" id="global-search" oninput="handleGlobalSearch(event)" placeholder="Search users or posts..." class="w-full clay-card px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none">
-            <div id="explore-grid" class="grid grid-cols-3 gap-1.5 pt-2"></div>
+            <input type="text" id="global-search" oninput="handleGlobalSearch(event)" placeholder="Search users, captions, or tags..." class="w-full clay-card px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none">
+            <div id="explore-grid" class="grid grid-cols-3 gap-1.5 pt-2">
+                <div class="col-span-3 text-center text-gray-500 py-10 text-xs">Loading explore feed...</div>
+            </div>
         </div>
 
         <!-- REELS FEED -->
@@ -272,7 +274,7 @@
             </div>
         </div>
 
-        <!-- PUBLIC USER PROFILE VIEW (Visiting another person) -->
+        <!-- PUBLIC USER PROFILE VIEW -->
         <div id="view-public-profile" class="space-y-4 hidden">
             <div class="flex items-center space-x-3 mb-2">
                 <button onclick="switchTab('home')" class="text-white"><i class="fa-solid fa-arrow-left text-lg"></i></button>
@@ -307,7 +309,7 @@
 
     </main>
 
-    <!-- Create Media Modal -->
+    <!-- Create Media Modal (With Instagram-Style Editor Suite) -->
     <div id="create-modal-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-gray-900 flex justify-between items-center">
             <button onclick="closeCreateModalPage()" class="text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -334,17 +336,42 @@
                 </button>
             </div>
 
-            <!-- Filters Preview -->
+            <!-- Instagram-Style Pro Video/Image Editor Suite -->
             <div id="create-preview-box" class="hidden space-y-3">
-                <div class="flex items-center space-x-2 overflow-x-auto py-1 text-xs">
-                    <span class="text-gray-400 text-[10px]">Filter:</span>
-                    <button onclick="applyFilter('none')" class="bg-[#1f1f1f] px-2.5 py-1 rounded-full text-[10px]">Normal</button>
-                    <button onclick="applyFilter('grayscale(100%)')" class="bg-[#1f1f1f] px-2.5 py-1 rounded-full text-[10px]">B&W</button>
-                    <button onclick="applyFilter('contrast(160%)')" class="bg-[#1f1f1f] px-2.5 py-1 rounded-full text-[10px]">Vibrant</button>
-                    <button onclick="applyFilter('sepia(100%)')" class="bg-[#1f1f1f] px-2.5 py-1 rounded-full text-[10px]">Vintage</button>
+                <div class="flex justify-between items-center bg-[#181818] p-2.5 rounded-2xl border border-gray-800 text-xs">
+                    <div class="flex items-center space-x-2">
+                        <button type="button" onclick="toggleVideoMute()" id="editor-mute-btn" class="bg-[#242424] px-2.5 py-1.5 rounded-xl text-white">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                        <button type="button" onclick="openTextOverlayPrompt()" class="bg-[#242424] px-3 py-1.5 rounded-xl text-white font-bold flex items-center space-x-1">
+                            <i class="fa-solid fa-font"></i>
+                            <span>Add Text</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-[10px] text-gray-400">Color:</span>
+                        <input type="color" id="overlay-text-color" value="#ffffff" onchange="changeOverlayTextColor(event)" class="w-6 h-6 rounded-full bg-transparent border-0 cursor-pointer">
+                    </div>
                 </div>
-                <img id="prev-img" class="rounded-2xl max-h-64 w-full object-cover hidden">
-                <video id="prev-vid" class="rounded-2xl max-h-64 w-full object-cover hidden" controls playsinline></video>
+
+                <!-- Filters Carousel -->
+                <div class="flex items-center space-x-2 overflow-x-auto py-1 text-xs">
+                    <button type="button" onclick="applyEditorFilter('none')" class="bg-[#202020] px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap active:scale-95 transition">Normal</button>
+                    <button type="button" onclick="applyEditorFilter('contrast(130%) saturate(140%)')" class="bg-[#202020] px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap active:scale-95 transition">Vivid</button>
+                    <button type="button" onclick="applyEditorFilter('sepia(60%) contrast(110%)')" class="bg-[#202020] px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap active:scale-95 transition">Retro</button>
+                    <button type="button" onclick="applyEditorFilter('grayscale(100%) contrast(150%)')" class="bg-[#202020] px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap active:scale-95 transition">Noir (B&W)</button>
+                    <button type="button" onclick="applyEditorFilter('hue-rotate(190deg) contrast(120%)')" class="bg-[#202020] px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap active:scale-95 transition">Cyberpunk</button>
+                </div>
+
+                <!-- Canvas Preview Box -->
+                <div class="relative w-full max-h-80 rounded-2xl overflow-hidden bg-black border border-gray-800 flex items-center justify-center">
+                    <img id="prev-img" class="w-full h-full max-h-80 object-contain hidden transition-all duration-300">
+                    <video id="prev-vid" class="w-full h-full max-h-80 object-contain hidden transition-all duration-300" autoplay loop playsinline></video>
+                    
+                    <div id="video-overlay-text-box" class="absolute pointer-events-auto cursor-move select-none hidden px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-sm border border-white/20 font-bold text-center text-sm shadow-2xl">
+                        <span id="video-overlay-text-val">Your Text</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -382,17 +409,16 @@
         </div>
     </div>
 
-    <!-- Instagram-Style Full-Screen Story Viewer (With Like, Share, DM Bar & Tappable Profile) -->
+    <!-- Instagram-Style Story Viewer -->
     <div id="story-viewer-modal" class="fixed inset-0 z-50 bg-black flex items-center justify-center hidden" onclick="closeStoryViewer()">
         <div class="relative w-full max-w-md h-full bg-black flex flex-col justify-between p-4" onclick="event.stopPropagation()">
-            <!-- Top Progress Bars -->
             <div class="w-full flex space-x-1 z-20 pt-2">
                 <div class="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
                     <div id="story-prog-bar" class="h-full bg-white w-0"></div>
                 </div>
             </div>
 
-            <!-- Header Info (Tappable Author Profile) -->
+            <!-- Tappable Header -->
             <div class="flex justify-between items-center z-20 pt-2">
                 <div class="flex items-center space-x-2 cursor-pointer" onclick="openAuthorProfileFromStory()">
                     <div class="w-8 h-8 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs overflow-hidden" id="story-avatar">U</div>
@@ -401,13 +427,12 @@
                 <button onclick="closeStoryViewer()" class="text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- Media Area -->
             <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
                 <img id="story-media-img" class="w-full h-full object-cover hidden">
                 <video id="story-media-vid" class="w-full h-full object-cover hidden" playsinline></video>
             </div>
 
-            <!-- Instagram-Style Story Interaction Bottom Bar -->
+            <!-- Instagram Bottom Bar -->
             <div class="z-20 flex items-center space-x-3 pb-2 pt-2 bg-gradient-to-t from-black/80 to-transparent">
                 <input type="text" id="story-reply-input" placeholder="Send message..." class="flex-1 rounded-full px-4 py-2.5 text-xs text-white bg-black/50 border border-gray-700 placeholder-gray-400 focus:outline-none">
                 <button onclick="sendStoryReply()" class="text-white text-sm font-bold bg-white/20 px-3 py-2 rounded-full"><i class="fa-solid fa-paper-plane"></i></button>
@@ -417,7 +442,7 @@
         </div>
     </div>
 
-    <!-- Instagram Comment Modal -->
+    <!-- Comments Modal -->
     <div id="comments-modal" class="fixed inset-0 z-50 bg-black/85 flex items-end justify-center hidden" onclick="closeCommentsModal()">
         <div class="clay-card w-full max-w-xl h-[65vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-gray-900 pb-2">
@@ -495,7 +520,7 @@
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white text-xs px-4 py-2 rounded-full border border-gray-800 shadow-2xl hidden z-50"></div>
 
-    <!-- Firebase Script Engine -->
+    <!-- Complete Firebase & Application Engine -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -519,6 +544,11 @@
         let selectedFileUrl = '';
         let selectedFileType = 'image';
         let currentFilter = 'none';
+
+        // Editor States
+        let isVideoMuted = false;
+        let videoOverlayText = '';
+        let overlayTextColor = '#ffffff';
 
         // Camera & Video
         let cameraMediaStream = null;
@@ -582,7 +612,7 @@
             setTimeout(() => t.classList.add('hidden'), 2500);
         }
 
-        // Settings Slide-up Drawer Handler
+        // Settings Slide-up Drawer
         window.toggleSettingsModal = function() {
             document.getElementById('settings-modal').classList.toggle('hidden');
         }
@@ -590,7 +620,7 @@
         window.toggleAccountPrivacy = function() {
             const lbl = document.getElementById('privacy-lbl');
             lbl.innerText = lbl.innerText === 'Public' ? 'Private' : 'Public';
-            showToast("Account privacy updated to " + lbl.innerText);
+            showToast("Account privacy: " + lbl.innerText);
         }
 
         window.toggleNotifications = function() {
@@ -734,7 +764,6 @@
                 document.getElementById('pub-stat-followers').innerText = (d.followers || []).length;
                 document.getElementById('pub-stat-following').innerText = (d.following || []).length;
 
-                // Follow state
                 const myDoc = await getDoc(doc(db, "users", user.email));
                 const myFollowing = myDoc.exists() ? (myDoc.data().following || []) : [];
                 const isFollowing = myFollowing.includes(email);
@@ -752,7 +781,6 @@
                     startDirectChat(email, d.name || 'User');
                 };
 
-                // Load Public Posts Grid
                 const postSnap = await getDocs(collection(db, "posts"));
                 const userPosts = [];
                 postSnap.forEach(p => {
@@ -1002,10 +1030,48 @@
             }
         }
 
-        window.applyFilter = function(f) {
+        // Instagram Video/Image Pro Editing Handlers
+        window.applyEditorFilter = function(f) {
             currentFilter = f;
-            document.getElementById('prev-img').style.filter = f;
-            document.getElementById('prev-vid').style.filter = f;
+            const vid = document.getElementById('prev-vid');
+            const img = document.getElementById('prev-img');
+            if (vid) vid.style.filter = f;
+            if (img) img.style.filter = f;
+            showToast("Filter applied");
+        }
+
+        window.toggleVideoMute = function() {
+            const vid = document.getElementById('prev-vid');
+            const btn = document.getElementById('editor-mute-btn');
+            if (!vid) return;
+
+            isVideoMuted = !isVideoMuted;
+            vid.muted = isVideoMuted;
+            btn.innerHTML = isVideoMuted 
+                ? `<i class="fa-solid fa-volume-xmark text-red-500"></i>` 
+                : `<i class="fa-solid fa-volume-high text-white"></i>`;
+            showToast(isVideoMuted ? "Video Muted" : "Sound Enabled");
+        }
+
+        window.openTextOverlayPrompt = function() {
+            const txt = prompt("Overlay text on media:", videoOverlayText || "");
+            const textBox = document.getElementById('video-overlay-text-box');
+            const textVal = document.getElementById('video-overlay-text-val');
+
+            if (txt && txt.trim() !== '') {
+                videoOverlayText = txt.trim();
+                textVal.innerText = videoOverlayText;
+                textBox.classList.remove('hidden');
+            } else if (txt === '') {
+                videoOverlayText = '';
+                textBox.classList.add('hidden');
+            }
+        }
+
+        window.changeOverlayTextColor = function(e) {
+            overlayTextColor = e.target.value;
+            const textVal = document.getElementById('video-overlay-text-val');
+            if (textVal) textVal.style.color = overlayTextColor;
         }
 
         window.openCreateModalPage = function(type = 'post') {
@@ -1085,6 +1151,10 @@
                         author: user.displayName || 'User',
                         authorEmail: user.email,
                         videoUrl: cloudMediaUrl,
+                        filter: currentFilter,
+                        overlayText: videoOverlayText,
+                        overlayColor: overlayTextColor,
+                        isMuted: isVideoMuted,
                         likes: [],
                         comments: [],
                         createdAt: Date.now()
@@ -1098,6 +1168,8 @@
                         mediaUrl: cloudMediaUrl,
                         mediaType: selectedFileType,
                         filter: currentFilter,
+                        overlayText: videoOverlayText,
+                        overlayColor: overlayTextColor,
                         likes: [],
                         createdAt: Date.now()
                     });
@@ -1111,6 +1183,8 @@
                         mediaUrl: cloudMediaUrl,
                         mediaType: selectedFileType,
                         filter: currentFilter,
+                        overlayText: videoOverlayText,
+                        overlayColor: overlayTextColor,
                         likes: [],
                         comments: [],
                         savedBy: [],
@@ -1123,6 +1197,8 @@
                 closeCreateModalPage();
                 selectedFileBlob = null;
                 selectedFileUrl = '';
+                videoOverlayText = '';
+                document.getElementById('video-overlay-text-box').classList.add('hidden');
                 document.getElementById('create-caption').value = '';
                 document.getElementById('create-preview-box').classList.add('hidden');
                 showToast("Published to cloud successfully!");
@@ -1134,7 +1210,28 @@
             }
         }
 
-        // Posts Loader with Clickable Profiles
+        // Delete Posts & Reels Handler
+        window.deleteCloudMedia = async function(col, docId, authorEmail) {
+            const user = auth.currentUser;
+            if (!user) return;
+            if (user.email !== authorEmail) {
+                showToast("You can only delete your own content!");
+                return;
+            }
+
+            if (!confirm("Are you sure you want to delete this permanently?")) return;
+
+            try {
+                await deleteDoc(doc(db, col, docId));
+                showToast("Deleted successfully!");
+                if (col === 'posts') await loadCloudPosts();
+                else if (col === 'reels') await loadCloudReels();
+            } catch(e) {
+                showToast("Delete failed: " + e.message);
+            }
+        }
+
+        // Posts Loader with Delete Option & Clickable Profiles
         window.loadCloudPosts = async function() {
             const container = document.getElementById('posts-container');
             const profileGrid = document.getElementById('profile-grid');
@@ -1177,10 +1274,21 @@
                                 <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${(p.author || 'U')[0]}</div>
                                 <span class="font-bold text-xs text-white hover:underline">${p.author}</span>
                             </div>
-                            ${!isSelf ? `<button onclick="toggleFollowUserCloud('${p.author}', '${p.authorEmail}')" class="text-[11px] font-bold px-3 py-1 rounded-full ${isFollowing ? 'border border-gray-700 text-gray-300' : 'clay-btn'}">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
+                            <div class="flex items-center space-x-2">
+                                ${!isSelf ? `<button onclick="toggleFollowUserCloud('${p.author}', '${p.authorEmail}')" class="text-[11px] font-bold px-3 py-1 rounded-full ${isFollowing ? 'border border-gray-700 text-gray-300' : 'clay-btn'}">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
+                                ${isSelf ? `<button onclick="deleteCloudMedia('posts', '${p.id}', '${p.authorEmail}')" class="text-gray-500 hover:text-red-500 p-1.5 transition text-xs" title="Delete Post"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                            </div>
                         </div>
                         ${p.title ? `<p class="text-xs text-white font-medium">${p.title}</p>` : ''}
-                        ${p.mediaUrl ? (p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="rounded-2xl w-full max-h-72 object-cover" controls playsinline></video>` : `<img src="${p.mediaUrl}" style="filter: ${p.filter || 'none'}" class="rounded-2xl w-full max-h-72 object-cover">`) : ''}
+                        ${p.mediaUrl ? `
+                            <div class="relative w-full max-h-72 rounded-2xl overflow-hidden flex items-center justify-center bg-black">
+                                ${p.mediaType === 'video' 
+                                    ? `<video src="${p.mediaUrl}" class="w-full max-h-72 object-cover" controls playsinline></video>` 
+                                    : `<img src="${p.mediaUrl}" style="filter: ${p.filter || 'none'}" class="w-full max-h-72 object-cover">`
+                                }
+                                ${p.overlayText ? `<div class="absolute px-3 py-1 rounded-xl bg-black/60 text-xs font-bold" style="color: ${p.overlayColor || '#ffffff'}">${p.overlayText}</div>` : ''}
+                            </div>
+                        ` : ''}
                         <div class="flex items-center space-x-4 pt-2 border-t border-gray-900 text-white text-xs">
                             <button onclick="toggleCloudLike('posts', '${p.id}')" class="flex items-center space-x-1 ${isLiked ? 'text-red-500 font-bold' : ''}">
                                 <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-lg"></i>
@@ -1200,7 +1308,7 @@
             } catch(e) {}
         }
 
-        // Reels Loader
+        // Reels Loader with Delete Option & Overlay Text
         window.loadCloudReels = async function() {
             const container = document.getElementById('reels-container');
             try {
@@ -1228,7 +1336,10 @@
 
                     return `
                     <div class="relative w-full max-w-sm h-[75vh] bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-end p-4 border border-gray-900">
-                        <video src="${r.videoUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop controls playsinline></video>
+                        <video src="${r.videoUrl}" style="filter: ${r.filter || 'none'}" class="absolute inset-0 w-full h-full object-cover" autoplay loop controls playsinline></video>
+                        
+                        ${r.overlayText ? `<div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10"><span class="px-3 py-1.5 rounded-xl bg-black/60 text-sm font-bold" style="color: ${r.overlayColor \vert{}\vert{} '#ffffff'}">${r.overlayText}</span></div>` : ''}
+
                         <div class="absolute right-3 bottom-20 flex flex-col items-center space-y-4 z-20 text-white">
                             <button onclick="toggleCloudLike('reels', '${r.id}')" class="flex flex-col items-center space-y-1 icon-3d ${isLiked ? 'text-red-500' : ''}">
                                 <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-2xl"></i>
@@ -1238,6 +1349,11 @@
                                 <i class="fa-regular fa-comment text-2xl"></i>
                                 <span class="text-[10px] font-bold">${(r.comments || []).length}</span>
                             </button>
+                            ${isSelf ? `
+                            <button onclick="deleteCloudMedia('reels', '${r.id}', '${r.authorEmail}')" class="flex flex-col items-center space-y-1 icon-3d text-gray-400 hover:text-red-500" title="Delete Reel">
+                                <i class="fa-solid fa-trash-can text-2xl"></i>
+                            </button>
+                            ` : ''}
                         </div>
                         <div class="relative z-10 flex justify-between items-center bg-gradient-to-t from-black/90 p-3 rounded-2xl">
                             <div class="flex items-center space-x-2 cursor-pointer" onclick="openPublicProfile('${r.authorEmail}')">
@@ -1252,7 +1368,7 @@
             } catch(e) {}
         }
 
-        // Stories with Tappable User & Interactions
+        // Stories Tray & Full-Screen Viewer
         window.loadCloudStories = async function() {
             const tray = document.getElementById('stories-tray');
             try {
@@ -1365,6 +1481,152 @@
         window.shareCurrentStory = function() {
             navigator.clipboard.writeText(window.location.href);
             showToast("Story link copied!");
+        }
+
+        // Auto-Playing Popular Explore Grid
+        window.loadExploreGrid = async function() {
+            const grid = document.getElementById('explore-grid');
+            grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">Loading popular explore feed...</div>';
+
+            try {
+                const [postsSnap, reelsSnap] = await Promise.all([
+                    getDocs(collection(db, "posts")),
+                    getDocs(collection(db, "reels"))
+                ]);
+
+                let items = [];
+
+                postsSnap.forEach(d => {
+                    const data = d.data();
+                    const popularity = (data.likes?.length || 0) * 2 + (data.comments?.length || 0) * 3;
+                    items.push({ id: d.id, col: 'posts', ...data, score: popularity });
+                });
+
+                reelsSnap.forEach(d => {
+                    const data = d.data();
+                    const popularity = (data.likes?.length || 0) * 2 + (data.comments?.length || 0) * 3;
+                    items.push({ id: d.id, col: 'reels', mediaType: 'video', mediaUrl: data.videoUrl, ...data, score: popularity });
+                });
+
+                items.sort((a, b) => b.score - a.score);
+
+                if (items.length === 0) {
+                    grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">No media found</div>';
+                    return;
+                }
+
+                grid.innerHTML = items.map(item => `
+                    <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 cursor-pointer" onclick="${item.col === 'reels' ? `switchTab('reels')` : `switchTab('home')`}">
+                        ${item.mediaType === 'video' 
+                            ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>
+                               <span class="absolute top-1.5 right-1.5 bg-black/60 rounded-full px-1.5 py-0.5 text-[9px] text-white"><i class="fa-solid fa-play text-[8px]"></i></span>`
+                            : `<img src="${item.mediaUrl}" style="filter: ${item.filter || 'none'}" class="w-full h-full object-cover">`
+                        }
+                        <div class="absolute bottom-1 left-1 bg-black/70 px-1.5 py-0.5 rounded text-[9px] text-white flex items-center space-x-1">
+                            <i class="fa-solid fa-heart text-red-500 text-[8px]"></i>
+                            <span>${item.likes?.length || 0}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch(e) {
+                grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">Could not load explore feed</div>';
+            }
+        }
+
+        // Unified Real-Time Search: User + Title/Caption + Tag
+        window.handleGlobalSearch = async function(e) {
+            const q = e.target.value.toLowerCase().trim();
+            const grid = document.getElementById('explore-grid');
+
+            if (!q) {
+                loadExploreGrid();
+                return;
+            }
+
+            try {
+                const [usersSnap, postsSnap, reelsSnap] = await Promise.all([
+                    getDocs(collection(db, "users")),
+                    getDocs(collection(db, "posts")),
+                    getDocs(collection(db, "reels"))
+                ]);
+
+                const matchedUsers = [];
+                usersSnap.forEach(u => {
+                    const d = u.data();
+                    const name = (d.name || '').toLowerCase();
+                    const username = (d.username || u.id.split('@')[0]).toLowerCase();
+                    if (name.includes(q) || username.includes(q)) {
+                        matchedUsers.push({ email: u.id, ...d });
+                    }
+                });
+
+                const matchedMedia = [];
+                postsSnap.forEach(p => {
+                    const d = p.data();
+                    const title = (d.title || '').toLowerCase();
+                    if (title.includes(q)) {
+                        matchedMedia.push({ id: p.id, col: 'posts', ...d });
+                    }
+                });
+
+                reelsSnap.forEach(r => {
+                    const d = r.data();
+                    const title = (d.title || d.author || '').toLowerCase();
+                    if (title.includes(q)) {
+                        matchedMedia.push({ id: r.id, col: 'reels', mediaType: 'video', mediaUrl: d.videoUrl, ...d });
+                    }
+                });
+
+                if (matchedUsers.length === 0 && matchedMedia.length === 0) {
+                    grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">No matching users or posts</div>';
+                    return;
+                }
+
+                let html = '';
+
+                if (matchedUsers.length > 0) {
+                    html += `
+                        <div class="col-span-3 pb-2 space-y-1">
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Accounts</p>
+                            <div class="space-y-1.5">
+                                ${matchedUsers.map(u => `
+                                    <div onclick="openPublicProfile('${u.email}')" class="clay-card p-2 flex items-center justify-between cursor-pointer hover:border-white transition">
+                                        <div class="flex items-center space-x-2.5">
+                                            <div class="w-9 h-9 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs overflow-hidden">
+                                                ${u.avatar ? `<img src="${u.avatar}" class="w-full h-full object-cover">` : (u.name || 'U')[0]}
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-xs text-white">${u.name || 'User'}</p>
+                                                <p class="text-[10px] text-gray-400">@${u.username || u.email.split('@')[0]}</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-[10px] text-gray-400 font-bold pr-2">View</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (matchedMedia.length > 0) {
+                    html += `<div class="col-span-3 pt-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">Posts & Videos</div>`;
+                    html += matchedMedia.map(item => `
+                        <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 cursor-pointer" onclick="${item.col === 'reels' ? `switchTab('reels')` : `switchTab('home')`}">
+                            ${item.mediaType === 'video'
+                                ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>`
+                                : `<img src="${item.mediaUrl}" style="filter: ${item.filter || 'none'}" class="w-full h-full object-cover">`
+                            }
+                            <div class="absolute bottom-1 left-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[9px] text-white truncate">
+                                ${item.title || item.author}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                grid.innerHTML = html;
+            } catch(e) {
+                grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">Search failed</div>';
+            }
         }
 
         // WebRTC Live Stream
@@ -1716,31 +1978,7 @@
             }
         }
 
-        // Search Explorer
-        window.handleGlobalSearch = async function(e) {
-            const q = e.target.value.toLowerCase().trim();
-            const grid = document.getElementById('explore-grid');
-            if (!q) { grid.innerHTML = ''; return; }
-
-            const userSnap = await getDocs(collection(db, "users"));
-            const users = [];
-            userSnap.forEach(u => {
-                const d = u.data();
-                if ((d.name && d.name.toLowerCase().includes(q)) || (d.username && d.username.toLowerCase().includes(q))) {
-                    users.push({ email: u.id, ...d });
-                }
-            });
-
-            grid.innerHTML = users.map(u => `
-                <div onclick="openPublicProfile('${u.email}')" class="clay-card p-2 text-center cursor-pointer">
-                    <div class="w-10 h-10 mx-auto rounded-full bg-white text-black font-bold flex items-center justify-center text-xs mb-1">${(u.name || 'U')[0]}</div>
-                    <p class="text-[10px] font-bold text-white truncate">${u.name}</p>
-                    <p class="text-[9px] text-gray-500 truncate">@${u.username || u.email.split('@')[0]}</p>
-                </div>
-            `).join('');
-        }
-
-        // Auth
+        // Authentication State
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('auth-modal').classList.add('hidden');
@@ -1811,6 +2049,7 @@
             if (activeEl) activeEl.classList.remove('hidden');
             if (activeNav) activeNav.className = 'text-white icon-3d text-xl';
 
+            if (tab === 'search') loadExploreGrid();
             if (tab === 'live') loadActiveLiveHub();
             if (tab === 'profile') loadUserProfileData();
             window.scrollTo({ top: 0, behavior: 'smooth' });
