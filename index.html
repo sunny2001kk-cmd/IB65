@@ -2,362 +2,470 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IB65 — Social Universe</title>
 
     <link rel="icon" type="image/png" sizes="192x192" href="./icon.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="./icon.png">
     <link rel="apple-touch-icon" href="./icon.png">
 
     <meta name="theme-color" content="#000000">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="IB65">
-    <meta name="application-name" content="IB65">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000000; color: #ffffff; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000000; color: #ffffff; overscroll-behavior-y: contain; }
         .clay-card {
             background: #121212;
             border: 1px solid #262626;
-            box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
-            border-radius: 24px;
+            border-radius: 20px;
         }
         .clay-btn {
-            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+            background: #ffffff;
             color: #000000;
-            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.2);
-            transition: all 0.2s ease;
-            border-radius: 16px;
+            font-weight: 700;
+            border-radius: 12px;
+            transition: transform 0.15s ease;
         }
-        .clay-btn:active { transform: scale(0.92); }
-        .icon-3d {
-            filter: drop-shadow(0 4px 6px rgba(255, 255, 255, 0.2));
-            transition: transform 0.2s ease;
+        .clay-btn:active { transform: scale(0.94); }
+        .icon-btn:active { transform: scale(0.85); transition: transform 0.1s; }
+        ::-webkit-scrollbar { display: none; }
+        
+        /* Double Tap Heart Animation */
+        @keyframes heartBurst {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.4); opacity: 0.95; }
+            100% { transform: scale(1); opacity: 0; }
         }
-        .icon-3d:active { transform: scale(0.85); }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #000000; }
-        ::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
-        @keyframes storyBar { from { width: 0%; } to { width: 100%; } }
-        .story-progress-active { animation: storyBar 7s linear forwards; }
+        .heart-burst-animate {
+            animation: heartBurst 0.75s ease-out forwards;
+        }
+
+        /* Story Progress Bar */
+        @keyframes storyBar {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+        .story-progress-active {
+            animation: storyBar 7s linear forwards;
+        }
+
+        /* Live Heart Float */
+        @keyframes flyHeart {
+            0% { transform: translateY(0) scale(0.8); opacity: 1; }
+            100% { transform: translateY(-160px) scale(1.4); opacity: 0; }
+        }
+        .live-heart-fly {
+            animation: flyHeart 1.5s ease-out forwards;
+        }
+
+        /* Recording Ring Pulse */
         @keyframes recordPulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { transform: scale(1.08); box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+            70% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-        .recording-active { animation: recordPulse 1.5s infinite; }
+        .recording-pulse { animation: recordPulse 1.2s infinite; }
     </style>
 </head>
-<body class="min-h-screen pb-24 select-none bg-black text-white">
+<body class="min-h-screen pb-20 select-none bg-black text-white">
 
-    <div id="anime-intro" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center space-y-3 transition-opacity duration-500">
-        <h1 class="text-5xl font-black tracking-widest text-white">IB65</h1>
-        <p class="text-xs text-gray-500 tracking-widest uppercase">Cloud Universe</p>
+    <!-- Splash Screen -->
+    <div id="splash" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center space-y-2 transition-opacity duration-300">
+        <h1 class="text-4xl font-black tracking-widest text-white">IB65</h1>
+        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Instagram Experience</p>
     </div>
 
-    <script>
-        setTimeout(() => {
-            const splash = document.getElementById('anime-intro');
-            if (splash) {
-                splash.style.opacity = '0';
-                setTimeout(() => splash.remove(), 400);
-            }
-        }, 700);
-
-        window.showToast = function(msg) {
-            const t = document.getElementById('toast');
-            if (!t) return;
-            t.innerText = msg;
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 2500);
-        };
-
-        window.switchTab = function(tab) {
-            const tabs = ['home', 'search', 'reels', 'live', 'profile', 'public-profile'];
-            tabs.forEach(t => {
-                const el = document.getElementById('view-' + t);
-                const nav = document.getElementById('nav-' + t);
-                if (el) el.classList.add('hidden');
-                if (nav) nav.className = 'text-gray-500 icon-3d text-xl';
-            });
-            const active = document.getElementById('view-' + tab);
-            const activeNav = document.getElementById('nav-' + tab);
-            if (active) active.classList.remove('hidden');
-            if (activeNav) activeNav.className = 'text-white icon-3d text-xl';
-            
-            if (tab === 'search' && typeof window.loadExploreGrid === 'function') window.loadExploreGrid();
-            if (tab === 'live' && typeof window.loadActiveLiveHub === 'function') window.loadActiveLiveHub();
-            if (tab === 'profile' && typeof window.loadUserProfileData === 'function') window.loadUserProfileData();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.openCreateModalPage = function(t) {
-            if (typeof window.setUploadType === 'function') window.setUploadType(t || 'post');
-            document.getElementById('create-modal-page').classList.remove('hidden');
-        };
-        window.closeCreateModalPage = function() {
-            document.getElementById('create-modal-page').classList.add('hidden');
-        };
-        window.toggleNotifications = function() {
-            document.getElementById('notif-modal').classList.toggle('hidden');
-        };
-        window.toggleSettingsModal = function() {
-            document.getElementById('settings-modal').classList.toggle('hidden');
-        };
-        window.openFullMessageInbox = function() {
-            document.getElementById('full-msg-page').classList.remove('hidden');
-            if (typeof window.loadDMInbox === 'function') window.loadDMInbox();
-        };
-        window.closeFullMessageInbox = function() {
-            document.getElementById('full-msg-page').classList.add('hidden');
-        };
-    </script>
-
-    <header class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-gray-900 px-4 py-3 flex justify-between items-center">
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-zinc-900 px-4 py-2.5 flex justify-between items-center">
         <h1 class="text-2xl font-black tracking-wider text-white">IB65</h1>
         <div class="flex items-center space-x-4">
-            <button onclick="switchTab('live')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 shadow-lg">
-                <i class="fa-solid fa-broadcast-tower"></i>
-                <span>LIVE HUB</span>
+            <button onclick="switchTab('live')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5 shadow-lg icon-btn">
+                <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                <span>LIVE</span>
             </button>
-            <button onclick="toggleNotifications()" class="relative text-white text-xl">
-                <i class="fa-solid fa-bell"></i>
+            <button onclick="showToast('No new notifications')" class="text-white text-lg icon-btn">
+                <i class="fa-regular fa-heart"></i>
             </button>
-            <button onclick="openFullMessageInbox()" class="text-white text-xl relative">
+            <button onclick="openDirectInbox()" class="text-white text-lg icon-btn relative">
                 <i class="fa-brands fa-facebook-messenger"></i>
             </button>
         </div>
     </header>
 
-    <div id="full-msg-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
-        <div class="p-4 border-b border-gray-900 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <button onclick="closeFullMessageInbox()" class="text-white text-lg"><i class="fa-solid fa-arrow-left"></i></button>
-                <span class="font-bold text-sm">Direct Messages</span>
-            </div>
-            <span class="text-xs text-gray-500">Chats</span>
-        </div>
-        <div id="dm-chats-list" class="flex-1 overflow-y-auto p-4 space-y-3">
-            <div class="text-center text-gray-500 py-6 text-xs">Loading conversations...</div>
-        </div>
-    </div>
+    <!-- Main Container -->
+    <main class="max-w-md mx-auto">
 
-    <div id="single-chat-modal" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
-        <div class="p-4 border-b border-gray-900 flex justify-between items-center bg-black/90">
-            <div class="flex items-center space-x-3">
-                <button onclick="closeSingleChat()" class="text-white text-lg"><i class="fa-solid fa-arrow-left"></i></button>
-                <div class="w-8 h-8 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs" id="chat-header-avatar">U</div>
-                <span class="font-bold text-sm text-white" id="chat-header-name">User</span>
-            </div>
-        </div>
-        <div id="single-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-2 text-xs"></div>
-        <div class="p-3 border-t border-gray-900 flex space-x-2 bg-black">
-            <input type="text" id="single-chat-input" placeholder="Message..." class="flex-1 clay-card p-2.5 text-xs text-white focus:outline-none">
-            <button onclick="sendDirectMessage()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
-        </div>
-    </div>
-
-    <div id="notif-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end hidden" onclick="toggleNotifications()">
-        <div class="clay-card w-80 h-full p-4 space-y-4" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-gray-900 pb-3">
-                <h3 class="font-bold text-sm">Notifications</h3>
-                <button onclick="toggleNotifications()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="text-center text-gray-500 py-6 text-xs">No notifications yet</div>
-        </div>
-    </div>
-
-    <div id="settings-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center hidden" onclick="toggleSettingsModal()">
-        <div class="clay-card w-full max-w-xl rounded-t-3xl p-5 space-y-3 text-xs" onclick="event.stopPropagation()">
-            <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-2"></div>
-            <div class="flex justify-between items-center border-b border-gray-900 pb-2">
-                <span class="font-bold text-sm text-white">Settings and Activity</span>
-                <button onclick="toggleSettingsModal()" class="text-gray-400 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div onclick="toggleAccountPrivacy()" class="flex items-center justify-between p-3.5 clay-card cursor-pointer">
-                <div class="flex items-center space-x-3"><i class="fa-solid fa-lock text-base"></i><span>Account Privacy</span></div>
-                <span id="privacy-lbl" class="text-gray-400 font-bold">Public</span>
-            </div>
-            <div onclick="switchProfileTab('saved'); toggleSettingsModal(); switchTab('profile');" class="flex items-center space-x-3 p-3.5 clay-card cursor-pointer">
-                <i class="fa-solid fa-bookmark text-base"></i><span>Saved Posts</span>
-            </div>
-            <div onclick="handleLogout()" class="flex items-center space-x-3 p-3.5 clay-card text-red-500 font-bold cursor-pointer">
-                <i class="fa-solid fa-right-from-bracket text-base"></i><span>Log Out</span>
-            </div>
-        </div>
-    </div>
-
-    <main class="max-w-xl mx-auto p-4 space-y-4">
-        
-        <div id="view-home" class="space-y-4">
-            <div class="clay-card p-3 overflow-x-auto flex space-x-3 items-center">
-                <div onclick="openCreateModalPage('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
-                    <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-white to-gray-500 flex items-center justify-center">
+        <!-- 1. HOME VIEW -->
+        <div id="view-home" class="space-y-3 pb-8">
+            <!-- Stories Tray -->
+            <div class="p-3 border-b border-zinc-900 overflow-x-auto flex space-x-3 items-center">
+                <div onclick="openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
+                    <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-pink-600 to-purple-600 flex items-center justify-center relative">
                         <div class="w-full h-full bg-black rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-plus text-white text-lg"></i>
+                            <span class="text-base font-black text-white" id="my-story-avatar">U</span>
                         </div>
+                        <span class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] border border-black font-bold">+</span>
                     </div>
-                    <span class="text-[10px] text-gray-300">Your story</span>
+                    <span class="text-[10px] text-gray-400 truncate w-16 text-center">Your story</span>
                 </div>
-                <div id="stories-tray" class="flex space-x-3"></div>
+                <div id="stories-tray-items" class="flex space-x-3"></div>
             </div>
 
-            <div id="posts-container" class="space-y-4">
-                <div class="text-center text-gray-500 py-10 text-xs">Connecting feed...</div>
-            </div>
-        </div>
-
-        <div id="view-search" class="space-y-4 hidden">
-            <input type="text" id="global-search" oninput="handleGlobalSearch(event)" placeholder="Search users, captions, or tags..." class="w-full clay-card px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none">
-            <div id="explore-grid" class="grid grid-cols-3 gap-1.5 pt-2">
-                <div class="col-span-3 text-center text-gray-500 py-10 text-xs">Loading explore feed...</div>
+            <!-- Feed Posts -->
+            <div id="posts-stream" class="space-y-4 px-2">
+                <div class="text-center text-gray-500 py-16 text-xs">Connecting feed...</div>
             </div>
         </div>
 
-        <div id="view-reels" class="space-y-4 hidden">
-            <div id="reels-container" class="space-y-6 flex flex-col items-center">
-                <div class="text-center text-gray-500 py-12 text-xs">Loading reels...</div>
+        <!-- 2. SEARCH & EXPLORE VIEW -->
+        <div id="view-search" class="space-y-3 p-3 hidden pb-12">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-xs"></i>
+                <input type="text" id="global-search-input" oninput="handleSearch(event)" placeholder="Search users, captions, handles..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none">
+            </div>
+
+            <!-- Search Results (Users List) -->
+            <div id="search-users-results" class="space-y-2 hidden"></div>
+
+            <!-- Instagram Style Explore Grid -->
+            <div>
+                <p class="text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Explore</p>
+                <div id="explore-grid" class="grid grid-cols-3 gap-1">
+                    <div class="col-span-3 text-center text-gray-500 py-12 text-xs">Loading explore feed...</div>
+                </div>
             </div>
         </div>
 
-        <div id="view-live" class="space-y-4 hidden">
+        <!-- 3. REELS FEED -->
+        <div id="view-reels" class="hidden">
+            <div id="reels-container" class="space-y-3 flex flex-col items-center px-1">
+                <div class="text-center text-gray-500 py-20 text-xs">Loading Reels...</div>
+            </div>
+        </div>
+
+        <!-- 4. LIVE HUB -->
+        <div id="view-live" class="space-y-4 p-4 hidden">
             <div class="clay-card p-4 flex justify-between items-center">
                 <div>
-                    <h2 class="text-sm font-bold text-white">Live Broadcast Hub</h2>
-                    <p class="text-[10px] text-gray-400">Watch live stream or broadcast real audio/video</p>
+                    <h2 class="text-sm font-bold text-white flex items-center space-x-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
+                        <span>Instagram Live</span>
+                    </h2>
+                    <p class="text-[10px] text-gray-400">Broadcast video & chat in real time</p>
                 </div>
-                <button onclick="startHostingLive()" class="bg-red-600 px-4 py-1.5 rounded-full text-xs font-bold text-white shadow-lg flex items-center space-x-1.5">
-                    <i class="fa-solid fa-video"></i>
-                    <span>Go Live</span>
-                </button>
+                <button onclick="startBroadcast()" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
             </div>
             
             <div class="space-y-2">
-                <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase">Active Streams</h3>
-                <div id="live-streams-list" class="space-y-3">
-                    <div class="text-center text-gray-500 py-12 text-xs">No active live streams right now</div>
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Broadcasts</h3>
+                <div id="live-rooms-list" class="space-y-2">
+                    <div class="text-center text-gray-500 py-10 text-xs">No one is currently live</div>
                 </div>
             </div>
         </div>
 
-        <div id="view-profile" class="space-y-4 hidden">
-            <div class="clay-card p-6 text-center space-y-4 relative">
-                <button onclick="toggleSettingsModal()" class="absolute top-4 right-4 text-white text-xl"><i class="fa-solid fa-gear"></i></button>
-                <div class="w-20 h-20 mx-auto rounded-full bg-white text-black font-black text-2xl flex items-center justify-center shadow-lg overflow-hidden border border-gray-800" id="profile-initial">U</div>
+        <!-- 5. MY PROFILE VIEW -->
+        <div id="view-profile" class="space-y-4 p-4 hidden">
+            <div class="clay-card p-5 text-center space-y-3 relative">
+                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
+                    <div class="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center text-2xl font-black text-white" id="my-profile-avatar">U</div>
+                </div>
                 <div>
-                    <h2 id="profile-name" class="text-lg font-bold text-white">User</h2>
-                    <p id="profile-username" class="text-xs text-gray-400">@username</p>
-                    <p id="profile-bio" class="text-xs text-gray-300 mt-1 max-w-xs mx-auto"></p>
+                    <h2 id="my-profile-name" class="text-base font-bold text-white">User</h2>
+                    <p id="my-profile-handle" class="text-xs text-gray-400">@handle</p>
+                    <p id="my-profile-bio" class="text-xs text-gray-300 mt-1 max-w-xs mx-auto"></p>
                 </div>
-                <div class="flex justify-around py-2 border-y border-gray-900 text-xs">
-                    <div><span id="stat-posts" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Posts</span></div>
-                    <div><span id="stat-followers" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
-                    <div><span id="stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
+                <div class="flex justify-around py-2 border-y border-zinc-800 text-xs">
+                    <div><span id="my-stat-posts" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Posts</span></div>
+                    <div onclick="openFollowListModal(auth.currentUser?.email, 'followers')" class="cursor-pointer icon-btn"><span id="my-stat-followers" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
+                    <div onclick="openFollowListModal(auth.currentUser?.email, 'following')" class="cursor-pointer icon-btn"><span id="my-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
-                <div class="flex space-x-2">
-                    <button onclick="handleLogout()" class="w-full clay-btn py-2 text-xs font-bold">Logout</button>
+                <div class="flex space-x-2 pt-1">
+                    <button onclick="editMyBio()" class="flex-1 bg-zinc-800 py-2 rounded-xl text-xs font-bold border border-zinc-700">Edit Profile</button>
+                    <button onclick="handleLogout()" class="clay-btn px-4 py-2 text-xs font-bold">Logout</button>
                 </div>
             </div>
 
-            <div class="clay-card p-4 space-y-3">
-                <div id="profile-grid" class="grid grid-cols-3 gap-1.5">
-                    <div class="text-center text-gray-500 col-span-3 py-6 text-xs">No media uploaded yet</div>
+            <!-- Profile Media Grid -->
+            <div>
+                <div class="grid grid-cols-3 gap-1" id="my-media-grid">
+                    <div class="text-center text-gray-500 col-span-3 py-10 text-xs">No media yet</div>
                 </div>
             </div>
+        </div>
+
+        <!-- 6. PUBLIC CREATOR PROFILE VIEW -->
+        <div id="view-public-profile" class="space-y-4 p-4 hidden">
+            <div class="flex items-center space-x-3">
+                <button onclick="switchTab('home')" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
+                <span class="font-bold text-sm" id="pub-top-handle">Profile</span>
+            </div>
+            <div class="clay-card p-5 text-center space-y-3">
+                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
+                    <div class="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center text-2xl font-black text-white" id="pub-avatar">C</div>
+                </div>
+                <div>
+                    <h2 id="pub-name" class="text-base font-bold text-white">Creator</h2>
+                    <p id="pub-handle" class="text-xs text-gray-400">@creator</p>
+                    <p id="pub-bio" class="text-xs text-gray-300 mt-1 max-w-xs mx-auto"></p>
+                </div>
+                <div class="flex justify-around py-2 border-y border-zinc-800 text-xs">
+                    <div><span id="pub-stat-posts" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Posts</span></div>
+                    <div onclick="openFollowListModal(activePublicUserEmail, 'followers')" class="cursor-pointer icon-btn"><span id="pub-stat-followers" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
+                    <div onclick="openFollowListModal(activePublicUserEmail, 'following')" class="cursor-pointer icon-btn"><span id="pub-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
+                </div>
+                <div class="flex space-x-2 pt-1">
+                    <button id="pub-follow-btn" class="flex-1 clay-btn py-2 text-xs font-bold">Follow</button>
+                    <button id="pub-msg-btn" class="flex-1 bg-zinc-800 py-2 rounded-xl text-xs font-bold border border-zinc-700">Message</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-1" id="pub-media-grid"></div>
         </div>
 
     </main>
 
-    <div id="create-modal-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
-        <div class="p-4 border-b border-gray-900 flex justify-between items-center">
-            <button onclick="closeCreateModalPage()" class="text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <span class="font-bold text-sm" id="create-title-lbl">Create New</span>
-            <button onclick="publishContent()" id="share-submit-btn" class="clay-btn px-4 py-1 text-xs font-bold">Share</button>
-        </div>
-        <div class="flex-1 p-4 space-y-4 max-w-lg mx-auto w-full overflow-y-auto">
-            <div class="flex space-x-2 border-b border-gray-900 pb-2 text-xs">
-                <button onclick="setUploadType('story')" id="up-type-story" class="text-gray-500 pb-1 px-3">Story</button>
-                <button onclick="setUploadType('post')" id="up-type-post" class="font-bold text-white pb-1 border-b border-white px-3">Post</button>
-                <button onclick="setUploadType('reel')" id="up-type-reel" class="text-gray-500 pb-1 px-3">Reel</button>
+    <!-- BOTTOM NAVBAR -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-zinc-900 py-2.5 px-6 flex justify-around items-center z-40">
+        <button onclick="switchTab('home')" id="nav-home" class="text-white text-xl icon-btn"><i class="fa-solid fa-house"></i></button>
+        <button onclick="switchTab('search')" id="nav-search" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button onclick="openCreateModal('post')" class="clay-btn w-10 h-10 rounded-full flex items-center justify-center text-black font-extrabold text-lg icon-btn -mt-2 shadow-lg"><i class="fa-solid fa-plus"></i></button>
+        <button onclick="switchTab('reels')" id="nav-reels" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-clapperboard"></i></button>
+        <button onclick="switchTab('profile')" id="nav-profile" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-user"></i></button>
+    </nav>
+
+    <!-- INSTAGRAM STORY VIEWER MODAL -->
+    <div id="modal-story" class="fixed inset-0 z-50 bg-black flex items-center justify-center hidden" onclick="closeStory()">
+        <div class="relative w-full max-w-md h-full bg-black flex flex-col justify-between p-3" onclick="event.stopPropagation()">
+            <!-- Story Progress Bar -->
+            <div class="w-full flex space-x-1 pt-2 z-20">
+                <div class="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
+                    <div id="story-progress-bar" class="h-full bg-white w-0"></div>
+                </div>
             </div>
-            <input type="text" id="create-caption" placeholder="Write a caption..." class="w-full clay-card p-3 text-xs text-white placeholder-gray-500 focus:outline-none">
+
+            <!-- Top Creator Bar (Tap to open creator profile) -->
+            <div class="flex justify-between items-center z-20 pt-2">
+                <div class="flex items-center space-x-2.5 cursor-pointer bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full" onclick="openProfileFromStory()">
+                    <div class="w-8 h-8 rounded-full bg-zinc-800 text-white font-extrabold flex items-center justify-center text-xs" id="story-top-avatar">U</div>
+                    <span class="text-xs font-bold text-white hover:underline" id="story-top-author">Creator</span>
+                </div>
+                <button onclick="closeStory()" class="text-white text-lg p-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Story Media with Double Tap Container -->
+            <div class="absolute inset-0 flex items-center justify-center overflow-hidden" ondblclick="triggerDoubleTapLike('story', currentStoryId, event)">
+                <img id="story-img" class="w-full h-full object-cover hidden">
+                <video id="story-vid" class="w-full h-full object-cover hidden" playsinline></video>
+                <!-- Double Tap Heart -->
+                <div class="absolute pointer-events-none hidden" id="story-heart-burst">
+                    <i class="fa-solid fa-heart text-red-500 text-7xl drop-shadow-2xl"></i>
+                </div>
+            </div>
+
+            <!-- Story Bottom Actions -->
+            <div class="z-20 flex items-center space-x-2.5 pb-2 bg-gradient-to-t from-black/90 to-transparent pt-4">
+                <input type="text" id="story-reply-msg" placeholder="Send message..." class="flex-1 bg-zinc-900/80 border border-zinc-700 rounded-full px-4 py-2 text-xs text-white focus:outline-none">
+                <button onclick="sendStoryReply()" class="text-white text-sm bg-white/20 px-3 py-2 rounded-full icon-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                <button onclick="toggleStoryLike()" id="story-like-icon" class="text-2xl text-white icon-btn"><i class="fa-regular fa-heart"></i></button>
+                <button onclick="shareLink()" class="text-xl text-white icon-btn"><i class="fa-solid fa-share-nodes"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INSTAGRAM COMMENTS BOTTOM DRAWER -->
+    <div id="modal-comments" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="closeComments()">
+        <div class="clay-card w-full max-w-md h-[60vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                <span class="font-bold text-xs text-white">Comments</span>
+                <button onclick="closeComments()" class="text-gray-400 text-base"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="comments-items-list" class="flex-1 overflow-y-auto space-y-2 py-3 text-xs"></div>
+            <div class="flex space-x-2 pt-2 border-t border-zinc-800">
+                <input type="text" id="comment-text-input" placeholder="Add a comment..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+                <button onclick="submitComment()" class="clay-btn px-4 py-2 text-xs font-bold">Post</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOLLOWERS / FOLLOWING LIST MODAL -->
+    <div id="modal-follow-list" class="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 hidden" onclick="closeFollowListModal()">
+        <div class="clay-card p-4 w-full max-w-sm space-y-3" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                <h3 id="follow-list-title" class="font-bold text-xs text-white">Followers</h3>
+                <button onclick="closeFollowListModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="follow-list-container" class="space-y-2 max-h-60 overflow-y-auto text-xs"></div>
+        </div>
+    </div>
+
+    <!-- POST & REEL FULL VIEW MODAL (From Explore) -->
+    <div id="modal-media-viewer" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-3 hidden">
+        <div class="flex justify-between items-center pt-2">
+            <button onclick="closeMediaViewer()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <span class="text-xs font-bold text-gray-400">IB65 Explore</span>
+        </div>
+        <div class="flex-1 flex items-center justify-center overflow-hidden my-3" id="media-viewer-content"></div>
+    </div>
+
+    <!-- CREATE MODAL (Post / Reel / Story) with Video Editor -->
+    <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
+        <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
+            <button onclick="closeCreateModal()" class="text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+            <span class="font-bold text-xs" id="create-modal-title">Create New</span>
+            <button onclick="publishMedia()" id="btn-publish" class="clay-btn px-4 py-1.5 text-xs font-bold">Share</button>
+        </div>
+        <div class="flex-1 p-4 space-y-3 max-w-md mx-auto w-full overflow-y-auto">
+            <!-- Tabs -->
+            <div class="flex space-x-2 border-b border-zinc-800 pb-2 text-xs">
+                <button onclick="setUploadType('post')" id="type-btn-post" class="font-bold text-white border-b-2 border-white pb-1 px-3">Post</button>
+                <button onclick="setUploadType('reel')" id="type-btn-reel" class="text-gray-500 pb-1 px-3">Reel</button>
+                <button onclick="setUploadType('story')" id="type-btn-story" class="text-gray-500 pb-1 px-3">Story</button>
+            </div>
+            <input type="text" id="create-caption-input" placeholder="Write a caption, tags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none">
             
+            <!-- Source Selector -->
             <div class="grid grid-cols-2 gap-2">
-                <label class="cursor-pointer block clay-card p-4 text-center border border-gray-800 hover:border-white transition">
+                <label class="cursor-pointer block clay-card p-4 text-center border border-zinc-800 hover:border-zinc-500 transition">
                     <i class="fa-solid fa-images text-2xl mb-1 text-white"></i>
                     <p class="text-[10px] text-gray-300">Device Gallery</p>
-                    <input type="file" id="gallery-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelected(event)">
+                    <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="handleFileSelected(event)">
                 </label>
-                <button type="button" onclick="openLiveCamera()" class="clay-card p-4 text-center border border-gray-800 hover:border-white transition">
-                    <i class="fa-solid fa-camera text-2xl mb-1 text-white"></i>
-                    <p class="text-[10px] text-gray-300">Live Lens</p>
+                <button type="button" onclick="openCameraRecorder()" class="clay-card p-4 text-center border border-zinc-800 hover:border-zinc-500 transition">
+                    <i class="fa-solid fa-video text-2xl mb-1 text-red-500"></i>
+                    <p class="text-[10px] text-gray-300">Instagram Camera</p>
                 </button>
             </div>
 
-            <div id="create-preview-box" class="hidden space-y-3">
-                <div class="relative w-full max-h-80 rounded-2xl overflow-hidden bg-black border border-gray-800 flex items-center justify-center">
-                    <img id="prev-img" class="w-full h-full max-h-80 object-contain hidden">
-                    <video id="prev-vid" class="w-full h-full max-h-80 object-contain hidden" autoplay loop playsinline></video>
+            <!-- Video & Image Editing Suite -->
+            <div id="editor-preview-container" class="hidden space-y-3 pt-2">
+                <!-- Filters & Sound Control -->
+                <div class="flex justify-between items-center bg-zinc-900 p-2.5 rounded-xl text-xs">
+                    <button type="button" onclick="toggleEditorAudio()" id="btn-editor-mute" class="bg-zinc-800 px-3 py-1.5 rounded-lg text-white">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <button type="button" onclick="addTextOverlay()" class="bg-zinc-800 px-3 py-1.5 rounded-lg text-white font-bold flex items-center space-x-1">
+                        <i class="fa-solid fa-font"></i>
+                        <span>Text</span>
+                    </button>
+                    <div class="flex items-center space-x-1">
+                        <span class="text-[10px] text-gray-400">Color:</span>
+                        <input type="color" id="overlay-color" value="#ffffff" onchange="updateTextColor(event)" class="w-6 h-6 rounded-full bg-transparent border-0 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Filter Strip -->
+                <div class="flex space-x-2 overflow-x-auto py-1 text-xs">
+                    <button onclick="setMediaFilter('none')" class="bg-zinc-900 px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">Normal</button>
+                    <button onclick="setMediaFilter('contrast(125%) saturate(130%)')" class="bg-zinc-900 px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">Vivid</button>
+                    <button onclick="setMediaFilter('sepia(50%) contrast(110%)')" class="bg-zinc-900 px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">Retro</button>
+                    <button onclick="setMediaFilter('grayscale(100%) contrast(140%)')" class="bg-zinc-900 px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">B&W</button>
+                    <button onclick="setMediaFilter('hue-rotate(180deg) saturate(130%)')" class="bg-zinc-900 px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">Neon</button>
+                </div>
+
+                <div class="relative w-full max-h-72 rounded-2xl overflow-hidden bg-black border border-zinc-800 flex items-center justify-center">
+                    <img id="edit-img-preview" class="w-full h-full max-h-72 object-contain hidden">
+                    <video id="edit-vid-preview" class="w-full h-full max-h-72 object-contain hidden" autoplay loop playsinline></video>
+                    
+                    <div id="editor-text-overlay" class="absolute pointer-events-none hidden px-3 py-1 rounded-xl bg-black/60 font-bold text-center text-sm shadow-xl">
+                        <span id="editor-text-val"></span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="inapp-camera-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
+    <!-- INSTAGRAM LIVE CAMERA & VIDEO RECORDER -->
+    <div id="modal-camera" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
         <div class="flex justify-between items-center z-10">
-            <button onclick="closeLiveCamera()" class="text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
-            <button onclick="flipCamera()" class="text-white text-lg"><i class="fa-solid fa-camera-rotate"></i></button>
+            <button onclick="closeCameraRecorder()" class="text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <div class="flex items-center space-x-2 bg-black/40 px-3 py-1 rounded-full">
+                <span id="cam-recording-indicator" class="w-2.5 h-2.5 rounded-full bg-red-600 hidden animate-ping"></span>
+                <span id="cam-record-timer" class="text-xs font-bold text-white uppercase">00:00</span>
+            </div>
+            <button onclick="flipCameraLens()" class="text-white text-lg"><i class="fa-solid fa-camera-rotate"></i></button>
         </div>
         
         <div class="flex-1 relative flex items-center justify-center my-2">
-            <video id="camera-stream" autoplay playsinline muted class="w-full h-full object-cover rounded-3xl"></video>
-            <canvas id="camera-canvas" class="hidden"></canvas>
+            <video id="live-cam-stream" autoplay playsinline muted class="w-full h-full object-cover rounded-3xl"></video>
+            <canvas id="live-cam-canvas" class="hidden"></canvas>
         </div>
 
         <div class="flex justify-around items-center py-4 z-10 px-8">
-            <button onclick="capturePhoto()" class="flex flex-col items-center space-y-1">
-                <div class="w-14 h-14 rounded-full border-2 border-white p-1 flex items-center justify-center active:scale-90 transition">
+            <!-- Capture Photo -->
+            <button onclick="capturePhotoNow()" class="flex flex-col items-center space-y-1 icon-btn">
+                <div class="w-14 h-14 rounded-full border-2 border-white p-1 flex items-center justify-center">
                     <div class="w-full h-full bg-white rounded-full"></div>
                 </div>
                 <span class="text-[10px] text-gray-300 font-bold">Photo</span>
             </button>
+
+            <!-- Record Video (Instagram style) -->
+            <button id="cam-record-btn" onclick="toggleVideoRecord()" class="flex flex-col items-center space-y-1 icon-btn">
+                <div id="record-ring" class="w-16 h-16 rounded-full border-4 border-red-600 p-1 flex items-center justify-center transition">
+                    <div id="record-circle" class="w-full h-full bg-red-600 rounded-full"></div>
+                </div>
+                <span id="record-label" class="text-[10px] text-red-500 font-bold">Record</span>
+            </button>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-gray-900 py-3 px-6 flex justify-around items-center z-40">
-        <button onclick="switchTab('home')" id="nav-home" class="text-white icon-3d text-xl"><i class="fa-solid fa-house"></i></button>
-        <button onclick="switchTab('search')" id="nav-search" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-compass"></i></button>
-        <button onclick="openCreateModalPage('post')" class="clay-btn w-12 h-12 rounded-full flex items-center justify-center shadow-xl -mt-5 icon-3d text-black font-extrabold text-xl"><i class="fa-solid fa-plus"></i></button>
-        <button onclick="switchTab('reels')" id="nav-reels" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-clapperboard"></i></button>
-        <button onclick="switchTab('profile')" id="nav-profile" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-user"></i></button>
-    </nav>
+    <!-- LIVE BROADCAST VIEW (WebRTC) -->
+    <div id="modal-live-room" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
+        <div class="flex justify-between items-center z-20">
+            <div class="flex items-center space-x-2">
+                <span class="bg-red-600 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold animate-pulse">LIVE</span>
+                <span id="live-viewers-tag" class="text-xs font-bold text-white">👁️ 1</span>
+                <span id="live-host-title" class="text-xs text-gray-300 font-semibold pl-2">Host</span>
+            </div>
+            <button onclick="exitLiveRoom()" class="text-xs bg-red-600 px-3.5 py-1.5 rounded-xl text-white font-bold">End</button>
+        </div>
 
-    <div id="auth-modal" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
-        <div class="clay-card p-6 w-full max-w-sm space-y-4">
-            <h2 class="text-2xl font-black text-center text-white">IB65</h2>
-            <p class="text-xs text-center text-gray-400">Login or Create Account</p>
-            <input type="text" id="auth-name" placeholder="Full Name" class="w-full clay-card p-3 text-xs text-white">
-            <input type="email" id="auth-email" placeholder="Email" class="w-full clay-card p-3 text-xs text-white">
-            <input type="password" id="auth-password" placeholder="Password (6+ chars)" class="w-full clay-card p-3 text-xs text-white">
+        <!-- Video stream -->
+        <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+            <video id="live-room-video" autoplay playsinline class="w-full h-full object-cover"></video>
+            <!-- Floating Hearts Area -->
+            <div id="live-hearts-container" class="absolute right-4 bottom-24 pointer-events-none"></div>
+        </div>
+
+        <div class="z-20 space-y-3">
+            <div id="live-chat-messages" class="space-y-1.5 max-h-48 overflow-y-auto p-2 text-xs"></div>
+            <div class="flex space-x-2">
+                <input type="text" id="live-input-msg" placeholder="Comment on live..." class="flex-1 bg-black/60 border border-zinc-700 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                <button onclick="sendLiveMsg()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
+                <button onclick="triggerLiveHeart()" class="bg-red-600 text-white px-3 py-2 rounded-xl text-base icon-btn"><i class="fa-solid fa-heart"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="modal-auth" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
+        <div class="clay-card p-6 w-full max-w-sm space-y-3.5">
+            <h2 class="text-3xl font-black text-center text-white">IB65</h2>
+            <p class="text-xs text-center text-gray-400">Instagram Experience</p>
+            <input type="text" id="auth-input-name" placeholder="Full Name" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
+            <input type="email" id="auth-input-email" placeholder="Email" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
+            <input type="password" id="auth-input-pass" placeholder="Password (6+ chars)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
             <div class="flex space-x-2 pt-2">
-                <button onclick="handleLogin()" class="flex-1 clay-card py-2.5 text-xs font-bold text-white">Login</button>
+                <button onclick="handleLogin()" class="flex-1 bg-zinc-800 py-2.5 text-xs font-bold text-white rounded-xl">Login</button>
                 <button onclick="handleSignup()" class="flex-1 clay-btn py-2.5 text-xs font-bold">Sign Up</button>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white text-xs px-4 py-2 rounded-full border border-gray-800 shadow-2xl hidden z-50"></div>
+    <!-- Global Toast -->
+    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
+    <!-- FIREBASE & APPLICATION ENGINE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, query, where, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBlM05NZl4bKjRsrZ0ZUDpjYi0fdPP2-X4",
@@ -372,117 +480,338 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // State Store
+        window.auth = auth;
+        window.db = db;
+        let currentTab = 'home';
         let uploadType = 'post';
         let selectedFileBlob = null;
         let selectedFileUrl = '';
         let selectedFileType = 'image';
-        let cameraMediaStream = null;
-        let cameraFacing = 'environment';
+        let currentFilter = 'none';
+        let isAudioMuted = false;
+        let overlayText = '';
+        let overlayTextColor = '#ffffff';
 
-        // Crash-proof loader
-        async function safeLoadAll() {
-            try { await loadCloudPosts(); } catch(e) { console.error("Posts error:", e); }
-            try { await loadCloudReels(); } catch(e) { console.error("Reels error:", e); }
-            try { await loadCloudStories(); } catch(e) { console.error("Stories error:", e); }
-            try { await loadUserProfileData(); } catch(e) { console.error("Profile error:", e); }
+        // Camera State
+        let cameraStream = null;
+        let cameraFacing = 'environment';
+        let mediaRecorder = null;
+        let recordedBlobs = [];
+        let isRecording = false;
+        let recordTimer = null;
+        let recordDuration = 0;
+
+        // Story State
+        let currentStory = null;
+        let storyTimer = null;
+
+        // Active Comments Target
+        let activeCommentCol = 'posts';
+        let activeCommentDocId = null;
+
+        // Public Profile & Live State
+        let activePublicUserEmail = null;
+        let peerInstance = null;
+        let activeLiveStreamId = null;
+        let isHostingLive = false;
+        let localStreamMedia = null;
+        let liveSnapshotUnsub = null;
+
+        // Splash dismiss
+        setTimeout(() => {
+            const sp = document.getElementById('splash');
+            if (sp) { sp.style.opacity = '0'; setTimeout(() => sp.remove(), 350); }
+        }, 700);
+
+        window.showToast = function(msg) {
+            const t = document.getElementById('toast');
+            if (!t) return;
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 2300);
+        };
+
+        // Navigation Switcher
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            ['home', 'search', 'reels', 'live', 'profile', 'public-profile'].forEach(t => {
+                const view = document.getElementById('view-' + t);
+                const nav = document.getElementById('nav-' + t);
+                if (view) view.classList.add('hidden');
+                if (nav) nav.className = 'text-gray-500 text-xl icon-btn';
+            });
+            const activeView = document.getElementById('view-' + tab);
+            const activeNav = document.getElementById('nav-' + tab);
+            if (activeView) activeView.classList.remove('hidden');
+            if (activeNav) activeNav.className = 'text-white text-xl icon-btn';
+
+            if (tab === 'home') safeLoadHome();
+            if (tab === 'search') loadExploreMedia();
+            if (tab === 'reels') loadReelsFeed();
+            if (tab === 'profile') loadMyProfile();
+            if (tab === 'live') loadLiveBroadcasters();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // Auth Listeners
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                document.getElementById('modal-auth').classList.add('hidden');
+                document.getElementById('my-story-avatar').innerText = (user.displayName || user.email)[0].toUpperCase();
+                safeLoadHome();
+            } else {
+                document.getElementById('modal-auth').classList.remove('hidden');
+            }
+        });
+
+        window.handleSignup = async function() {
+            const name = document.getElementById('auth-input-name').value.trim();
+            const email = document.getElementById('auth-input-email').value.trim();
+            const pass = document.getElementById('auth-input-pass').value.trim();
+            if (!name || !email || pass.length < 6) { showToast("Enter valid details (pass 6+ chars)"); return; }
+
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, pass);
+                await updateProfile(res.user, { displayName: name });
+                await setDoc(doc(db, "users", email), {
+                    name: name,
+                    handle: email.split('@')[0],
+                    email: email,
+                    bio: 'Hey there! Using IB65.',
+                    followers: 0,
+                    following: 0,
+                    followersList: [],
+                    followingList: [],
+                    createdAt: Date.now()
+                });
+                showToast("Account created successfully!");
+            } catch(e) { showToast("Signup error: " + e.message); }
+        };
+
+        window.handleLogin = async function() {
+            const email = document.getElementById('auth-input-email').value.trim();
+            const pass = document.getElementById('auth-input-pass').value.trim();
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                showToast("Welcome back!");
+            } catch(e) { showToast("Login failed: " + e.message); }
+        };
+
+        window.handleLogout = async function() {
+            await signOut(auth);
+            showToast("Logged out");
+        };
+
+        // Safe Load Home (Feed + Stories)
+        async function safeLoadHome() {
+            loadStoriesTray();
+            loadPostsFeed();
         }
 
-        window.loadUserProfileData = async function() {
-            const user = auth.currentUser;
-            if (!user) return;
+        // STORIES SYSTEM
+        async function loadStoriesTray() {
+            const tray = document.getElementById('stories-tray-items');
             try {
-                let d = null;
-                // Pehle email se dhoondhega, fir UID se
-                const uDoc = await getDoc(doc(db, "users", user.email));
-                if (uDoc.exists()) {
-                    d = uDoc.data();
-                } else {
-                    const qSnap = await getDocs(query(collection(db, "users"), where("email", "==", user.email)));
-                    if (!qSnap.empty) d = qSnap.docs[0].data();
+                const snap = await getDocs(collection(db, "stories"));
+                const stories = [];
+                const now = Date.now();
+                snap.forEach(d => {
+                    const s = { id: d.id, ...d.data() };
+                    if (now - (s.createdAt || 0) < 86400000) stories.push(s);
+                });
+                stories.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                if (stories.length === 0) {
+                    tray.innerHTML = '<span class="text-[11px] text-gray-500 pl-2">No active stories</span>';
+                    return;
                 }
 
-                if (d) {
-                    document.getElementById('profile-name').innerText = d.name || user.displayName || 'User';
-                    document.getElementById('profile-username').innerText = '@' + (d.handle || d.username || user.email.split('@')[0]);
-                    document.getElementById('profile-bio').innerText = d.bio || '';
-                    
-                    const av = document.getElementById('profile-initial');
-                    if (d.avatar) {
-                        av.innerHTML = '<img src="' + d.avatar + '" class="w-full h-full object-cover">';
-                    } else {
-                        av.innerText = (d.initial || (d.name || 'U')[0]).toUpperCase();
-                    }
+                tray.innerHTML = stories.map(s => {
+                    const authorName = s.author || s.handle || 'Creator';
+                    const isVid = s.mediaType === 'video';
+                    return `
+                        <div class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0" onclick='openStoryModal(${JSON.stringify(s)})'>
+                            <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-pink-600 to-purple-600 flex items-center justify-center">
+                                <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
+                                    ${isVid ? `<video src="${s.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${s.mediaUrl}" class="w-full h-full object-cover">`}
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-gray-300 truncate w-16 text-center">${authorName}</span>
+                        </div>
+                    `;
+                }).join('');
+            } catch(e) { console.warn(e); }
+        }
 
-                    // Number ya Array dono safely count karega
-                    const fCount = typeof d.followers === 'number' ? d.followers : (d.followers ? d.followers.length : 0);
-                    const fgCount = typeof d.following === 'number' ? d.following : (d.following ? d.following.length : 0);
-                    document.getElementById('stat-followers').innerText = fCount;
-                    document.getElementById('stat-following').innerText = fgCount;
-                }
-            } catch(e) {
-                console.warn(e);
+        window.openStoryModal = function(story) {
+            clearTimeout(storyTimer);
+            currentStory = story;
+            window.currentStoryId = story.id;
+
+            document.getElementById('story-top-author').innerText = story.author || story.handle || 'Creator';
+            document.getElementById('story-top-avatar').innerText = (story.author || 'U')[0].toUpperCase();
+
+            const bar = document.getElementById('story-progress-bar');
+            bar.classList.remove('story-progress-active');
+            void bar.offsetWidth;
+            bar.classList.add('story-progress-active');
+
+            const sImg = document.getElementById('story-img');
+            const sVid = document.getElementById('story-vid');
+
+            if (story.mediaType === 'video') {
+                sImg.classList.add('hidden');
+                sVid.classList.remove('hidden');
+                sVid.src = story.mediaUrl;
+                sVid.play().catch(()=>{});
+            } else {
+                sVid.classList.add('hidden');
+                sImg.classList.remove('hidden');
+                sImg.src = story.mediaUrl;
+            }
+
+            const isLiked = (story.likes || []).includes(auth.currentUser?.email);
+            document.getElementById('story-like-icon').innerHTML = isLiked ? '<i class="fa-solid fa-heart text-red-500"></i>' : '<i class="fa-regular fa-heart"></i>';
+
+            document.getElementById('modal-story').classList.remove('hidden');
+            storyTimer = setTimeout(() => closeStory(), 7000);
+        };
+
+        window.closeStory = function() {
+            clearTimeout(storyTimer);
+            const sVid = document.getElementById('story-vid');
+            if (sVid) sVid.pause();
+            document.getElementById('modal-story').classList.add('hidden');
+            currentStory = null;
+        };
+
+        window.openProfileFromStory = function() {
+            if (currentStory && currentStory.authorEmail) {
+                const email = currentStory.authorEmail;
+                closeStory();
+                openPublicProfile(email);
             }
         };
 
-        window.loadCloudPosts = async function() {
-            const container = document.getElementById('posts-container');
-            const profileGrid = document.getElementById('profile-grid');
+        window.toggleStoryLike = async function() {
+            if (!currentStory || !auth.currentUser) return;
+            const docRef = doc(db, "stories", currentStory.id);
+            const userEmail = auth.currentUser.email;
+            let likes = currentStory.likes || [];
+
+            if (likes.includes(userEmail)) {
+                await updateDoc(docRef, { likes: arrayRemove(userEmail) });
+                currentStory.likes = likes.filter(e => e !== userEmail);
+                document.getElementById('story-like-icon').innerHTML = '<i class="fa-regular fa-heart"></i>';
+            } else {
+                await updateDoc(docRef, { likes: arrayUnion(userEmail) });
+                currentStory.likes = [...likes, userEmail];
+                document.getElementById('story-like-icon').innerHTML = '<i class="fa-solid fa-heart text-red-500"></i>';
+                showToast("❤️ Liked story");
+            }
+        };
+
+        window.sendStoryReply = async function() {
+            const input = document.getElementById('story-reply-msg');
+            const txt = input.value.trim();
+            if (!txt || !currentStory || !auth.currentUser) return;
+            input.value = '';
+            showToast("Reply sent to " + (currentStory.author || 'creator'));
+        };
+
+        // POSTS FEED (Instagram Style with Double Tap, Like, Comment, Share, Follow, Delete)
+        async function loadPostsFeed() {
+            const container = document.getElementById('posts-stream');
             try {
                 const snap = await getDocs(collection(db, "posts"));
                 const posts = [];
                 snap.forEach(d => posts.push({ id: d.id, ...d.data() }));
 
                 if (posts.length === 0) {
-                    container.innerHTML = '<div class="text-center text-gray-500 py-10 text-xs">No posts yet. Tap + to upload!</div>';
+                    container.innerHTML = '<div class="text-center text-gray-500 py-16 text-xs">No posts yet. Tap + to upload!</div>';
                     return;
                 }
 
                 posts.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
-
                 const user = auth.currentUser;
-                const myPosts = user ? posts.filter(p => (p.authorEmail === user.email || p.email === user.email)) : [];
-                document.getElementById('stat-posts').innerText = myPosts.length;
 
-                if (profileGrid) {
-                    profileGrid.innerHTML = myPosts.length === 0 ? '<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No media uploaded yet</div>' : myPosts.map(p => {
-                        const media = p.mediaUrl || p.url || p.image || '';
-                        const isVid = p.mediaType === 'video' || (p.type && p.type.includes('video'));
-                        return `
-                            <div class="h-28 clay-card rounded-xl overflow-hidden flex items-center justify-center">
-                                ${isVid ? `<video src="${media}" class="w-full h-full object-cover"></video>` : `<img src="${media}" class="w-full h-full object-cover">`}
-                            </div>
-                        `;
-                    }).join('');
+                // Get Current User Following List
+                let myFollowing = [];
+                if (user) {
+                    const uSnap = await getDoc(doc(db, "users", user.email));
+                    if (uSnap.exists()) myFollowing = uSnap.data().followingList || [];
                 }
 
                 container.innerHTML = posts.map(p => {
-                    const media = p.mediaUrl || p.url || p.image || '';
-                    const isVid = p.mediaType === 'video' || (p.type && p.type.includes('video'));
-                    const authorName = p.author || p.name || p.handle || 'User';
+                    const authorName = p.author || p.handle || 'User';
+                    const authorEmail = p.authorEmail || p.email || '';
+                    const media = p.mediaUrl || p.url || '';
+                    const isVid = p.mediaType === 'video';
+                    const isLiked = user && (p.likes || []).includes(user.email);
+                    const isFollowing = myFollowing.includes(authorEmail);
+                    const isSelf = user && user.email === authorEmail;
 
                     return `
-                    <div class="clay-card p-4 space-y-3">
+                    <div class="clay-card p-3 space-y-2.5">
+                        <!-- Post Header -->
                         <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-2.5 cursor-pointer" onclick="openPublicProfile('${authorEmail}')">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
+                                    <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-bold text-xs">${authorName[0].toUpperCase()}</div>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-xs text-white hover:underline">${authorName}</p>
+                                </div>
+                            </div>
                             <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${authorName[0].toUpperCase()}</div>
-                                <span class="font-bold text-xs text-white">${authorName}</span>
+                                ${!isSelf ? `
+                                    <button onclick="toggleFollowUser('${authorEmail}', '${authorName}')" class="text-[11px] font-bold px-3 py-1 rounded-full ${isFollowing ? 'border border-zinc-700 text-gray-300' : 'clay-btn'}">
+                                        ${isFollowing ? 'Following' : 'Follow'}
+                                    </button>
+                                ` : `
+                                    <button onclick="deleteMyContent('posts', '${p.id}', '${authorEmail}')" class="text-gray-500 hover:text-red-500 p-1 icon-btn" title="Delete Post">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                    </button>
+                                `}
                             </div>
                         </div>
-                        ${(p.title || p.caption) ? `<p class="text-xs text-white font-medium">${p.title || p.caption}</p>` : ''}
-                        ${media ? `
-                            <div class="relative w-full max-h-72 rounded-2xl overflow-hidden flex items-center justify-center bg-black">
-                                ${isVid ? `<video src="${media}" class="w-full max-h-72 object-cover" controls playsinline></video>` : `<img src="${media}" class="w-full max-h-72 object-cover">`}
+
+                        <!-- Post Media with Double Tap Container -->
+                        <div class="relative w-full max-h-80 rounded-2xl overflow-hidden bg-black flex items-center justify-center" ondblclick="triggerDoubleTapLike('posts', '${p.id}', event)">
+                            ${isVid ? `<video src="${media}" class="w-full max-h-80 object-cover" controls playsinline></video>` : `<img src="${media}" style="filter: ${p.filter || 'none'}" class="w-full max-h-80 object-cover">`}
+                            <!-- Heart Burst -->
+                            <div class="absolute pointer-events-none hidden" id="burst-${p.id}">
+                                <i class="fa-solid fa-heart text-red-500 text-7xl drop-shadow-2xl"></i>
                             </div>
-                        ` : ''}
+                        </div>
+
+                        <!-- Action Bar (Instagram Like, Comment, Share) -->
+                        <div class="flex items-center space-x-4 pt-1 text-white text-base">
+                            <button onclick="toggleCloudLike('posts', '${p.id}')" class="flex items-center space-x-1.5 icon-btn ${isLiked ? 'text-red-500' : ''}">
+                                <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-lg"></i>
+                                <span class="text-xs font-bold text-white">${(p.likes || []).length}</span>
+                            </button>
+                            <button onclick="openComments('posts', '${p.id}')" class="flex items-center space-x-1.5 icon-btn">
+                                <i class="fa-regular fa-comment text-lg"></i>
+                                <span class="text-xs font-bold">${(p.comments || []).length}</span>
+                            </button>
+                            <button onclick="shareLink()" class="icon-btn">
+                                <i class="fa-solid fa-paper-plane text-base"></i>
+                            </button>
+                        </div>
+
+                        ${p.title ? `<p class="text-xs text-gray-300"><strong class="text-white">${authorName}</strong> ${p.title}</p>` : ''}
                     </div>
-                `;
+                    `;
                 }).join('');
             } catch(e) {
-                container.innerHTML = '<div class="text-center text-gray-500 py-10 text-xs">Feed ready. Tap + to upload new media.</div>';
+                container.innerHTML = '<div class="text-center text-gray-500 py-16 text-xs">Feed ready.</div>';
             }
-        };
+        }
 
-        window.loadCloudReels = async function() {
+        // REELS FEED (Full Screen Style with Double Tap, Like, Comment, Follow, Delete)
+        async function loadReelsFeed() {
             const container = document.getElementById('reels-container');
             try {
                 const snap = await getDocs(collection(db, "reels"));
@@ -490,131 +819,545 @@
                 snap.forEach(d => reels.push({ id: d.id, ...d.data() }));
 
                 if (reels.length === 0) {
-                    container.innerHTML = '<div class="text-center text-gray-500 py-12 text-xs">No reels found.</div>';
+                    container.innerHTML = '<div class="text-center text-gray-500 py-20 text-xs">No reels available right now.</div>';
                     return;
+                }
+
+                reels.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+                const user = auth.currentUser;
+
+                let myFollowing = [];
+                if (user) {
+                    const uSnap = await getDoc(doc(db, "users", user.email));
+                    if (uSnap.exists()) myFollowing = uSnap.data().followingList || [];
                 }
 
                 container.innerHTML = reels.map(r => {
-                    const vidUrl = r.videoUrl || r.url || r.mediaUrl || '';
-                    const author = r.author || r.name || 'Creator';
+                    const authorName = r.author || r.handle || 'Creator';
+                    const authorEmail = r.authorEmail || r.email || '';
+                    const vidUrl = r.videoUrl || r.mediaUrl || '';
+                    const isLiked = user && (r.likes || []).includes(user.email);
+                    const isFollowing = myFollowing.includes(authorEmail);
+                    const isSelf = user && user.email === authorEmail;
+
                     return `
-                    <div class="relative w-full max-w-sm h-[75vh] bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-end p-4 border border-gray-900">
-                        <video src="${vidUrl}" class="absolute inset-0 w-full h-full object-cover" autoplay loop controls playsinline></video>
-                        <div class="relative z-10 flex items-center space-x-2 bg-gradient-to-t from-black/90 p-3 rounded-2xl">
-                            <div class="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">${author[0].toUpperCase()}</div>
-                            <span class="font-bold text-xs text-white">${author}</span>
+                    <div class="relative w-full max-w-sm h-[78vh] bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-end p-4 border border-zinc-900" ondblclick="triggerDoubleTapLike('reels', '${r.id}', event)">
+                        <video src="${vidUrl}" style="filter: ${r.filter || 'none'}" class="absolute inset-0 w-full h-full object-cover" autoplay loop controls playsinline></video>
+                        
+                        <!-- Double Tap Heart -->
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none hidden" id="burst-${r.id}">
+                            <i class="fa-solid fa-heart text-red-500 text-7xl drop-shadow-2xl"></i>
+                        </div>
+
+                        <!-- Right Actions (Instagram Style) -->
+                        <div class="absolute right-3 bottom-16 flex flex-col items-center space-y-4 z-20 text-white">
+                            <button onclick="toggleCloudLike('reels', '${r.id}')" class="flex flex-col items-center space-y-1 icon-btn ${isLiked ? 'text-red-500' : ''}">
+                                <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-2xl"></i>
+                                <span class="text-[11px] font-bold text-white">${(r.likes || []).length}</span>
+                            </button>
+                            <button onclick="openComments('reels', '${r.id}')" class="flex flex-col items-center space-y-1 icon-btn">
+                                <i class="fa-regular fa-comment text-2xl"></i>
+                                <span class="text-[11px] font-bold">${(r.comments || []).length}</span>
+                            </button>
+                            <button onclick="shareLink()" class="flex flex-col items-center space-y-1 icon-btn">
+                                <i class="fa-solid fa-paper-plane text-xl"></i>
+                            </button>
+                            ${isSelf ? `
+                                <button onclick="deleteMyContent('reels', '${r.id}', '${authorEmail}')" class="text-gray-400 hover:text-red-500 icon-btn" title="Delete Reel">
+                                    <i class="fa-solid fa-trash-can text-xl"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+
+                        <!-- Creator Card Bottom -->
+                        <div class="relative z-10 flex justify-between items-center bg-gradient-to-t from-black/90 via-black/50 to-transparent p-2.5 rounded-2xl">
+                            <div class="flex items-center space-x-2 cursor-pointer" onclick="openPublicProfile('${authorEmail}')">
+                                <div class="w-8 h-8 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs">${authorName[0].toUpperCase()}</div>
+                                <span class="font-bold text-xs text-white hover:underline">${authorName}</span>
+                            </div>
+                            ${!isSelf ? `
+                                <button onclick="toggleFollowUser('${authorEmail}', '${authorName}')" class="px-3 py-1 rounded-full text-xs font-bold ${isFollowing ? 'border border-zinc-700 text-gray-300' : 'clay-btn'}">
+                                    ${isFollowing ? 'Following' : 'Follow'}
+                                </button>
+                            ` : ''}
                         </div>
                     </div>
-                `;
+                    `;
                 }).join('');
-            } catch(e) {
-                container.innerHTML = '<div class="text-center text-gray-500 py-12 text-xs">Reels tab ready.</div>';
+            } catch(e) {}
+        }
+
+        // DOUBLE TAP LIKE ANIMATION (Posts, Reels & Stories)
+        window.triggerDoubleTapLike = async function(col, docId, event) {
+            const burst = document.getElementById('burst-' + docId) || document.getElementById('story-heart-burst');
+            if (burst) {
+                burst.classList.remove('hidden');
+                burst.classList.remove('heart-burst-animate');
+                void burst.offsetWidth;
+                burst.classList.add('heart-burst-animate');
+                setTimeout(() => burst.classList.add('hidden'), 750);
+            }
+
+            if (col === 'story') {
+                toggleStoryLike();
+            } else {
+                const user = auth.currentUser;
+                if (!user) return;
+                const docRef = doc(db, col, docId);
+                await updateDoc(docRef, { likes: arrayUnion(user.email) });
+                if (col === 'posts') loadPostsFeed();
+                if (col === 'reels') loadReelsFeed();
             }
         };
 
-        window.loadCloudStories = async function() {
-            const tray = document.getElementById('stories-tray');
+        // LIKE TOGGLE
+        window.toggleCloudLike = async function(col, id) {
+            const user = auth.currentUser;
+            if (!user) return;
+            const docRef = doc(db, col, id);
             try {
-                const snap = await getDocs(collection(db, "stories"));
-                const stories = [];
-                snap.forEach(d => stories.push({ id: d.id, ...d.data() }));
+                const snap = await getDoc(docRef);
+                if (!snap.exists()) return;
+                const likes = snap.data().likes || [];
+                if (likes.includes(user.email)) {
+                    await updateDoc(docRef, { likes: arrayRemove(user.email) });
+                } else {
+                    await updateDoc(docRef, { likes: arrayUnion(user.email) });
+                }
+                if (col === 'posts') loadPostsFeed();
+                if (col === 'reels') loadReelsFeed();
+            } catch(e) {}
+        };
 
-                if (stories.length === 0) {
-                    tray.innerHTML = '<span class="text-xs text-gray-500 px-2">No active stories</span>';
+        // DELETE OPTION (Instagram Style)
+        window.deleteMyContent = async function(col, docId, authorEmail) {
+            const user = auth.currentUser;
+            if (!user || user.email !== authorEmail) {
+                showToast("You can only delete your own posts!");
+                return;
+            }
+
+            if (!confirm("Delete this " + (col === 'posts' ? 'post' : 'reel') + "?")) return;
+
+            try {
+                await deleteDoc(doc(db, col, docId));
+                showToast("Deleted successfully");
+                if (col === 'posts') loadPostsFeed();
+                if (col === 'reels') loadReelsFeed();
+            } catch(e) { showToast("Delete error: " + e.message); }
+        };
+
+        // INSTAGRAM COMMENTS DRAWER
+        window.openComments = function(col, id) {
+            activeCommentCol = col;
+            activeCommentDocId = id;
+            document.getElementById('modal-comments').classList.remove('hidden');
+            loadCommentsData();
+        };
+
+        window.closeComments = function() {
+            document.getElementById('modal-comments').classList.add('hidden');
+        };
+
+        async function loadCommentsData() {
+            const list = document.getElementById('comments-items-list');
+            try {
+                const snap = await getDoc(doc(db, activeCommentCol, activeCommentDocId));
+                const comments = snap.exists() ? (snap.data().comments || []) : [];
+
+                if (comments.length === 0) {
+                    list.innerHTML = '<div class="text-center text-gray-500 py-8">No comments yet. Be first!</div>';
                     return;
                 }
 
-                tray.innerHTML = stories.map(s => {
-                    const media = s.mediaUrl || s.url || '';
-                    const isVid = s.mediaType === 'video';
-                    const author = s.author || 'User';
-                    return `
-                        <div class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
-                            <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-white to-gray-500 flex items-center justify-center">
-                                <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
-                                    ${isVid ? `<video src="${media}" class="w-full h-full object-cover"></video>` : `<img src="${media}" class="w-full h-full object-cover">`}
-                                </div>
-                            </div>
-                            <span class="text-[10px] text-gray-300 truncate w-14 text-center">${author}</span>
-                        </div>
-                    `;
-                }).join('');
-            } catch(e) {
-                tray.innerHTML = '<span class="text-xs text-gray-500 px-2">Stories ready</span>';
-            }
+                list.innerHTML = comments.map(c => `
+                    <div class="clay-card p-2.5 space-y-0.5">
+                        <strong class="text-white text-[11px]">${c.user}</strong>
+                        <p class="text-gray-300 text-xs">${c.text}</p>
+                    </div>
+                `).join('');
+            } catch(e) {}
+        }
+
+        window.submitComment = async function() {
+            const input = document.getElementById('comment-text-input');
+            const txt = input.value.trim();
+            const user = auth.currentUser;
+            if (!txt || !user || !activeCommentDocId) return;
+
+            try {
+                await updateDoc(doc(db, activeCommentCol, activeCommentDocId), {
+                    comments: arrayUnion({ user: user.displayName || 'User', text: txt, time: Date.now() })
+                });
+                input.value = '';
+                loadCommentsData();
+                if (activeCommentCol === 'posts') loadPostsFeed();
+                if (activeCommentCol === 'reels') loadReelsFeed();
+            } catch(e) {}
         };
 
-        window.loadExploreGrid = async function() {
+        // SEARCH & EXPLORE (Instagram Style Grid with Full View)
+        async function loadExploreMedia() {
             const grid = document.getElementById('explore-grid');
             try {
-                const [pSnap, rSnap] = await Promise.all([
+                const [postsSnap, reelsSnap] = await Promise.all([
                     getDocs(collection(db, "posts")),
                     getDocs(collection(db, "reels"))
                 ]);
-                const list = [];
-                pSnap.forEach(d => list.push({ ...d.data(), isReel: false }));
-                rSnap.forEach(d => list.push({ ...d.data(), isReel: true }));
 
-                if (list.length === 0) {
-                    grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">No media found</div>';
+                const items = [];
+                postsSnap.forEach(d => items.push({ id: d.id, col: 'posts', ...d.data() }));
+                reelsSnap.forEach(d => items.push({ id: d.id, col: 'reels', mediaType: 'video', mediaUrl: d.videoUrl, ...d.data() }));
+
+                if (items.length === 0) {
+                    grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-12 text-xs">No media found</div>';
                     return;
                 }
 
-                grid.innerHTML = list.map(item => {
-                    const media = item.mediaUrl || item.videoUrl || item.url || '';
-                    const isVid = item.isReel || item.mediaType === 'video';
+                grid.innerHTML = items.map(it => {
+                    const media = it.mediaUrl || it.url || it.videoUrl || '';
+                    const isVid = it.mediaType === 'video' || it.col === 'reels';
                     return `
-                        <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800">
-                            ${isVid ? `<video src="${media}" class="w-full h-full object-cover"></video>` : `<img src="${media}" class="w-full h-full object-cover">`}
+                        <div class="relative h-32 bg-zinc-900 overflow-hidden cursor-pointer rounded-lg" onclick='openMediaViewer(${JSON.stringify(it)})'>
+                            ${isVid ? `<video src="${media}" class="w-full h-full object-cover"></video><span class="absolute top-1.5 right-1.5 bg-black/60 rounded-full px-1.5 py-0.5 text-[9px] text-white"><i class="fa-solid fa-play"></i></span>` : `<img src="${media}" class="w-full h-full object-cover">`}
                         </div>
                     `;
                 }).join('');
-            } catch(e) {
-                grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">Explore ready</div>';
+            } catch(e) {}
+        }
+
+        window.openMediaViewer = function(it) {
+            const modal = document.getElementById('modal-media-viewer');
+            const container = document.getElementById('media-viewer-content');
+            const media = it.mediaUrl || it.url || it.videoUrl || '';
+            const isVid = it.mediaType === 'video' || it.col === 'reels';
+
+            container.innerHTML = `
+                <div class="clay-card p-3 w-full max-w-sm space-y-3">
+                    <div class="flex items-center space-x-2 cursor-pointer" onclick="closeMediaViewer(); openPublicProfile('${it.authorEmail || ''}')">
+                        <div class="w-8 h-8 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs">${(it.author || 'U')[0]}</div>
+                        <span class="font-bold text-xs text-white">${it.author || 'Creator'}</span>
+                    </div>
+                    <div class="rounded-xl overflow-hidden bg-black max-h-80 flex items-center justify-center">
+                        ${isVid ? `<video src="${media}" class="w-full max-h-80 object-cover" controls autoplay></video>` : `<img src="${media}" class="w-full max-h-80 object-cover">`}
+                    </div>
+                    ${it.title ? `<p class="text-xs text-gray-300">${it.title}</p>` : ''}
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        };
+
+        window.closeMediaViewer = function() {
+            const container = document.getElementById('media-viewer-content');
+            container.innerHTML = '';
+            document.getElementById('modal-media-viewer').classList.add('hidden');
+        };
+
+        // GLOBAL SEARCH (Real Users & Real Posts)
+        window.handleSearch = async function(e) {
+            const q = e.target.value.toLowerCase().trim();
+            const resultsBox = document.getElementById('search-users-results');
+
+            if (!q) {
+                resultsBox.classList.add('hidden');
+                loadExploreMedia();
+                return;
             }
+
+            resultsBox.classList.remove('hidden');
+            try {
+                const uSnap = await getDocs(collection(db, "users"));
+                const matched = [];
+                uSnap.forEach(d => {
+                    const u = d.data();
+                    const name = (u.name || '').toLowerCase();
+                    const handle = (u.handle || u.username || d.id.split('@')[0]).toLowerCase();
+                    if (name.includes(q) || handle.includes(q)) matched.push({ email: d.id, ...u });
+                });
+
+                if (matched.length === 0) {
+                    resultsBox.innerHTML = '<div class="text-gray-500 text-xs py-3 text-center">No user accounts found</div>';
+                    return;
+                }
+
+                resultsBox.innerHTML = matched.map(u => `
+                    <div onclick="openPublicProfile('${u.email}')" class="clay-card p-2.5 flex justify-between items-center cursor-pointer hover:border-zinc-500 transition">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-9 h-9 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs">${(u.name || 'U')[0]}</div>
+                            <div>
+                                <p class="font-bold text-xs text-white">${u.name || 'User'}</p>
+                                <p class="text-[10px] text-gray-400">@${u.handle || u.username || u.email.split('@')[0]}</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] text-gray-400 font-bold pr-2">View Profile</span>
+                    </div>
+                `).join('');
+            } catch(e) {}
+        };
+
+        // PUBLIC PROFILE & REAL FOLLOWERS / FOLLOWING
+        window.openPublicProfile = async function(email) {
+            const user = auth.currentUser;
+            if (user && user.email === email) {
+                switchTab('profile');
+                return;
+            }
+
+            activePublicUserEmail = email;
+            try {
+                const uSnap = await getDoc(doc(db, "users", email));
+                if (!uSnap.exists()) return;
+                const d = uSnap.data();
+
+                document.getElementById('pub-top-handle').innerText = '@' + (d.handle || email.split('@')[0]);
+                document.getElementById('pub-name').innerText = d.name || 'Creator';
+                document.getElementById('pub-handle').innerText = '@' + (d.handle || email.split('@')[0]);
+                document.getElementById('pub-bio').innerText = d.bio || '';
+                document.getElementById('pub-avatar').innerText = (d.name || 'C')[0].toUpperCase();
+
+                const fCount = typeof d.followers === 'number' ? d.followers : (d.followersList ? d.followersList.length : 0);
+                const fgCount = typeof d.following === 'number' ? d.following : (d.followingList ? d.followingList.length : 0);
+                document.getElementById('pub-stat-followers').innerText = fCount;
+                document.getElementById('pub-stat-following').innerText = fgCount;
+
+                // Follow Button State
+                const mySnap = await getDoc(doc(db, "users", user.email));
+                const myFollowing = mySnap.exists() ? (mySnap.data().followingList || []) : [];
+                const isFollowing = myFollowing.includes(email);
+
+                const fBtn = document.getElementById('pub-follow-btn');
+                fBtn.innerText = isFollowing ? 'Following' : 'Follow';
+                fBtn.className = isFollowing ? 'flex-1 border border-zinc-700 text-gray-300 py-2 rounded-xl text-xs font-bold' : 'flex-1 clay-btn py-2 text-xs font-bold';
+                fBtn.onclick = async () => {
+                    await toggleFollowUser(email, d.name || 'Creator');
+                    openPublicProfile(email);
+                };
+
+                // Creator Media Grid
+                const pSnap = await getDocs(collection(db, "posts"));
+                const posts = [];
+                pSnap.forEach(p => { if (p.data().authorEmail === email) posts.push(p.data()); });
+                document.getElementById('pub-stat-posts').innerText = posts.length;
+
+                const grid = document.getElementById('pub-media-grid');
+                grid.innerHTML = posts.length === 0 ? '<div class="col-span-3 text-center text-gray-500 py-8 text-xs">No posts uploaded yet</div>' : posts.map(p => `
+                    <div class="h-28 rounded-lg overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+                        ${p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${p.mediaUrl}" class="w-full h-full object-cover">`}
+                    </div>
+                `).join('');
+
+                ['home', 'search', 'reels', 'live', 'profile'].forEach(t => document.getElementById('view-' + t).classList.add('hidden'));
+                document.getElementById('view-public-profile').classList.remove('hidden');
+            } catch(e) {}
+        };
+
+        // REAL MUTUAL FOLLOW SYSTEM
+        window.toggleFollowUser = async function(targetEmail, targetName) {
+            const user = auth.currentUser;
+            if (!user || user.email === targetEmail) return;
+
+            const myRef = doc(db, "users", user.email);
+            const targetRef = doc(db, "users", targetEmail);
+
+            try {
+                const mySnap = await getDoc(myRef);
+                const myFollowing = mySnap.exists() ? (mySnap.data().followingList || []) : [];
+
+                if (myFollowing.includes(targetEmail)) {
+                    await updateDoc(myRef, {
+                        followingList: arrayRemove(targetEmail),
+                        following: Math.max(0, (mySnap.data().following || 1) - 1)
+                    });
+                    const tSnap = await getDoc(targetRef);
+                    await updateDoc(targetRef, {
+                        followersList: arrayRemove(user.email),
+                        followers: Math.max(0, (tSnap.data().followers || 1) - 1)
+                    });
+                    showToast("Unfollowed " + targetName);
+                } else {
+                    await updateDoc(myRef, {
+                        followingList: arrayUnion(targetEmail),
+                        following: (mySnap.data().following || 0) + 1
+                    });
+                    const tSnap = await getDoc(targetRef);
+                    await updateDoc(targetRef, {
+                        followersList: arrayUnion(user.email),
+                        followers: (tSnap.data().followers || 0) + 1
+                    });
+                    showToast("Following " + targetName);
+                }
+                loadPostsFeed();
+                loadReelsFeed();
+            } catch(e) { showToast("Follow error: " + e.message); }
+        };
+
+        // FOLLOWERS / FOLLOWING LIST MODAL
+        window.openFollowListModal = async function(email, type) {
+            document.getElementById('follow-list-title').innerText = type === 'followers' ? 'Followers' : 'Following';
+            const list = document.getElementById('follow-list-container');
+            list.innerHTML = '<div class="text-center text-gray-500 py-4">Loading list...</div>';
+            document.getElementById('modal-follow-list').classList.remove('hidden');
+
+            try {
+                const uDoc = await getDoc(doc(db, "users", email));
+                const emails = uDoc.exists() ? (uDoc.data()[type === 'followers' ? 'followersList' : 'followingList'] || []) : [];
+
+                if (emails.length === 0) {
+                    list.innerHTML = '<div class="text-center text-gray-500 py-6 text-xs">No ' + type + ' yet</div>';
+                    return;
+                }
+
+                list.innerHTML = emails.map(em => `
+                    <div class="flex justify-between items-center p-2 clay-card cursor-pointer" onclick="closeFollowListModal(); openPublicProfile('${em}')">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-7 h-7 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs">${em[0].toUpperCase()}</div>
+                            <span class="font-bold text-xs text-white">${em.split('@')[0]}</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
+                    </div>
+                `).join('');
+            } catch(e) { list.innerHTML = '<div class="text-center text-gray-500 py-4">Could not load</div>'; }
+        };
+
+        window.closeFollowListModal = function() {
+            document.getElementById('modal-follow-list').classList.add('hidden');
+        };
+
+        // MY PROFILE LOADER
+        async function loadMyProfile() {
+            const user = auth.currentUser;
+            if (!user) return;
+            try {
+                const uDoc = await getDoc(doc(db, "users", user.email));
+                if (uDoc.exists()) {
+                    const d = uDoc.data();
+                    document.getElementById('my-profile-name').innerText = d.name || user.displayName || 'User';
+                    document.getElementById('my-profile-handle').innerText = '@' + (d.handle || user.email.split('@')[0]);
+                    document.getElementById('my-profile-bio').innerText = d.bio || '';
+                    document.getElementById('my-profile-avatar').innerText = (d.name || 'U')[0].toUpperCase();
+
+                    const fCount = typeof d.followers === 'number' ? d.followers : (d.followersList ? d.followersList.length : 0);
+                    const fgCount = typeof d.following === 'number' ? d.following : (d.followingList ? d.followingList.length : 0);
+                    document.getElementById('my-stat-followers').innerText = fCount;
+                    document.getElementById('my-stat-following').innerText = fgCount;
+                }
+
+                // Load My Posts
+                const pSnap = await getDocs(collection(db, "posts"));
+                const myPosts = [];
+                pSnap.forEach(p => { if (p.data().authorEmail === user.email) myPosts.push({ id: p.id, ...p.data() }); });
+                document.getElementById('my-stat-posts').innerText = myPosts.length;
+
+                const grid = document.getElementById('my-media-grid');
+                grid.innerHTML = myPosts.length === 0 ? '<div class="col-span-3 text-center text-gray-500 py-8 text-xs">No media uploaded yet</div>' : myPosts.map(p => `
+                    <div class="h-28 rounded-lg overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+                        ${p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${p.mediaUrl}" class="w-full h-full object-cover">`}
+                    </div>
+                `).join('');
+            } catch(e) {}
+        }
+
+        window.editMyBio = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
+            const bio = prompt("Enter your bio:");
+            if (bio !== null) {
+                await updateDoc(doc(db, "users", user.email), { bio: bio });
+                loadMyProfile();
+                showToast("Bio updated!");
+            }
+        };
+
+        // CREATE MEDIA & CLOUDINARY UPLOADER
+        window.openCreateModal = function(type) {
+            setUploadType(type || 'post');
+            document.getElementById('modal-create').classList.remove('hidden');
+        };
+
+        window.closeCreateModal = function() {
+            document.getElementById('modal-create').classList.add('hidden');
         };
 
         window.setUploadType = function(t) {
             uploadType = t;
-            ['story', 'post', 'reel'].forEach(tp => {
-                const el = document.getElementById('up-type-' + tp);
-                if (el) el.className = tp === t ? 'font-bold text-white pb-1 border-b border-white px-3' : 'text-gray-500 pb-1 px-3';
+            ['post', 'reel', 'story'].forEach(tp => {
+                const btn = document.getElementById('type-btn-' + tp);
+                if (btn) btn.className = tp === t ? 'font-bold text-white border-b-2 border-white pb-1 px-3' : 'text-gray-500 pb-1 px-3';
             });
-            document.getElementById('create-title-lbl').innerText = 'Upload ' + t.toUpperCase();
+            document.getElementById('create-modal-title').innerText = 'Upload ' + t.toUpperCase();
         };
 
         window.handleFileSelected = function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            selectedFileBlob = file;
-            selectedFileType = file.type.includes('video') ? 'video' : 'image';
-            selectedFileUrl = URL.createObjectURL(file);
+            const f = e.target.files[0];
+            if (!f) return;
+            selectedFileBlob = f;
+            selectedFileType = f.type.includes('video') ? 'video' : 'image';
+            selectedFileUrl = URL.createObjectURL(f);
 
-            document.getElementById('create-preview-box').classList.remove('hidden');
-            const pImg = document.getElementById('prev-img');
-            const pVid = document.getElementById('prev-vid');
+            document.getElementById('editor-preview-container').classList.remove('hidden');
+            const img = document.getElementById('edit-img-preview');
+            const vid = document.getElementById('edit-vid-preview');
 
             if (selectedFileType === 'video') {
-                pVid.src = selectedFileUrl; pVid.classList.remove('hidden');
-                pImg.classList.add('hidden');
+                vid.src = selectedFileUrl; vid.classList.remove('hidden');
+                img.classList.add('hidden');
             } else {
-                pImg.src = selectedFileUrl; pImg.classList.remove('hidden');
-                pVid.classList.add('hidden');
+                img.src = selectedFileUrl; img.classList.remove('hidden');
+                vid.classList.add('hidden');
             }
         };
 
-        window.publishContent = async function() {
+        // VIDEO & PHOTO EDITOR CONTROLS
+        window.setMediaFilter = function(filterVal) {
+            currentFilter = filterVal;
+            const img = document.getElementById('edit-img-preview');
+            const vid = document.getElementById('edit-vid-preview');
+            if (img) img.style.filter = filterVal;
+            if (vid) vid.style.filter = filterVal;
+            showToast("Filter set");
+        };
+
+        window.toggleEditorAudio = function() {
+            const vid = document.getElementById('edit-vid-preview');
+            const btn = document.getElementById('btn-editor-mute');
+            if (!vid) return;
+            isAudioMuted = !isAudioMuted;
+            vid.muted = isAudioMuted;
+            btn.innerHTML = isAudioMuted ? '<i class="fa-solid fa-volume-xmark text-red-500"></i>' : '<i class="fa-solid fa-volume-high"></i>';
+        };
+
+        window.addTextOverlay = function() {
+            const txt = prompt("Enter text on media:", overlayText || "");
+            const box = document.getElementById('editor-text-overlay');
+            const val = document.getElementById('editor-text-val');
+            if (txt && txt.trim() !== '') {
+                overlayText = txt.trim();
+                val.innerText = overlayText;
+                box.classList.remove('hidden');
+            } else if (txt === '') {
+                overlayText = '';
+                box.classList.add('hidden');
+            }
+        };
+
+        window.updateTextColor = function(e) {
+            overlayTextColor = e.target.value;
+            const val = document.getElementById('editor-text-val');
+            if (val) val.style.color = overlayTextColor;
+        };
+
+        window.publishMedia = async function() {
             const user = auth.currentUser;
             if (!user) { showToast("Login required!"); return; }
-            if (!selectedFileBlob && !selectedFileUrl) { showToast("Select media first!"); return; }
+            if (!selectedFileBlob && !selectedFileUrl) { showToast("Select or record media first!"); return; }
 
-            const caption = document.getElementById('create-caption').value.trim();
-            const btn = document.getElementById('share-submit-btn');
-            btn.innerText = "Uploading...";
+            const caption = document.getElementById('create-caption-input').value.trim();
+            const btn = document.getElementById('btn-publish');
+            btn.innerText = "Sharing...";
             btn.disabled = true;
 
             try {
-                let cloudMediaUrl = selectedFileUrl;
+                let cloudUrl = selectedFileUrl;
                 if (selectedFileBlob) {
                     const fd = new FormData();
                     fd.append("file", selectedFileBlob);
@@ -625,73 +1368,92 @@
                         : "https://api.cloudinary.com/v1_1/mhj8jvag/image/upload";
 
                     const res = await fetch(endpoint, { method: "POST", body: fd });
-                    const cData = await res.json();
-                    if (cData.secure_url) cloudMediaUrl = cData.secure_url;
+                    const data = await res.json();
+                    if (data.secure_url) cloudUrl = data.secure_url;
                 }
 
-                const docData = {
+                const payload = {
                     author: user.displayName || 'User',
                     authorEmail: user.email,
                     title: caption,
-                    mediaUrl: cloudMediaUrl,
+                    mediaUrl: cloudUrl,
                     mediaType: selectedFileType,
+                    filter: currentFilter,
+                    likes: [],
+                    comments: [],
                     createdAt: Date.now()
                 };
 
-                if (uploadType === 'reel') await addDoc(collection(db, "reels"), { ...docData, videoUrl: cloudMediaUrl });
-                else if (uploadType === 'story') await addDoc(collection(db, "stories"), docData);
-                else await addDoc(collection(db, "posts"), docData);
+                if (uploadType === 'reel') {
+                    await addDoc(collection(db, "reels"), { ...payload, videoUrl: cloudUrl });
+                    switchTab('reels');
+                } else if (uploadType === 'story') {
+                    await addDoc(collection(db, "stories"), payload);
+                    switchTab('home');
+                } else {
+                    await addDoc(collection(db, "posts"), payload);
+                    switchTab('home');
+                }
 
-                closeCreateModalPage();
+                closeCreateModal();
+                selectedFileBlob = null;
+                selectedFileUrl = '';
+                document.getElementById('create-caption-input').value = '';
+                document.getElementById('editor-preview-container').classList.add('hidden');
                 showToast("Uploaded successfully!");
-                safeLoadAll();
             } catch(e) {
-                showToast("Failed: " + e.message);
+                showToast("Upload error: " + e.message);
             } finally {
                 btn.innerText = "Share";
                 btn.disabled = false;
             }
         };
 
-        window.openLiveCamera = async function() {
-            const modal = document.getElementById('inapp-camera-modal');
-            if (modal) modal.classList.remove('hidden');
+        // INSTAGRAM CAMERA & VIDEO RECORDER
+        window.openCameraRecorder = async function() {
+            const modal = document.getElementById('modal-camera');
+            modal.classList.remove('hidden');
 
             try {
-                if (cameraMediaStream) {
-                    cameraMediaStream.getTracks().forEach(t => t.stop());
-                }
-                cameraMediaStream = await navigator.mediaDevices.getUserMedia({
+                if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: cameraFacing },
-                    audio: false
+                    audio: true
                 });
-                const vid = document.getElementById('camera-stream');
-                if (vid) {
-                    vid.srcObject = cameraMediaStream;
-                    vid.play();
-                }
+                const vid = document.getElementById('live-cam-stream');
+                vid.srcObject = cameraStream;
+                vid.play();
             } catch(e) {
-                showToast("Camera error: " + (e.message || "Denied"));
-                if (modal) modal.classList.add('hidden');
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    const vid = document.getElementById('live-cam-stream');
+                    vid.srcObject = cameraStream;
+                    vid.play();
+                } catch(err) {
+                    showToast("Camera permission denied!");
+                    modal.classList.add('hidden');
+                }
             }
         };
 
-        window.closeLiveCamera = function() {
-            if (cameraMediaStream) {
-                cameraMediaStream.getTracks().forEach(t => t.stop());
-                cameraMediaStream = null;
+        window.closeCameraRecorder = function() {
+            if (isRecording) stopRecordVideo();
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
             }
-            document.getElementById('inapp-camera-modal').classList.add('hidden');
+            document.getElementById('modal-camera').classList.add('hidden');
         };
 
-        window.flipCamera = function() {
+        window.flipCameraLens = function() {
+            if (isRecording) return;
             cameraFacing = cameraFacing === 'environment' ? 'user' : 'environment';
-            openLiveCamera();
+            openCameraRecorder();
         };
 
-        window.capturePhoto = function() {
-            const vid = document.getElementById('camera-stream');
-            const can = document.getElementById('camera-canvas');
+        window.capturePhotoNow = function() {
+            const vid = document.getElementById('live-cam-stream');
+            const can = document.getElementById('live-cam-canvas');
             if (!vid || !can) return;
 
             can.width = vid.videoWidth || 720;
@@ -703,57 +1465,249 @@
                 selectedFileType = 'image';
                 selectedFileUrl = URL.createObjectURL(blob);
 
-                document.getElementById('create-preview-box').classList.remove('hidden');
-                const pImg = document.getElementById('prev-img');
-                const pVid = document.getElementById('prev-vid');
-                pImg.src = selectedFileUrl; pImg.classList.remove('hidden');
-                pVid.classList.add('hidden');
+                document.getElementById('editor-preview-container').classList.remove('hidden');
+                const img = document.getElementById('edit-img-preview');
+                const v = document.getElementById('edit-vid-preview');
+                img.src = selectedFileUrl; img.classList.remove('hidden');
+                v.classList.add('hidden');
 
-                closeLiveCamera();
-                showToast("Captured!");
+                closeCameraRecorder();
+                showToast("Photo captured!");
             }, 'image/jpeg', 0.95);
         };
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                document.getElementById('auth-modal').classList.add('hidden');
-                safeLoadAll();
-            } else {
-                document.getElementById('auth-modal').classList.remove('hidden');
+        window.toggleVideoRecord = function() {
+            if (!isRecording) startRecordVideo();
+            else stopRecordVideo();
+        };
+
+        function startRecordVideo() {
+            if (!cameraStream) return;
+            recordedBlobs = [];
+            try {
+                let options = {};
+                if (MediaRecorder.isTypeSupported('video/mp4')) options = { mimeType: 'video/mp4' };
+                else if (MediaRecorder.isTypeSupported('video/webm')) options = { mimeType: 'video/webm' };
+
+                mediaRecorder = new MediaRecorder(cameraStream, options);
+                mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) recordedBlobs.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    const videoBlob = new Blob(recordedBlobs, { type: mediaRecorder.mimeType || 'video/mp4' });
+                    selectedFileBlob = videoBlob;
+                    selectedFileType = 'video';
+                    selectedFileUrl = URL.createObjectURL(videoBlob);
+
+                    document.getElementById('editor-preview-container').classList.remove('hidden');
+                    const img = document.getElementById('edit-img-preview');
+                    const v = document.getElementById('edit-vid-preview');
+                    v.src = selectedFileUrl; v.classList.remove('hidden');
+                    img.classList.add('hidden');
+
+                    closeCameraRecorder();
+                    showToast("Video recorded!");
+                };
+
+                mediaRecorder.start(200);
+                isRecording = true;
+
+                document.getElementById('cam-recording-indicator').classList.remove('hidden');
+                document.getElementById('record-ring').classList.add('recording-pulse');
+                document.getElementById('record-circle').classList.replace('rounded-full', 'rounded-md');
+                document.getElementById('record-label').innerText = "Stop";
+
+                recordDuration = 0;
+                clearInterval(recordTimer);
+                recordTimer = setInterval(() => {
+                    recordDuration++;
+                    const m = String(Math.floor(recordDuration / 60)).padStart(2, '0');
+                    const s = String(recordDuration % 60).padStart(2, '0');
+                    document.getElementById('cam-record-timer').innerText = `${m}:${s}`;
+                }, 1000);
+            } catch(e) { showToast("Record error: " + e.message); }
+        }
+
+        function stopRecordVideo() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                clearInterval(recordTimer);
+                document.getElementById('cam-recording-indicator').classList.add('hidden');
+                document.getElementById('record-ring').classList.remove('recording-pulse');
+                document.getElementById('record-circle').classList.replace('rounded-md', 'rounded-full');
+                document.getElementById('record-label').innerText = "Record";
+                document.getElementById('cam-record-timer').innerText = "00:00";
             }
-        });
+        }
 
-        window.handleSignup = async function() {
-            const name = document.getElementById('auth-name').value;
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-password').value;
-            if (!name || !email || pass.length < 6) { showToast("Invalid inputs"); return; }
+        // INSTAGRAM LIVE BROADCAST (WebRTC)
+        async function loadLiveBroadcasters() {
+            const list = document.getElementById('live-rooms-list');
             try {
-                const res = await createUserWithEmailAndPassword(auth, email, pass);
-                await updateProfile(res.user, { displayName: name });
-                await setDoc(doc(db, "users", email), {
-                    name: name,
-                    handle: email.split('@')[0],
-                    email: email,
-                    bio: '',
-                    avatar: '',
-                    followers: 0,
-                    following: 0
+                const snap = await getDocs(collection(db, "lives"));
+                const streams = [];
+                snap.forEach(d => streams.push({ id: d.id, ...d.data() }));
+
+                if (streams.length === 0) {
+                    list.innerHTML = '<div class="text-center text-gray-500 py-10 text-xs">No active live broadcasts right now.</div>';
+                    return;
+                }
+
+                list.innerHTML = streams.map(s => `
+                    <div onclick="joinBroadcast('${s.id}', '${s.host}', '${s.peerId}')" class="clay-card p-3 flex justify-between items-center cursor-pointer hover:border-zinc-500 transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full border-2 border-red-600 p-0.5 flex items-center justify-center">
+                                <div class="w-full h-full bg-white text-black font-extrabold rounded-full flex items-center justify-center text-xs">${(s.host || 'H')[0]}</div>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">${s.host}</h4>
+                                <p class="text-[10px] text-gray-400">Tap to watch live</p>
+                            </div>
+                        </div>
+                        <span class="bg-red-600/30 text-red-500 border border-red-600 text-[10px] px-2 py-0.5 rounded-full font-bold">👁️ ${s.viewers || 1}</span>
+                    </div>
+                `).join('');
+            } catch(e) {}
+        }
+
+        window.startBroadcast = async function() {
+            const user = auth.currentUser;
+            if (!user) { showToast("Login to broadcast live!"); return; }
+
+            try {
+                localStreamMedia = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                isHostingLive = true;
+
+                if (peerInstance) peerInstance.destroy();
+                peerInstance = new Peer();
+
+                peerInstance.on('open', async (peerId) => {
+                    const docRef = await addDoc(collection(db, "lives"), {
+                        host: user.displayName || 'Host',
+                        hostEmail: user.email,
+                        peerId: peerId,
+                        viewers: 1,
+                        comments: [],
+                        createdAt: Date.now()
+                    });
+
+                    activeLiveStreamId = docRef.id;
+                    document.getElementById('live-host-title').innerText = (user.displayName || 'Host') + " (You)";
+                    document.getElementById('live-viewers-tag').innerText = "👁️ 1";
+
+                    const vid = document.getElementById('live-room-video');
+                    vid.srcObject = localStreamMedia;
+                    vid.muted = true;
+                    vid.play();
+
+                    peerInstance.on('call', call => call.answer(localStreamMedia));
+                    document.getElementById('modal-live-room').classList.remove('hidden');
+                    listenLiveUpdates(activeLiveStreamId);
                 });
-                showToast("Account created!");
-            } catch(e) { showToast(e.message); }
+            } catch(e) { showToast("Live camera error: " + e.message); }
         };
 
-        window.handleLogin = async function() {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-password').value;
+        window.joinBroadcast = async function(liveId, hostName, peerId) {
+            activeLiveStreamId = liveId;
+            isHostingLive = false;
+
+            if (peerInstance) peerInstance.destroy();
+            peerInstance = new Peer();
+
+            peerInstance.on('open', async () => {
+                const call = peerInstance.call(peerId, new MediaStream());
+                call.on('stream', stream => {
+                    const vid = document.getElementById('live-room-video');
+                    vid.srcObject = stream;
+                    vid.muted = false;
+                    vid.play().catch(()=>{});
+                });
+
+                const ref = doc(db, "lives", liveId);
+                const snap = await getDoc(ref);
+                if (snap.exists()) await updateDoc(ref, { viewers: (snap.data().viewers || 1) + 1 });
+
+                document.getElementById('live-host-title').innerText = hostName;
+                document.getElementById('modal-live-room').classList.remove('hidden');
+                listenLiveUpdates(liveId);
+            });
+        };
+
+        function listenLiveUpdates(liveId) {
+            if (liveSnapshotUnsub) liveSnapshotUnsub();
+            liveSnapshotUnsub = onSnapshot(doc(db, "lives", liveId), snap => {
+                if (!snap.exists()) {
+                    showToast("Live ended by host");
+                    exitLiveRoom(true);
+                    return;
+                }
+                const data = snap.data();
+                document.getElementById('live-viewers-tag').innerText = "👁️ " + (data.viewers || 1);
+                const chatBox = document.getElementById('live-chat-messages');
+                chatBox.innerHTML = (data.comments || []).map(c => `
+                    <div class="bg-black/60 px-2.5 py-1 rounded-xl w-max">
+                        <strong class="text-gray-300">${c.user}:</strong> <span>${c.text}</span>
+                    </div>
+                `).join('');
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+
+        window.sendLiveMsg = async function() {
+            const input = document.getElementById('live-input-msg');
+            const txt = input.value.trim();
+            const user = auth.currentUser;
+            if (!txt || !user || !activeLiveStreamId) return;
+
             try {
-                await signInWithEmailAndPassword(auth, email, pass);
-                showToast("Logged in!");
-            } catch(e) { showToast("Login failed: " + e.message); }
+                await updateDoc(doc(db, "lives", activeLiveStreamId), {
+                    comments: arrayUnion({ user: user.displayName || 'User', text: txt, time: Date.now() })
+                });
+                input.value = '';
+            } catch(e) {}
         };
 
-        window.handleLogout = async function() { await signOut(auth); showToast("Logged out"); };
+        window.triggerLiveHeart = function() {
+            const container = document.getElementById('live-hearts-container');
+            const heart = document.createElement('div');
+            heart.className = 'live-heart-fly text-red-500 text-2xl';
+            heart.innerHTML = '<i class="fa-solid fa-heart"></i>';
+            container.appendChild(heart);
+            setTimeout(() => heart.remove(), 1500);
+        };
+
+        window.exitLiveRoom = async function(forced = false) {
+            if (liveSnapshotUnsub) { liveSnapshotUnsub(); liveSnapshotUnsub = null; }
+            if (activeLiveStreamId && !forced) {
+                if (isHostingLive) await deleteDoc(doc(db, "lives", activeLiveStreamId)).catch(()=>{});
+                else {
+                    const ref = doc(db, "lives", activeLiveStreamId);
+                    const snap = await getDoc(ref);
+                    if (snap.exists()) await updateDoc(ref, { viewers: Math.max(1, (snap.data().viewers || 2) - 1) }).catch(()=>{});
+                }
+            }
+
+            if (localStreamMedia) {
+                localStreamMedia.getTracks().forEach(t => t.stop());
+                localStreamMedia = null;
+            }
+            const vid = document.getElementById('live-room-video');
+            vid.srcObject = null;
+
+            if (peerInstance) { peerInstance.destroy(); peerInstance = null; }
+            activeLiveStreamId = null;
+            isHostingLive = false;
+            document.getElementById('modal-live-room').classList.add('hidden');
+            loadLiveBroadcasters();
+        };
+
+        window.shareLink = function() {
+            navigator.clipboard.writeText(window.location.href);
+            showToast("🔗 Link copied to clipboard!");
+        };
+
+        window.openDirectInbox = function() {
+            showToast("Direct messages ready");
+        };
     </script>
 </body>
 </html>
