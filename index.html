@@ -25,11 +25,12 @@
         .icon-btn:active { transform: scale(0.85); transition: transform 0.1s; }
         ::-webkit-scrollbar { display: none; }
 
-        /* Reels Snap Scroll */
+        /* Reels Two-Way Snap Scroll */
         .reels-scroll-container {
             scroll-snap-type: y mandatory;
             overflow-y: scroll;
             height: calc(100vh - 65px);
+            scroll-behavior: smooth;
         }
         .reel-item-box {
             scroll-snap-align: start;
@@ -127,7 +128,7 @@
             </div>
         </div>
 
-        <!-- 3. REELS FEED (Pure Instagram Full Screen Snap Scroll) -->
+        <!-- 3. REELS FEED (Up & Down Two-Way Snap Scroll) -->
         <div id="view-reels" class="hidden">
             <div id="reels-container" class="reels-scroll-container">
                 <div class="text-center text-gray-500 py-24 text-xs">Loading Reels...</div>
@@ -150,7 +151,7 @@
             <div class="space-y-2">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Broadcasts</h3>
                 <div id="live-rooms-list" class="space-y-2">
-                    <div class="text-center text-gray-500 py-10 text-xs">No one is currently live</div>
+                    <div class="text-center text-gray-500 py-10 text-xs">No active live streams right now.</div>
                 </div>
             </div>
         </div>
@@ -213,7 +214,7 @@
 
     </main>
 
-    <!-- REAL-TIME 1-ON-1 CHAT WINDOW -->
+    <!-- REAL-TIME 1-ON-1 CHAT WINDOW WITH PRESENCE (Active now / Last seen) -->
     <div id="modal-direct-chat" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-3 border-b border-zinc-900 flex justify-between items-center bg-black/95">
             <div class="flex items-center space-x-3">
@@ -223,7 +224,7 @@
                 </div>
                 <div>
                     <p class="font-bold text-xs text-white" id="chat-user-name">User</p>
-                    <p class="text-[10px] text-green-500 font-semibold">Online</p>
+                    <p class="text-[10px] font-semibold" id="chat-user-presence">Active now</p>
                 </div>
             </div>
         </div>
@@ -254,7 +255,7 @@
         <button onclick="switchTab('profile')" id="nav-profile" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-user"></i></button>
     </nav>
 
-    <!-- INSTAGRAM STORY VIEWER MODAL -->
+    <!-- INSTAGRAM STORY VIEWER WITH 3-DOT MENU -->
     <div id="modal-story" class="fixed inset-0 z-50 bg-black flex items-center justify-center hidden" onclick="closeStory()">
         <div class="relative w-full max-w-md h-full bg-black flex flex-col justify-between p-3" onclick="event.stopPropagation()">
             <div class="w-full flex space-x-1 pt-2 z-20">
@@ -263,12 +264,16 @@
                 </div>
             </div>
 
+            <!-- Top Creator Bar with Three Dots Menu Button -->
             <div class="flex justify-between items-center z-20 pt-2">
                 <div class="flex items-center space-x-2.5 cursor-pointer bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full" onclick="openProfileFromStory()">
                     <div class="w-8 h-8 rounded-full bg-zinc-800 text-white font-extrabold flex items-center justify-center text-xs" id="story-top-avatar">U</div>
                     <span class="text-xs font-bold text-white hover:underline" id="story-top-author">Creator</span>
                 </div>
-                <button onclick="closeStory()" class="text-white text-lg p-2"><i class="fa-solid fa-xmark"></i></button>
+                <div class="flex items-center space-x-2">
+                    <button onclick="openStoryOptions(event)" class="text-white text-lg p-2 icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    <button onclick="closeStory()" class="text-white text-lg p-2 icon-btn"><i class="fa-solid fa-xmark"></i></button>
+                </div>
             </div>
 
             <div class="absolute inset-0 flex items-center justify-center overflow-hidden" ondblclick="triggerDoubleTapLike('story', currentStoryId, event)">
@@ -279,6 +284,7 @@
                 </div>
             </div>
 
+            <!-- Story Bottom Actions -->
             <div class="z-20 flex items-center space-x-2.5 pb-2 bg-gradient-to-t from-black/90 to-transparent pt-4">
                 <input type="text" id="story-reply-msg" placeholder="Send message..." class="flex-1 bg-zinc-900/80 border border-zinc-700 rounded-full px-4 py-2 text-xs text-white focus:outline-none">
                 <button onclick="sendStoryReply()" class="text-white text-sm bg-white/20 px-3 py-2 rounded-full icon-btn"><i class="fa-solid fa-paper-plane"></i></button>
@@ -288,9 +294,24 @@
         </div>
     </div>
 
-    <!-- INSTAGRAM REELS PRO EDITOR ("TRY EDITS" SUITE) -->
+    <!-- STORY 3-DOTS OPTIONS SHEET -->
+    <div id="modal-story-options" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="closeStoryOptions()">
+        <div class="clay-card w-full max-w-md rounded-t-3xl p-4 space-y-3" onclick="event.stopPropagation()">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-2"></div>
+            <button onclick="forwardStoryToUser()" class="w-full p-3.5 clay-card flex items-center space-x-3 text-xs font-bold text-white">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Send to user (Share)</span>
+            </button>
+            <button id="btn-delete-story-opt" onclick="deleteActiveStory()" class="w-full p-3.5 clay-card flex items-center space-x-3 text-xs font-bold text-red-500 hidden">
+                <i class="fa-solid fa-trash-can"></i>
+                <span>Delete story</span>
+            </button>
+            <button onclick="closeStoryOptions()" class="w-full py-2.5 text-center text-xs font-bold text-gray-400">Cancel</button>
+        </div>
+    </div>
+
+    <!-- PRO REEL EDITOR ("TRY EDITS" SUITE WITH TOUCH-DRAGGABLE TEXT) -->
     <div id="modal-pro-editor" class="fixed inset-0 z-50 bg-black flex flex-col justify-between hidden">
-        <!-- Top Header -->
         <div class="p-3.5 flex justify-between items-center z-20 bg-black/80">
             <button onclick="closeProEditor()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-white icon-btn">
                 <i class="fa-solid fa-chevron-down"></i>
@@ -304,19 +325,19 @@
             </button>
         </div>
 
-        <!-- 9:16 Video Canvas Stage -->
-        <div class="flex-1 relative flex items-center justify-center overflow-hidden my-1">
-            <div class="relative w-full max-w-[280px] h-[50vh] rounded-2xl overflow-hidden bg-zinc-900 flex items-center justify-center border border-zinc-800">
+        <!-- 9:16 Stage with Draggable Overlay -->
+        <div class="flex-1 relative flex items-center justify-center overflow-hidden my-1" id="editor-stage-viewport">
+            <div class="relative w-full max-w-[280px] h-[50vh] rounded-2xl overflow-hidden bg-zinc-900 flex items-center justify-center border border-zinc-800" id="editor-canvas-box">
                 <video id="editor-main-video" playsinline loop class="w-full h-full object-cover"></video>
                 <img id="editor-main-img" class="w-full h-full object-cover hidden">
 
-                <div id="pro-text-overlay-box" class="absolute pointer-events-auto cursor-move select-none hidden px-3 py-1.5 rounded-xl bg-black/60 font-bold text-center text-sm shadow-2xl">
+                <!-- Touch Move Text Container -->
+                <div id="pro-text-overlay-box" class="absolute select-none hidden px-3.5 py-1.5 rounded-xl bg-black/60 font-bold text-center text-sm shadow-2xl border border-white/20 touch-none z-30" style="left: 20px; top: 40px; cursor: move;">
                     <span id="pro-text-overlay-val">Sample</span>
                 </div>
             </div>
         </div>
 
-        <!-- Transport Controls (Play, Counter, Undo/Redo) -->
         <div class="px-5 py-1.5 flex justify-between items-center text-xs">
             <button onclick="toggleEditorPlayback()" class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-white icon-btn">
                 <i id="btn-play-pause-icon" class="fa-solid fa-play"></i>
@@ -330,7 +351,6 @@
 
         <!-- Multi-Track Timeline -->
         <div class="bg-zinc-950 p-3 space-y-2 border-t border-zinc-900">
-            <!-- Video Track -->
             <div class="relative h-12 bg-zinc-900 rounded-xl overflow-hidden flex items-center border border-zinc-800">
                 <div class="absolute inset-y-0 left-0 w-3 bg-white rounded-l-xl flex items-center justify-center cursor-ew-resize">
                     <span class="w-1 h-4 bg-black rounded-full"></span>
@@ -341,23 +361,20 @@
                 <div class="absolute inset-y-0 right-0 w-3 bg-white rounded-r-xl flex items-center justify-center cursor-ew-resize">
                     <span class="w-1 h-4 bg-black rounded-full"></span>
                 </div>
-                <!-- Playhead Indicator Line -->
                 <div id="timeline-playhead-line" class="absolute top-0 bottom-0 left-1/4 w-0.5 bg-white z-10 pointer-events-none shadow-md"></div>
             </div>
 
-            <!-- Audio Track -->
             <div onclick="addBackgroundAudioPrompt()" class="h-7 bg-zinc-900/80 rounded-lg border border-dashed border-zinc-800 flex items-center px-3 space-x-2 cursor-pointer text-gray-400 hover:text-white">
                 <i class="fa-solid fa-plus text-[10px]"></i>
                 <span class="text-[11px] font-medium" id="lbl-audio-track">Add audio</span>
             </div>
 
-            <!-- Text Track -->
             <div onclick="openAddTextTool()" class="h-7 bg-zinc-900/80 rounded-lg border border-dashed border-zinc-800 flex items-center px-3 space-x-2 cursor-pointer text-gray-400 hover:text-white">
                 <i class="fa-solid fa-plus text-[10px]"></i>
                 <span class="text-[11px] font-medium">Add text</span>
             </div>
 
-            <p class="text-[9px] text-center text-gray-500">Tap on a track to trim. Pinch to zoom.</p>
+            <p class="text-[9px] text-center text-gray-500">Tap on a track to trim. Drag text on preview.</p>
         </div>
 
         <!-- Bottom Feature Tool Strip -->
@@ -433,7 +450,7 @@
         <div class="flex-1 flex items-center justify-center overflow-hidden my-3" id="media-viewer-content"></div>
     </div>
 
-    <!-- CREATE MODAL (Quick Post / Story) -->
+    <!-- CREATE MODAL (Post / Reel / Story) -->
     <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
             <button onclick="closeCreateModal()" class="text-white text-base"><i class="fa-solid fa-xmark"></i></button>
@@ -495,7 +512,7 @@
         </div>
     </div>
 
-    <!-- IB65 LIVE BROADCAST VIEW (WebRTC) -->
+    <!-- IB65 LIVE BROADCAST VIEW (With Google STUN Peer & 5-Min Expiry) -->
     <div id="modal-live-room" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
         <div class="flex justify-between items-center z-20">
             <div class="flex items-center space-x-2">
@@ -596,7 +613,7 @@
         let currentStory = null;
         let storyTimer = null;
 
-        // Active Comments Target
+        // Comments Target
         let activeCommentCol = 'posts';
         let activeCommentDocId = null;
 
@@ -604,15 +621,18 @@
         let activePublicUserEmail = null;
         let activeDirectRecipient = null;
         let chatSnapshotUnsub = null;
+        let presenceInterval = null;
+        let targetPresenceUnsub = null;
 
-        // WebRTC Live Broadcast
+        // WebRTC Live Broadcast (With Google STUN configuration)
         let peerInstance = null;
         let activeLiveStreamId = null;
         let isHostingLive = false;
         let localStreamMedia = null;
         let liveSnapshotUnsub = null;
+        let liveHeartbeatInterval = null;
 
-        // Intersection Observer for Reels (Smart Play/Pause)
+        // Intersection Observer for Reels
         let reelsObserver = null;
 
         setTimeout(() => {
@@ -628,11 +648,10 @@
             setTimeout(() => t.classList.add('hidden'), 2300);
         };
 
-        // Navigation Switcher & Video Audio Killer
+        // Navigation Switcher & Video Audio Muter
         window.switchTab = function(tab) {
             currentTab = tab;
 
-            // Stop all playing reel videos if leaving Reels tab
             if (tab !== 'reels') {
                 document.querySelectorAll('.reel-video-element').forEach(v => {
                     v.pause();
@@ -641,11 +660,8 @@
             }
 
             const header = document.getElementById('main-app-header');
-            if (tab === 'reels') {
-                header.classList.add('hidden');
-            } else {
-                header.classList.remove('hidden');
-            }
+            if (tab === 'reels') header.classList.add('hidden');
+            else header.classList.remove('hidden');
 
             ['home', 'search', 'reels', 'live', 'profile', 'public-profile'].forEach(t => {
                 const view = document.getElementById('view-' + t);
@@ -666,14 +682,50 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
+        // USER PRESENCE HEARTBEAT (Online / Last seen calculations)
+        function initPresenceTracking(user) {
+            if (!user) return;
+            const updateOnlineStatus = async (isOnline) => {
+                try {
+                    await updateDoc(doc(db, "users", user.email), {
+                        isOnline: isOnline,
+                        lastSeen: Date.now()
+                    });
+                } catch(e) {}
+            };
+
+            updateOnlineStatus(true);
+            clearInterval(presenceInterval);
+            presenceInterval = setInterval(() => updateOnlineStatus(true), 25000);
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') updateOnlineStatus(false);
+                else updateOnlineStatus(true);
+            });
+            window.addEventListener('beforeunload', () => updateOnlineStatus(false));
+        }
+
+        function formatLastSeen(lastSeenTime, isOnline) {
+            if (isOnline) return `<span class="text-green-500">🟢 Active now</span>`;
+            if (!lastSeenTime) return `<span class="text-gray-400">Offline</span>`;
+
+            const diff = Math.floor((Date.now() - lastSeenTime) / 1000);
+            if (diff < 60) return `<span class="text-gray-400">Active a moment ago</span>`;
+            if (diff < 3600) return `<span class="text-gray-400">Active ${Math.floor(diff / 60)}m ago</span>`;
+            if (diff < 86400) return `<span class="text-gray-400">Active ${Math.floor(diff / 3600)}h ago</span>`;
+            return `<span class="text-gray-400">Active ${Math.floor(diff / 86400)}d ago</span>`;
+        }
+
         // Auth Listeners
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('modal-auth').classList.add('hidden');
                 document.getElementById('my-story-avatar').innerText = (user.displayName || user.email)[0].toUpperCase();
+                initPresenceTracking(user);
                 safeLoadHome();
             } else {
                 document.getElementById('modal-auth').classList.remove('hidden');
+                clearInterval(presenceInterval);
             }
         });
 
@@ -695,6 +747,8 @@
                     following: 0,
                     followersList: [],
                     followingList: [],
+                    isOnline: true,
+                    lastSeen: Date.now(),
                     createdAt: Date.now()
                 });
                 showToast("Account created successfully!");
@@ -711,6 +765,10 @@
         };
 
         window.handleLogout = async function() {
+            const user = auth.currentUser;
+            if (user) {
+                await updateDoc(doc(db, "users", user.email), { isOnline: false, lastSeen: Date.now() }).catch(()=>{});
+            }
             await signOut(auth);
             showToast("Logged out");
         };
@@ -720,7 +778,7 @@
             loadPostsFeed();
         }
 
-        // STORIES SYSTEM
+        // STORIES SYSTEM WITH 3-DOT OPTIONS
         async function loadStoriesTray() {
             const tray = document.getElementById('stories-tray-items');
             try {
@@ -803,6 +861,41 @@
                 closeStory();
                 openPublicProfile(email);
             }
+        };
+
+        window.openStoryOptions = function(e) {
+            e.stopPropagation();
+            clearTimeout(storyTimer);
+            const user = auth.currentUser;
+            const delBtn = document.getElementById('btn-delete-story-opt');
+            if (currentStory && user && currentStory.authorEmail === user.email) {
+                delBtn.classList.remove('hidden');
+            } else {
+                delBtn.classList.add('hidden');
+            }
+            document.getElementById('modal-story-options').classList.remove('hidden');
+        };
+
+        window.closeStoryOptions = function() {
+            document.getElementById('modal-story-options').classList.add('hidden');
+            storyTimer = setTimeout(() => closeStory(), 4000);
+        };
+
+        window.deleteActiveStory = async function() {
+            if (!currentStory) return;
+            if (!confirm("Delete this story?")) return;
+            try {
+                await deleteDoc(doc(db, "stories", currentStory.id));
+                showToast("Story deleted");
+                closeStoryOptions();
+                closeStory();
+                loadStoriesTray();
+            } catch(e) { showToast("Delete failed: " + e.message); }
+        };
+
+        window.forwardStoryToUser = function() {
+            closeStoryOptions();
+            shareLink();
         };
 
         window.toggleStoryLike = async function() {
@@ -916,7 +1009,7 @@
             }
         }
 
-        // FULL SCREEN REELS FEED (With Zero Initial Sound & Snap Scroll)
+        // FULL SCREEN REELS FEED (Up & Down Both Ways Snap-Scroll)
         async function loadReelsFeed() {
             const container = document.getElementById('reels-container');
             try {
@@ -948,20 +1041,17 @@
 
                     return `
                     <div class="reel-item-box relative w-full bg-black flex flex-col justify-between overflow-hidden" ondblclick="triggerDoubleTapLike('reels', '${r.id}', event)">
-                        <!-- Full Aspect Video -->
                         <video src="${vidUrl}" style="filter: ${r.filter || 'none'}" class="reel-video-element absolute inset-0 w-full h-full object-cover" loop playsinline></video>
                         
                         <div class="absolute inset-0 flex items-center justify-center pointer-events-none hidden" id="burst-${r.id}">
                             <i class="fa-solid fa-heart text-red-500 text-7xl drop-shadow-2xl"></i>
                         </div>
 
-                        <!-- Top Reels Header -->
                         <div class="relative z-20 flex justify-between items-center p-4">
                             <span class="text-lg font-bold text-white tracking-wide">Reels</span>
                             <button onclick="openCreateModal('reel')" class="text-white text-lg icon-btn"><i class="fa-solid fa-camera"></i></button>
                         </div>
 
-                        <!-- Right Actions Stack -->
                         <div class="absolute right-3 bottom-20 flex flex-col items-center space-y-4 z-20 text-white">
                             <button onclick="toggleCloudLike('reels', '${r.id}')" class="flex flex-col items-center space-y-1 icon-btn ${isLiked ? 'text-red-500' : ''}">
                                 <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-2xl drop-shadow-lg"></i>
@@ -981,7 +1071,6 @@
                             ` : ''}
                         </div>
 
-                        <!-- Left-Bottom Creator Card -->
                         <div class="relative z-20 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent space-y-2">
                             <div class="flex items-center space-x-2.5">
                                 <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 cursor-pointer" onclick="openPublicProfile('${authorEmail}')">
@@ -1004,7 +1093,6 @@
             } catch(e) {}
         }
 
-        // Smart Intersection Observer (Play video ONLY when visible, stop others)
         function initReelsIntersectionObserver() {
             if (reelsObserver) reelsObserver.disconnect();
 
@@ -1227,7 +1315,7 @@
             } catch(e) {}
         };
 
-        // REAL-TIME 1-ON-1 MESSAGING
+        // REAL-TIME 1-ON-1 MESSAGING WITH REAL PRESENCE
         window.openDirectChatWithUser = function(recipientEmail, recipientName) {
             const user = auth.currentUser;
             if (!user) { showToast("Login to send messages!"); return; }
@@ -1236,6 +1324,15 @@
             document.getElementById('chat-user-name').innerText = recipientName;
             document.getElementById('chat-user-avatar').innerText = recipientName[0].toUpperCase();
             document.getElementById('modal-direct-chat').classList.remove('hidden');
+
+            // Track Target Presence in Real Time
+            if (targetPresenceUnsub) targetPresenceUnsub();
+            targetPresenceUnsub = onSnapshot(doc(db, "users", recipientEmail), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    document.getElementById('chat-user-presence').innerHTML = formatLastSeen(data.lastSeen, data.isOnline);
+                }
+            });
 
             const chatId = [user.email, recipientEmail].sort().join('_').replace(/[^a-zA-Z0-9]/g, '');
 
@@ -1263,10 +1360,8 @@
         };
 
         window.closeDirectChat = function() {
-            if (chatSnapshotUnsub) {
-                chatSnapshotUnsub();
-                chatSnapshotUnsub = null;
-            }
+            if (chatSnapshotUnsub) { chatSnapshotUnsub(); chatSnapshotUnsub = null; }
+            if (targetPresenceUnsub) { targetPresenceUnsub(); targetPresenceUnsub = null; }
             activeDirectRecipient = null;
             document.getElementById('modal-direct-chat').classList.add('hidden');
         };
@@ -1501,7 +1596,7 @@
             }
         };
 
-        // CREATE MEDIA & PRO REEL EDITOR INTEGRATION
+        // CREATE MEDIA WORKFLOW
         window.openCreateModal = function(type) {
             setUploadType(type || 'post');
             document.getElementById('modal-create').classList.remove('hidden');
@@ -1531,7 +1626,7 @@
             openProEditorSuite(selectedFileUrl, selectedFileType);
         };
 
-        // PRO EDITOR WORKFLOW
+        // PRO REEL EDITOR SUITE WITH TOUCH DRAGGABLE TEXT
         window.openProEditorSuite = function(url, type) {
             const modal = document.getElementById('modal-pro-editor');
             const v = document.getElementById('editor-main-video');
@@ -1555,6 +1650,7 @@
 
             modal.classList.remove('hidden');
             startEditorTimer();
+            initDraggableTextOverlay();
         };
 
         window.closeProEditor = function() {
@@ -1593,6 +1689,35 @@
             }
         };
 
+        // TOUCH-DRAGGABLE TEXT LOGIC
+        function initDraggableTextOverlay() {
+            const el = document.getElementById('pro-text-overlay-box');
+            let startX = 0, startY = 0, initialLeft = 20, initialTop = 40;
+
+            const onStart = (e) => {
+                const touch = e.touches ? e.touches[0] : e;
+                startX = touch.clientX;
+                startY = touch.clientY;
+                initialLeft = parseInt(el.style.left || '20', 10);
+                initialTop = parseInt(el.style.top || '40', 10);
+            };
+
+            const onMove = (e) => {
+                const touch = e.touches ? e.touches[0] : e;
+                const dx = touch.clientX - startX;
+                const dy = touch.clientY - startY;
+                el.style.left = `${initialLeft + dx}px`;
+                el.style.top = `${initialTop + dy}px`;
+                e.preventDefault();
+            };
+
+            el.addEventListener('touchstart', onStart, { passive: false });
+            el.addEventListener('touchmove', onMove, { passive: false });
+            el.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', (e) => { if (startX !== 0) onMove(e); });
+            window.addEventListener('mouseup', () => { startX = 0; });
+        }
+
         window.openAddTextTool = function() {
             const txt = prompt("Enter text on media:", overlayText || "");
             const box = document.getElementById('pro-text-overlay-box');
@@ -1602,6 +1727,7 @@
                 overlayText = txt.trim();
                 val.innerText = overlayText;
                 box.classList.remove('hidden');
+                showToast("Drag text to reposition");
             } else if (txt === '') {
                 overlayText = '';
                 box.classList.add('hidden');
@@ -1609,10 +1735,10 @@
         };
 
         window.addBackgroundAudioPrompt = function() {
-            const track = prompt("Select Audio / Sound effect title:", "Viral Sound - Trending Beat");
+            const track = prompt("Select Audio title:", "Trending Track — Original Beat");
             if (track) {
                 document.getElementById('lbl-audio-track').innerText = track;
-                showToast("🎵 Audio attached to timeline");
+                showToast("🎵 Audio track attached");
             }
         };
 
@@ -1824,16 +1950,27 @@
             }
         }
 
-        // IB65 LIVE BROADCAST
+        // IB65 LIVE BROADCAST (5-MINUTE EXPIRY & GOOGLE STUN PEER CONFIG)
         async function loadLiveBroadcasters() {
             const list = document.getElementById('live-rooms-list');
             try {
                 const snap = await getDocs(collection(db, "lives"));
                 const streams = [];
-                snap.forEach(d => streams.push({ id: d.id, ...d.data() }));
+                const now = Date.now();
+
+                // 5-Minute (300,000ms) Auto-Expiry & Dead-Stream Cleaner
+                snap.forEach(d => {
+                    const data = d.data();
+                    const age = now - (data.lastHeartbeat || data.createdAt || 0);
+                    if (age < 300000 && data.status === 'live') {
+                        streams.push({ id: d.id, ...data });
+                    } else {
+                        deleteDoc(doc(db, "lives", d.id)).catch(()=>{});
+                    }
+                });
 
                 if (streams.length === 0) {
-                    list.innerHTML = '<div class="text-center text-gray-500 py-10 text-xs">No active live broadcasts right now.</div>';
+                    list.innerHTML = '<div class="text-center text-gray-500 py-10 text-xs">No active live streams right now.</div>';
                     return;
                 }
 
@@ -1865,7 +2002,15 @@
                 isHostingLive = true;
 
                 if (peerInstance) peerInstance.destroy();
-                peerInstance = new Peer();
+                // Google STUN ICE configuration for cross-phone carrier compatibility
+                peerInstance = new Peer({
+                    config: {
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            { urls: 'stun:stun1.l.google.com:19302' }
+                        ]
+                    }
+                });
 
                 peerInstance.on('open', async (peerId) => {
                     const docRef = await addDoc(collection(db, "lives"), {
@@ -1873,8 +2018,10 @@
                         hostEmail: user.email,
                         peerId: peerId,
                         viewers: 1,
+                        status: 'live',
                         comments: [],
-                        createdAt: Date.now()
+                        createdAt: Date.now(),
+                        lastHeartbeat: Date.now()
                     });
 
                     activeLiveStreamId = docRef.id;
@@ -1886,6 +2033,14 @@
                     vid.srcObject = localStreamMedia;
                     vid.muted = true;
                     vid.play();
+
+                    // Host heartbeat ping to prevent premature auto-deletion
+                    clearInterval(liveHeartbeatInterval);
+                    liveHeartbeatInterval = setInterval(async () => {
+                        if (activeLiveStreamId && isHostingLive) {
+                            await updateDoc(doc(db, "lives", activeLiveStreamId), { lastHeartbeat: Date.now() }).catch(()=>{});
+                        }
+                    }, 20000);
 
                     peerInstance.on('call', call => call.answer(localStreamMedia));
                     document.getElementById('modal-live-room').classList.remove('hidden');
@@ -1899,7 +2054,14 @@
             isHostingLive = false;
 
             if (peerInstance) peerInstance.destroy();
-            peerInstance = new Peer();
+            peerInstance = new Peer({
+                config: {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' }
+                    ]
+                }
+            });
 
             peerInstance.on('open', async () => {
                 const call = peerInstance.call(peerId, new MediaStream());
@@ -1925,7 +2087,7 @@
             if (liveSnapshotUnsub) liveSnapshotUnsub();
             liveSnapshotUnsub = onSnapshot(doc(db, "lives", liveId), snap => {
                 if (!snap.exists()) {
-                    showToast("Live ended by host");
+                    showToast("Live broadcast ended");
                     exitLiveRoom(true);
                     return;
                 }
@@ -1965,10 +2127,13 @@
         };
 
         window.exitLiveRoom = async function(forced = false) {
+            clearInterval(liveHeartbeatInterval);
             if (liveSnapshotUnsub) { liveSnapshotUnsub(); liveSnapshotUnsub = null; }
+
             if (activeLiveStreamId && !forced) {
-                if (isHostingLive) await deleteDoc(doc(db, "lives", activeLiveStreamId)).catch(()=>{});
-                else {
+                if (isHostingLive) {
+                    await deleteDoc(doc(db, "lives", activeLiveStreamId)).catch(()=>{});
+                } else {
                     const ref = doc(db, "lives", activeLiveStreamId);
                     const snap = await getDoc(ref);
                     if (snap.exists()) await updateDoc(ref, { viewers: Math.max(1, (snap.data().viewers || 2) - 1) }).catch(()=>{});
