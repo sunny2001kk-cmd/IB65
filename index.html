@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IB65 — Social Universe</title>
+
+    <!-- App Icon & Manifest Links -->
+    <link rel="icon" type="image/png" sizes="512x512" href="./icon.png">
+    <link rel="apple-touch-icon" href="./icon.png">
+    <meta name="apple-mobile-web-app-title" content="IB65">
+    <meta name="application-name" content="IB65">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -51,13 +61,23 @@
 </head>
 <body class="min-h-screen pb-24 select-none bg-black text-white">
 
-    <!-- Splash Screen -->
+    <!-- Independent Fail-Safe Splash Screen -->
     <div id="anime-intro" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center space-y-3 transition-opacity duration-500">
         <h1 class="text-5xl font-black tracking-widest text-white">IB65</h1>
         <p class="text-xs text-gray-500 tracking-widest uppercase">Cloud Universe</p>
     </div>
+    <script>
+        // Guaranteed Splash Removal without Script-Lock
+        setTimeout(() => {
+            const splash = document.getElementById('anime-intro');
+            if (splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => splash.remove(), 400);
+            }
+        }, 900);
+    </script>
 
-    <!-- Header -->
+    <!-- Top Header -->
     <header class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-gray-900 px-4 py-3 flex justify-between items-center">
         <h1 class="text-2xl font-black tracking-wider text-white">IB65</h1>
         <div class="flex items-center space-x-4">
@@ -170,7 +190,7 @@
         </div>
     </div>
 
-    <!-- Main Content Container -->
+    <!-- Main Container -->
     <main class="max-w-xl mx-auto p-4 space-y-4">
         
         <!-- HOME FEED -->
@@ -581,13 +601,11 @@
 
         // Initialization
         window.addEventListener('load', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('anime-intro');
-                if (splash) {
-                    splash.style.opacity = '0';
-                    setTimeout(() => splash.remove(), 500);
-                }
-            }, 800);
+            const splash = document.getElementById('anime-intro');
+            if (splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => splash.remove(), 400);
+            }
             safeLoadAll();
         });
 
@@ -598,11 +616,13 @@
         });
 
         async function safeLoadAll() {
-            try { await loadCloudPosts(); } catch(e) {}
-            try { await loadCloudReels(); } catch(e) {}
-            try { await loadCloudStories(); } catch(e) {}
-            try { await loadActiveLiveHub(); } catch(e) {}
-            try { await loadSuggestions(); } catch(e) {}
+            setTimeout(() => {
+                try { loadCloudPosts().catch(()=>{}); } catch(e) {}
+                try { loadCloudReels().catch(()=>{}); } catch(e) {}
+                try { loadCloudStories().catch(()=>{}); } catch(e) {}
+                try { loadActiveLiveHub().catch(()=>{}); } catch(e) {}
+                try { loadSuggestions().catch(()=>{}); } catch(e) {}
+            }, 200);
         }
 
         window.showToast = function(msg) {
