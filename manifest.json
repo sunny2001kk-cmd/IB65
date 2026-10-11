@@ -1,25 +1,21 @@
 {
-  "name": "IB65 Social Universe",
   "short_name": "IB65",
-  "description": "Next Gen Social Media & Live Universe",
-  "start_url": "./index.html",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "name": "IB65 Live Broadcast Hub",
   "icons": [
     {
-      "src": "./icon.png",
-      "sizes": "192x192",
+      "src": "icon-192.png",
       "type": "image/png",
-      "purpose": "any maskable"
+      "sizes": "192x192"
     },
     {
-      "src": "./icon.png",
-      "sizes": "512x512",
+      "src": "icon-512.png",
       "type": "image/png",
-      "purpose": "any maskable"
+      "sizes": "512x512"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0b0c10",
+  "theme_color": "#0b0c10",
+  "display": "standalone",
+  "orientation": "portrait"
 }
