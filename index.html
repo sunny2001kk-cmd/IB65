@@ -128,7 +128,7 @@
             </div>
         </div>
 
-        <!-- 3. REELS FEED (Up & Down Two-Way Snap Scroll) -->
+        <!-- 3. REELS FEED (Two-Way Up/Down Snap Scroll) -->
         <div id="view-reels" class="hidden">
             <div id="reels-container" class="reels-scroll-container">
                 <div class="text-center text-gray-500 py-24 text-xs">Loading Reels...</div>
@@ -214,7 +214,7 @@
 
     </main>
 
-    <!-- REAL-TIME 1-ON-1 CHAT WINDOW WITH PRESENCE (Active now / Last seen) -->
+    <!-- REAL-TIME 1-ON-1 CHAT WINDOW (Active now & Last seen) -->
     <div id="modal-direct-chat" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-3 border-b border-zinc-900 flex justify-between items-center bg-black/95">
             <div class="flex items-center space-x-3">
@@ -255,7 +255,7 @@
         <button onclick="switchTab('profile')" id="nav-profile" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-user"></i></button>
     </nav>
 
-    <!-- INSTAGRAM STORY VIEWER WITH 3-DOT MENU -->
+    <!-- INSTAGRAM STORY VIEWER (With 3-Dots Menu) -->
     <div id="modal-story" class="fixed inset-0 z-50 bg-black flex items-center justify-center hidden" onclick="closeStory()">
         <div class="relative w-full max-w-md h-full bg-black flex flex-col justify-between p-3" onclick="event.stopPropagation()">
             <div class="w-full flex space-x-1 pt-2 z-20">
@@ -450,7 +450,7 @@
         <div class="flex-1 flex items-center justify-center overflow-hidden my-3" id="media-viewer-content"></div>
     </div>
 
-    <!-- CREATE MODAL (Post / Reel / Story) -->
+    <!-- CREATE MODAL (Device Gallery & Camera) -->
     <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
             <button onclick="closeCreateModal()" class="text-white text-base"><i class="fa-solid fa-xmark"></i></button>
@@ -466,16 +466,18 @@
             <input type="text" id="create-caption-input" placeholder="Write a caption, tags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none">
             
             <div class="grid grid-cols-2 gap-2">
-                <label class="cursor-pointer block clay-card p-4 text-center border border-zinc-800 hover:border-zinc-500 transition">
+                <!-- Direct File Picker Trigger -->
+                <div onclick="document.getElementById('file-gallery-picker').click()" class="cursor-pointer clay-card p-4 text-center border border-zinc-800 hover:border-zinc-500 transition">
                     <i class="fa-solid fa-images text-2xl mb-1 text-white"></i>
-                    <p class="text-[10px] text-gray-300">Device Gallery</p>
-                    <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="handleFileSelected(event)">
-                </label>
+                    <p class="text-[10px] text-gray-300 font-bold">Device Gallery</p>
+                </div>
                 <button type="button" onclick="openCameraRecorder()" class="clay-card p-4 text-center border border-zinc-800 hover:border-zinc-500 transition">
                     <i class="fa-solid fa-video text-2xl mb-1 text-red-500"></i>
-                    <p class="text-[10px] text-gray-300">Camera Lens</p>
+                    <p class="text-[10px] text-gray-300 font-bold">Camera Lens</p>
                 </button>
             </div>
+            <!-- Robust File Input for Android & iOS -->
+            <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="handleFileSelected(event)">
         </div>
     </div>
 
@@ -584,11 +586,8 @@
         let selectedFileUrl = '';
         let selectedFileType = 'image';
         let currentFilter = 'none';
-        let isAudioMuted = false;
         let overlayText = '';
-        let overlayTextColor = '#ffffff';
 
-        // Camera State
         let cameraStream = null;
         let cameraFacing = 'environment';
         let mediaRecorder = null;
@@ -597,7 +596,6 @@
         let recordTimer = null;
         let recordDuration = 0;
 
-        // Pro Editor State
         let editorVideoDuration = 0;
         let editorTimeInterval = null;
         const filterPresets = [
@@ -609,22 +607,18 @@
         ];
         let filterIndex = 0;
 
-        // Story State
         let currentStory = null;
         let storyTimer = null;
 
-        // Comments Target
         let activeCommentCol = 'posts';
         let activeCommentDocId = null;
 
-        // Public Profile & Messaging State
         let activePublicUserEmail = null;
         let activeDirectRecipient = null;
         let chatSnapshotUnsub = null;
         let presenceInterval = null;
         let targetPresenceUnsub = null;
 
-        // WebRTC Live Broadcast (With Google STUN configuration)
         let peerInstance = null;
         let activeLiveStreamId = null;
         let isHostingLive = false;
@@ -632,7 +626,6 @@
         let liveSnapshotUnsub = null;
         let liveHeartbeatInterval = null;
 
-        // Intersection Observer for Reels
         let reelsObserver = null;
 
         setTimeout(() => {
@@ -648,7 +641,6 @@
             setTimeout(() => t.classList.add('hidden'), 2300);
         };
 
-        // Navigation Switcher & Video Audio Muter
         window.switchTab = function(tab) {
             currentTab = tab;
 
@@ -682,7 +674,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // USER PRESENCE HEARTBEAT (Online / Last seen calculations)
         function initPresenceTracking(user) {
             if (!user) return;
             const updateOnlineStatus = async (isOnline) => {
@@ -716,7 +707,6 @@
             return `<span class="text-gray-400">Active ${Math.floor(diff / 86400)}d ago</span>`;
         }
 
-        // Auth Listeners
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('modal-auth').classList.add('hidden');
@@ -778,7 +768,6 @@
             loadPostsFeed();
         }
 
-        // STORIES SYSTEM WITH 3-DOT OPTIONS
         async function loadStoriesTray() {
             const tray = document.getElementById('stories-tray-items');
             try {
@@ -924,7 +913,6 @@
             showToast("Reply sent to " + (currentStory.author || 'creator'));
         };
 
-        // POSTS FEED
         async function loadPostsFeed() {
             const container = document.getElementById('posts-stream');
             try {
@@ -1009,7 +997,6 @@
             }
         }
 
-        // FULL SCREEN REELS FEED (Up & Down Both Ways Snap-Scroll)
         async function loadReelsFeed() {
             const container = document.getElementById('reels-container');
             try {
@@ -1325,7 +1312,6 @@
             document.getElementById('chat-user-avatar').innerText = recipientName[0].toUpperCase();
             document.getElementById('modal-direct-chat').classList.remove('hidden');
 
-            // Track Target Presence in Real Time
             if (targetPresenceUnsub) targetPresenceUnsub();
             targetPresenceUnsub = onSnapshot(doc(db, "users", recipientEmail), (snap) => {
                 if (snap.exists()) {
@@ -1596,7 +1582,7 @@
             }
         };
 
-        // CREATE MEDIA WORKFLOW
+        // CREATE MEDIA WORKFLOW (With Safe FileReader for Redmi / Cloud Files)
         window.openCreateModal = function(type) {
             setUploadType(type || 'post');
             document.getElementById('modal-create').classList.remove('hidden');
@@ -1616,14 +1602,27 @@
         };
 
         window.handleFileSelected = function(e) {
-            const f = e.target.files[0];
+            const f = e.target.files && e.target.files[0];
             if (!f) return;
-            selectedFileBlob = f;
-            selectedFileType = f.type.includes('video') ? 'video' : 'image';
-            selectedFileUrl = URL.createObjectURL(f);
 
-            closeCreateModal();
-            openProEditorSuite(selectedFileUrl, selectedFileType);
+            showToast("Loading media...");
+            selectedFileBlob = f;
+            selectedFileType = (f.type && f.type.startsWith('video')) ? 'video' : 'image';
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                selectedFileUrl = event.target.result;
+                e.target.value = '';
+
+                closeCreateModal();
+                openProEditorSuite(selectedFileUrl, selectedFileType);
+            };
+
+            reader.onerror = function() {
+                showToast("File reading error!");
+            };
+
+            reader.readAsDataURL(f);
         };
 
         // PRO REEL EDITOR SUITE WITH TOUCH DRAGGABLE TEXT
@@ -1689,7 +1688,6 @@
             }
         };
 
-        // TOUCH-DRAGGABLE TEXT LOGIC
         function initDraggableTextOverlay() {
             const el = document.getElementById('pro-text-overlay-box');
             let startX = 0, startY = 0, initialLeft = 20, initialTop = 40;
@@ -1958,7 +1956,6 @@
                 const streams = [];
                 const now = Date.now();
 
-                // 5-Minute (300,000ms) Auto-Expiry & Dead-Stream Cleaner
                 snap.forEach(d => {
                     const data = d.data();
                     const age = now - (data.lastHeartbeat || data.createdAt || 0);
@@ -2002,7 +1999,6 @@
                 isHostingLive = true;
 
                 if (peerInstance) peerInstance.destroy();
-                // Google STUN ICE configuration for cross-phone carrier compatibility
                 peerInstance = new Peer({
                     config: {
                         iceServers: [
@@ -2034,7 +2030,6 @@
                     vid.muted = true;
                     vid.play();
 
-                    // Host heartbeat ping to prevent premature auto-deletion
                     clearInterval(liveHeartbeatInterval);
                     liveHeartbeatInterval = setInterval(async () => {
                         if (activeLiveStreamId && isHostingLive) {
