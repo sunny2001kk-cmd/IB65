@@ -5,19 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IB65 — Social Universe</title>
 
-    <!-- Mobile Console Debugger Tool (Screen par niche gear icon aayega) -->
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
 
-    <!-- Manifest Link -->
     <link rel="manifest" href="./manifest.json">
-
-    <!-- App Icon Links -->
     <link rel="icon" type="image/png" sizes="192x192" href="./icon.png">
     <link rel="icon" type="image/png" sizes="512x512" href="./icon.png">
     <link rel="apple-touch-icon" href="./icon.png">
 
-    <!-- Mobile Screen Config -->
     <meta name="theme-color" content="#000000">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -53,32 +48,23 @@
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #000000; }
         ::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
-        @keyframes storyBar {
-            from { width: 0%; }
-            to { width: 100%; }
-        }
-        .story-progress-active {
-            animation: storyBar 7s linear forwards;
-        }
+        @keyframes storyBar { from { width: 0%; } to { width: 100%; } }
+        .story-progress-active { animation: storyBar 7s linear forwards; }
         @keyframes recordPulse {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
             70% { transform: scale(1.08); box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-        .recording-active {
-            animation: recordPulse 1.5s infinite;
-        }
+        .recording-active { animation: recordPulse 1.5s infinite; }
     </style>
 </head>
 <body class="min-h-screen pb-24 select-none bg-black text-white">
 
-    <!-- Splash Screen -->
     <div id="anime-intro" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center space-y-3 transition-opacity duration-500">
         <h1 class="text-5xl font-black tracking-widest text-white">IB65</h1>
         <p class="text-xs text-gray-500 tracking-widest uppercase">Cloud Universe</p>
     </div>
 
-    <!-- Global Early Navigation Guard -->
     <script>
         setTimeout(() => {
             const splash = document.getElementById('anime-intro');
@@ -137,7 +123,6 @@
         };
     </script>
 
-    <!-- Top Header -->
     <header class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-gray-900 px-4 py-3 flex justify-between items-center">
         <h1 class="text-2xl font-black tracking-wider text-white">IB65</h1>
         <div class="flex items-center space-x-4">
@@ -154,7 +139,6 @@
         </div>
     </header>
 
-    <!-- Direct Messages Inbox -->
     <div id="full-msg-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-gray-900 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -168,7 +152,6 @@
         </div>
     </div>
 
-    <!-- 1-on-1 Chat Window -->
     <div id="single-chat-modal" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-gray-900 flex justify-between items-center bg-black/90">
             <div class="flex items-center space-x-3">
@@ -184,7 +167,6 @@
         </div>
     </div>
 
-    <!-- Notifications Drawer -->
     <div id="notif-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end hidden" onclick="toggleNotifications()">
         <div class="clay-card w-80 h-full p-4 space-y-4" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-gray-900 pb-3">
@@ -195,7 +177,6 @@
         </div>
     </div>
 
-    <!-- Settings Slide-up Drawer -->
     <div id="settings-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center hidden" onclick="toggleSettingsModal()">
         <div class="clay-card w-full max-w-xl rounded-t-3xl p-5 space-y-3 text-xs" onclick="event.stopPropagation()">
             <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-2"></div>
@@ -219,7 +200,6 @@
         </div>
     </div>
 
-    <!-- Edit Profile Modal -->
     <div id="edit-profile-modal" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-gray-900 flex justify-between items-center bg-black">
             <button onclick="closeEditProfileModal()" class="text-white text-sm"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -250,10 +230,8 @@
         </div>
     </div>
 
-    <!-- Main Container -->
     <main class="max-w-xl mx-auto p-4 space-y-4">
         
-        <!-- HOME FEED -->
         <div id="view-home" class="space-y-4">
             <div class="clay-card p-3 overflow-x-auto flex space-x-3 items-center">
                 <div onclick="openCreateModalPage('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
@@ -267,7 +245,6 @@
                 <div id="stories-tray" class="flex space-x-3"></div>
             </div>
 
-            <!-- Follow Suggestions Tray -->
             <div id="suggestions-box" class="clay-card p-4 space-y-2 hidden">
                 <div class="flex justify-between items-center text-xs">
                     <span class="font-bold text-gray-300">Suggested for you</span>
@@ -276,13 +253,11 @@
                 <div id="suggestions-list" class="flex space-x-3 overflow-x-auto py-2"></div>
             </div>
 
-            <!-- Posts List -->
             <div id="posts-container" class="space-y-4">
                 <div class="text-center text-gray-500 py-10 text-xs">Connecting feed...</div>
             </div>
         </div>
 
-        <!-- SEARCH / EXPLORE VIEW -->
         <div id="view-search" class="space-y-4 hidden">
             <input type="text" id="global-search" oninput="handleGlobalSearch(event)" placeholder="Search users, captions, or tags..." class="w-full clay-card px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none">
             <div id="explore-grid" class="grid grid-cols-3 gap-1.5 pt-2">
@@ -290,14 +265,12 @@
             </div>
         </div>
 
-        <!-- REELS FEED -->
         <div id="view-reels" class="space-y-4 hidden">
             <div id="reels-container" class="space-y-6 flex flex-col items-center">
                 <div class="text-center text-gray-500 py-12 text-xs">Loading reels...</div>
             </div>
         </div>
 
-        <!-- LIVE HUB -->
         <div id="view-live" class="space-y-4 hidden">
             <div class="clay-card p-4 flex justify-between items-center">
                 <div>
@@ -318,7 +291,6 @@
             </div>
         </div>
 
-        <!-- PROFILE VIEW -->
         <div id="view-profile" class="space-y-4 hidden">
             <div class="clay-card p-6 text-center space-y-4 relative">
                 <button onclick="toggleSettingsModal()" class="absolute top-4 right-4 text-white text-xl"><i class="fa-solid fa-gear"></i></button>
@@ -340,7 +312,6 @@
                 </div>
             </div>
 
-            <!-- Profile Tabs -->
             <div class="clay-card p-4 space-y-3">
                 <div class="flex justify-around border-b border-gray-900 pb-2 text-gray-400 text-sm">
                     <button onclick="switchProfileTab('posts')" id="tab-btn-posts" class="text-white border-b-2 border-white pb-1 px-4"><i class="fa-solid fa-table-cells"></i></button>
@@ -353,7 +324,6 @@
             </div>
         </div>
 
-        <!-- PUBLIC USER PROFILE VIEW -->
         <div id="view-public-profile" class="space-y-4 hidden">
             <div class="flex items-center space-x-3 mb-2">
                 <button onclick="switchTab('home')" class="text-white"><i class="fa-solid fa-arrow-left text-lg"></i></button>
@@ -387,7 +357,6 @@
 
     </main>
 
-    <!-- Create Media Modal -->
     <div id="create-modal-page" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-gray-900 flex justify-between items-center">
             <button onclick="closeCreateModalPage()" class="text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -414,7 +383,6 @@
                 </button>
             </div>
 
-            <!-- Media Editor Suite -->
             <div id="create-preview-box" class="hidden space-y-3">
                 <div class="flex justify-between items-center bg-[#181818] p-2.5 rounded-2xl border border-gray-800 text-xs">
                     <div class="flex items-center space-x-2">
@@ -432,7 +400,6 @@
                     </div>
                 </div>
 
-                <!-- Filters -->
                 <div class="flex items-center space-x-2 overflow-x-auto py-1 text-xs">
                     <button type="button" onclick="applyEditorFilter('none')" class="bg-[#202020] px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap active:scale-95 transition">Normal</button>
                     <button type="button" onclick="applyEditorFilter('contrast(130%) saturate(140%)')" class="bg-[#202020] px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap active:scale-95 transition">Vivid</button>
@@ -453,7 +420,6 @@
         </div>
     </div>
 
-    <!-- In-App Camera Viewfinder -->
     <div id="inapp-camera-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
         <div class="flex justify-between items-center z-10">
             <button onclick="closeLiveCamera()" class="text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
@@ -486,7 +452,6 @@
         </div>
     </div>
 
-    <!-- Story Viewer Modal -->
     <div id="story-viewer-modal" class="fixed inset-0 z-50 bg-black flex items-center justify-center hidden" onclick="closeStoryViewer()">
         <div class="relative w-full max-w-md h-full bg-black flex flex-col justify-between p-4" onclick="event.stopPropagation()">
             <div class="w-full flex space-x-1 z-20 pt-2">
@@ -517,7 +482,6 @@
         </div>
     </div>
 
-    <!-- Comments Modal -->
     <div id="comments-modal" class="fixed inset-0 z-50 bg-black/85 flex items-end justify-center hidden" onclick="closeCommentsModal()">
         <div class="clay-card w-full max-w-xl h-[65vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-gray-900 pb-2">
@@ -532,7 +496,6 @@
         </div>
     </div>
 
-    <!-- Live Stream Modal -->
     <div id="live-player-modal" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
         <div class="flex justify-between items-center z-20">
             <div class="flex items-center space-x-2">
@@ -557,7 +520,6 @@
         </div>
     </div>
 
-    <!-- Follow / Following List Modal -->
     <div id="follow-modal" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 hidden" onclick="closeFollowListModal()">
         <div class="clay-card p-5 w-full max-w-sm space-y-4" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-gray-900 pb-2">
@@ -568,7 +530,6 @@
         </div>
     </div>
 
-    <!-- Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-gray-900 py-3 px-6 flex justify-around items-center z-40">
         <button onclick="switchTab('home')" id="nav-home" class="text-white icon-3d text-xl"><i class="fa-solid fa-house"></i></button>
         <button onclick="switchTab('search')" id="nav-search" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-compass"></i></button>
@@ -577,7 +538,6 @@
         <button onclick="switchTab('profile')" id="nav-profile" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-user"></i></button>
     </nav>
 
-    <!-- Auth Modal -->
     <div id="auth-modal" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
         <div class="clay-card p-6 w-full max-w-sm space-y-4">
             <h2 class="text-2xl font-black text-center text-white">IB65</h2>
@@ -592,10 +552,8 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white text-xs px-4 py-2 rounded-full border border-gray-800 shadow-2xl hidden z-50"></div>
 
-    <!-- Firebase Application Engine -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -654,7 +612,6 @@
             }
         });
 
-        // Safe Data Loader
         async function safeLoadAll() {
             try { await loadCloudPosts(); } catch(e) { console.warn(e); }
             try { await loadCloudReels(); } catch(e) { console.warn(e); }
@@ -663,7 +620,284 @@
             try { await loadSuggestions(); } catch(e) { console.warn(e); }
         }
 
-        // Live Lens Camera Handlers (Fail-Safe & Direct Diagnostics)
+        window.toggleAccountPrivacy = function() {
+            const lbl = document.getElementById('privacy-lbl');
+            lbl.innerText = lbl.innerText === 'Public' ? 'Private' : 'Public';
+            showToast("Account privacy: " + lbl.innerText);
+        };
+
+        window.openEditProfileModal = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
+            const uDoc = await getDoc(doc(db, "users", user.email));
+            if (uDoc.exists()) {
+                const d = uDoc.data();
+                document.getElementById('edit-name-input').value = d.name || user.displayName || '';
+                document.getElementById('edit-username-input').value = d.username || user.email.split('@')[0];
+                document.getElementById('edit-bio-input').value = d.bio || '';
+                document.getElementById('edit-hashtags-input').value = d.hashtags || '';
+                document.getElementById('edit-avatar-url').value = d.avatar || '';
+            }
+            document.getElementById('edit-profile-modal').classList.remove('hidden');
+        };
+
+        window.closeEditProfileModal = function() {
+            document.getElementById('edit-profile-modal').classList.add('hidden');
+        };
+
+        window.saveProfileChanges = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const newName = document.getElementById('edit-name-input').value.trim();
+            const newUsername = document.getElementById('edit-username-input').value.trim();
+            const newBio = document.getElementById('edit-bio-input').value.trim();
+            const newHashtags = document.getElementById('edit-hashtags-input').value.trim();
+            const newAvatar = document.getElementById('edit-avatar-url').value.trim();
+
+            try {
+                await updateDoc(doc(db, "users", user.email), {
+                    name: newName || 'User',
+                    username: newUsername || user.email.split('@')[0],
+                    bio: newBio,
+                    hashtags: newHashtags,
+                    avatar: newAvatar
+                });
+                await updateProfile(user, { displayName: newName });
+
+                showToast("Profile updated!");
+                closeEditProfileModal();
+                loadUserProfileData();
+            } catch(e) {
+                showToast("Save error: " + e.message);
+            }
+        };
+
+        window.loadUserProfileData = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
+            const uDoc = await getDoc(doc(db, "users", user.email));
+            if (uDoc.exists()) {
+                const d = uDoc.data();
+                document.getElementById('profile-name').innerText = d.name || user.displayName || 'User';
+                document.getElementById('profile-username').innerText = '@' + (d.username || user.email.split('@')[0]);
+                document.getElementById('profile-bio').innerText = d.bio || '';
+                document.getElementById('profile-hashtags').innerText = d.hashtags || '';
+                
+                const av = document.getElementById('profile-initial');
+                if (d.avatar) {
+                    av.innerHTML = '<img src="' + d.avatar + '" class="w-full h-full object-cover">';
+                } else {
+                    av.innerText = (d.name || 'U')[0].toUpperCase();
+                }
+
+                document.getElementById('stat-followers').innerText = (d.followers || []).length;
+                document.getElementById('stat-following').innerText = (d.following || []).length;
+            }
+        };
+
+        window.loadSuggestions = async function() {
+            const box = document.getElementById('suggestions-box');
+            const list = document.getElementById('suggestions-list');
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                const uDoc = await getDoc(doc(db, "users", user.email));
+                const myFollowing = uDoc.exists() ? (uDoc.data().following || []) : [];
+
+                const snap = await getDocs(collection(db, "users"));
+                const suggested = [];
+                snap.forEach(d => {
+                    if (d.id !== user.email && !myFollowing.includes(d.id)) {
+                        suggested.push({ email: d.id, ...d.data() });
+                    }
+                });
+
+                if (suggested.length === 0) {
+                    box.classList.add('hidden');
+                    return;
+                }
+
+                box.classList.remove('hidden');
+                list.innerHTML = suggested.map(s => {
+                    const avatarHtml = s.avatar 
+                        ? '<img src="' + s.avatar + '" class="w-full h-full object-cover">'
+                        : (s.name || 'U')[0];
+                    const usernameStr = s.username || s.email.split('@')[0];
+                    return `
+                        <div class="clay-card p-3 flex flex-col items-center space-y-2 flex-shrink-0 w-32 border border-gray-800 text-center">
+                            <div class="w-12 h-12 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-sm overflow-hidden">
+                                ${avatarHtml}
+                            </div>
+                            <div class="w-full">
+                                <p class="font-bold text-xs truncate">${s.name || 'User'}</p>
+                                <p class="text-[10px] text-gray-500 truncate">@${usernameStr}</p>
+                            </div>
+                            <button onclick="toggleFollowUserCloud('${s.name || 'User'}', '${s.email}')" class="w-full clay-btn py-1 text-[10px] font-bold">Follow</button>
+                        </div>
+                    `;
+                }).join('');
+            } catch(e) {}
+        };
+
+        window.openPublicProfile = async function(email) {
+            const user = auth.currentUser;
+            if (user && user.email === email) {
+                switchTab('profile');
+                return;
+            }
+
+            try {
+                const uDoc = await getDoc(doc(db, "users", email));
+                if (!uDoc.exists()) return;
+                const d = uDoc.data();
+
+                const cleanUser = d.username || email.split('@')[0];
+                document.getElementById('pub-top-username').innerText = '@' + cleanUser;
+                document.getElementById('pub-name').innerText = d.name || 'Creator';
+                document.getElementById('pub-username').innerText = '@' + cleanUser;
+                document.getElementById('pub-bio').innerText = d.bio || '';
+                document.getElementById('pub-hashtags').innerText = d.hashtags || '';
+
+                const av = document.getElementById('pub-avatar');
+                if (d.avatar) av.innerHTML = '<img src="' + d.avatar + '" class="w-full h-full object-cover">';
+                else av.innerText = (d.name || 'U')[0].toUpperCase();
+
+                document.getElementById('pub-stat-followers').innerText = (d.followers || []).length;
+                document.getElementById('pub-stat-following').innerText = (d.following || []).length;
+
+                const myDoc = await getDoc(doc(db, "users", user.email));
+                const myFollowing = myDoc.exists() ? (myDoc.data().following || []) : [];
+                const isFollowing = myFollowing.includes(email);
+
+                const fBtn = document.getElementById('pub-follow-btn');
+                fBtn.innerText = isFollowing ? "Following" : "Follow";
+                fBtn.className = isFollowing ? "flex-1 border border-gray-600 text-gray-300 py-2 text-xs font-bold rounded-2xl" : "flex-1 clay-btn py-2 text-xs font-bold";
+                fBtn.onclick = async () => {
+                    await toggleFollowUserCloud(d.name || 'User', email);
+                    openPublicProfile(email);
+                };
+
+                const mBtn = document.getElementById('pub-message-btn');
+                mBtn.onclick = () => {
+                    startDirectChat(email, d.name || 'User');
+                };
+
+                const postSnap = await getDocs(collection(db, "posts"));
+                const userPosts = [];
+                postSnap.forEach(p => {
+                    if (p.data().authorEmail === email) userPosts.push(p.data());
+                });
+                document.getElementById('pub-stat-posts').innerText = userPosts.length;
+                const grid = document.getElementById('pub-profile-grid');
+                grid.innerHTML = userPosts.length === 0 ? '<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No posts uploaded yet</div>' : userPosts.map(p => `
+                    <div class="h-28 clay-card rounded-xl overflow-hidden flex items-center justify-center">
+                        ${p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${p.mediaUrl}" style="filter: ${p.filter || 'none'}" class="w-full h-full object-cover">`}
+                    </div>
+                `).join('');
+
+                ['home', 'search', 'reels', 'live', 'profile'].forEach(t => document.getElementById('view-' + t).classList.add('hidden'));
+                document.getElementById('view-public-profile').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch(e) {}
+        };
+
+        window.loadDMInbox = async function() {
+            const list = document.getElementById('dm-chats-list');
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                const uDoc = await getDoc(doc(db, "users", user.email));
+                const allContacts = [...new Set([...(uDoc.data().followers || []), ...(uDoc.data().following || [])])];
+
+                if (allContacts.length === 0) {
+                    list.innerHTML = '<div class="text-center text-gray-500 py-10 text-xs">No conversations yet. Follow creators to message them!</div>';
+                    return;
+                }
+
+                list.innerHTML = allContacts.map(cEmail => `
+                    <div onclick="startDirectChat('${cEmail}', '${cEmail.split('@')[0]}')" class="clay-card p-3 flex items-center justify-between cursor-pointer">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-sm">${cEmail[0].toUpperCase()}</div>
+                            <div>
+                                <p class="font-bold text-xs text-white">${cEmail.split('@')[0]}</p>
+                                <p class="text-[10px] text-gray-400">Tap to chat</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
+                    </div>
+                `).join('');
+            } catch(e) {}
+        };
+
+        window.startDirectChat = function(recipientEmail, recipientName) {
+            activeChatRecipient = recipientEmail;
+            activeChatRecipientName = recipientName;
+            document.getElementById('chat-header-name').innerText = recipientName;
+            document.getElementById('chat-header-avatar').innerText = recipientName[0].toUpperCase();
+            document.getElementById('single-chat-modal').classList.remove('hidden');
+
+            const user = auth.currentUser;
+            const chatId = [user.email, recipientEmail].sort().join('_').replace(/[^a-zA-Z0-9]/g, '');
+
+            if (chatMessagesUnsubscribe) chatMessagesUnsubscribe();
+
+            chatMessagesUnsubscribe = onSnapshot(doc(db, "chats", chatId), (docSnap) => {
+                const chatBox = document.getElementById('single-chat-messages');
+                if (!docSnap.exists()) {
+                    chatBox.innerHTML = '<div class="text-center text-gray-500 py-8">Say hello to ' + recipientName + '!</div>';
+                    return;
+                }
+                const msgs = docSnap.data().messages || [];
+                chatBox.innerHTML = msgs.map(m => {
+                    const isMe = m.sender === user.email;
+                    return `
+                        <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                            <div class="max-w-[75%] px-3.5 py-2 rounded-2xl ${isMe ? 'bg-white text-black font-medium' : 'clay-card text-white'}">
+                                ${m.text}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        };
+
+        window.closeSingleChat = function() {
+            if (chatMessagesUnsubscribe) {
+                chatMessagesUnsubscribe();
+                chatMessagesUnsubscribe = null;
+            }
+            activeChatRecipient = null;
+            document.getElementById('single-chat-modal').classList.add('hidden');
+        };
+
+        window.sendDirectMessage = async function() {
+            const input = document.getElementById('single-chat-input');
+            const txt = input.value.trim();
+            const user = auth.currentUser;
+            if (!txt || !user || !activeChatRecipient) return;
+
+            const chatId = [user.email, activeChatRecipient].sort().join('_').replace(/[^a-zA-Z0-9]/g, '');
+            const chatRef = doc(db, "chats", chatId);
+
+            try {
+                const snap = await getDoc(chatRef);
+                const msgObj = { sender: user.email, text: txt, time: Date.now() };
+
+                if (!snap.exists()) {
+                    await setDoc(chatRef, { messages: [msgObj] });
+                } else {
+                    await updateDoc(chatRef, { messages: arrayUnion(msgObj) });
+                }
+                input.value = '';
+            } catch(e) {
+                showToast("Message error: " + e.message);
+            }
+        };
+
         window.openLiveCamera = async function() {
             const modal = document.getElementById('inapp-camera-modal');
             if (modal) modal.classList.remove('hidden');
@@ -674,7 +908,6 @@
                     cameraMediaStream = null;
                 }
 
-                // Pehle basic video try karega (microphone failure se bachaane ke liye)
                 let stream = null;
                 try {
                     stream = await navigator.mediaDevices.getUserMedia({
@@ -682,7 +915,6 @@
                         audio: false
                     });
                 } catch(camErr) {
-                    // Agar specific facingMode fail ho toh bina constraint ke try karega
                     stream = await navigator.mediaDevices.getUserMedia({
                         video: true,
                         audio: false
@@ -700,7 +932,7 @@
                 }
             } catch(e) {
                 console.error("Camera Error:", e);
-                alert("Camera Error: " + (e.name || "Error") + " - " + (e.message || "Cannot access device camera"));
+                alert("Camera Error: " + (e.name || "Error") + " - " + (e.message || "Cannot access camera"));
                 if (modal) modal.classList.add('hidden');
             }
         };
@@ -751,16 +983,13 @@
 
         window.toggleVideoRecording = async function() {
             if (!isRecordingVideo) {
-                // Audio track add karne ki koshish karein recording ke liye
                 try {
                     const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     const audioTrack = audioStream.getAudioTracks()[0];
                     if (audioTrack && cameraMediaStream) {
                         cameraMediaStream.addTrack(audioTrack);
                     }
-                } catch(e) {
-                    console.warn("Audio recording disabled:", e);
-                }
+                } catch(e) {}
                 startVideoRecording();
             } else {
                 stopVideoRecording();
@@ -849,8 +1078,8 @@
             isVideoMuted = !isVideoMuted;
             vid.muted = isVideoMuted;
             btn.innerHTML = isVideoMuted 
-                ? `<i class="fa-solid fa-volume-xmark text-red-500"></i>` 
-                : `<i class="fa-solid fa-volume-high text-white"></i>`;
+                ? '<i class="fa-solid fa-volume-xmark text-red-500"></i>' 
+                : '<i class="fa-solid fa-volume-high text-white"></i>';
             showToast(isVideoMuted ? "Video Muted" : "Sound Enabled");
         };
 
@@ -905,7 +1134,6 @@
             }
         };
 
-        // Cloud Media Publisher
         window.publishContent = async function() {
             const user = auth.currentUser;
             if (!user) { showToast("Login required!"); return; }
@@ -1000,7 +1228,6 @@
             }
         };
 
-        // Delete Posts & Reels Handler
         window.deleteCloudMedia = async function(col, docId, authorEmail) {
             const user = auth.currentUser;
             if (!user) return;
@@ -1021,7 +1248,6 @@
             }
         };
 
-        // Posts Loader
         window.loadCloudPosts = async function() {
             const container = document.getElementById('posts-container');
             const profileGrid = document.getElementById('profile-grid');
@@ -1039,7 +1265,7 @@
 
                     const myPosts = posts.filter(p => p.authorEmail === user.email);
                     document.getElementById('stat-posts').innerText = myPosts.length;
-                    profileGrid.innerHTML = myPosts.length === 0 ? `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No posts yet</div>` : myPosts.map(p => `
+                    profileGrid.innerHTML = myPosts.length === 0 ? '<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No posts yet</div>' : myPosts.map(p => `
                         <div class="h-28 clay-card rounded-xl overflow-hidden flex items-center justify-center">
                             ${p.mediaType === 'video' ? `<video src="${p.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${p.mediaUrl}" style="filter: ${p.filter || 'none'}" class="w-full h-full object-cover">`}
                         </div>
@@ -1047,7 +1273,7 @@
                 }
 
                 if (posts.length === 0) {
-                    container.innerHTML = `<div class="text-center text-gray-500 py-10 text-xs">No posts yet. Tap + to upload!</div>`;
+                    container.innerHTML = '<div class="text-center text-gray-500 py-10 text-xs">No posts yet. Tap + to upload!</div>';
                     return;
                 }
 
@@ -1096,11 +1322,10 @@
                 `;
                 }).join('');
             } catch(e) {
-                container.innerHTML = `<div class="text-center text-gray-500 py-10 text-xs">No posts available right now</div>`;
+                container.innerHTML = '<div class="text-center text-gray-500 py-10 text-xs">No posts available right now</div>';
             }
         };
 
-        // Reels Loader
         window.loadCloudReels = async function() {
             const container = document.getElementById('reels-container');
             try {
@@ -1110,7 +1335,7 @@
                 reels.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
 
                 if (reels.length === 0) {
-                    container.innerHTML = `<div class="text-center text-gray-500 py-12 text-xs">No reels found.</div>`;
+                    container.innerHTML = '<div class="text-center text-gray-500 py-12 text-xs">No reels found.</div>';
                     return;
                 }
 
@@ -1160,7 +1385,6 @@
             } catch(e) {}
         };
 
-        // Stories Tray & Full-Screen Viewer
         window.loadCloudStories = async function() {
             const tray = document.getElementById('stories-tray');
             try {
@@ -1174,20 +1398,25 @@
                 stories.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
 
                 if (stories.length === 0) {
-                    tray.innerHTML = `<span class="text-xs text-gray-500 px-2">No active stories</span>`;
+                    tray.innerHTML = '<span class="text-xs text-gray-500 px-2">No active stories</span>';
                     return;
                 }
 
-                tray.innerHTML = stories.map(s => `
-                    <div class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0" onclick='viewInstagramStory(${JSON.stringify(s)})'>
-                        <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-white to-gray-500 flex items-center justify-center">
-                            <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
-                                ${s.mediaType === 'video' ? `<video src="${s.mediaUrl}" class="w-full h-full object-cover"></video>` : `<img src="${s.mediaUrl}" style="filter: ${s.filter || 'none'}" class="w-full h-full object-cover">`}
+                tray.innerHTML = stories.map(s => {
+                    const mediaTag = s.mediaType === 'video'
+                        ? '<video src="' + s.mediaUrl + '" class="w-full h-full object-cover"></video>'
+                        : '<img src="' + s.mediaUrl + '" style="filter: ' + (s.filter || 'none') + '" class="w-full h-full object-cover">';
+                    return `
+                        <div class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0" onclick='viewInstagramStory(${JSON.stringify(s)})'>
+                            <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-white to-gray-500 flex items-center justify-center">
+                                <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
+                                    ${mediaTag}
+                                </div>
                             </div>
+                            <span class="text-[10px] text-gray-300 truncate w-14 text-center">${s.author}</span>
                         </div>
-                        <span class="text-[10px] text-gray-300 truncate w-14 text-center">${s.author}</span>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } catch(e) {}
         };
 
@@ -1275,7 +1504,6 @@
             showToast("Story link copied!");
         };
 
-        // Explore Grid Loader
         window.loadExploreGrid = async function() {
             const grid = document.getElementById('explore-grid');
             grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">Loading popular explore feed...</div>';
@@ -1308,9 +1536,10 @@
                 }
 
                 grid.innerHTML = items.map(item => `
-                    <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 cursor-pointer" onclick="${item.col === 'reels' ? `switchTab('reels')` : `switchTab('home')`}">
+                    <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 cursor-pointer" onclick="${item.col === 'reels' ? 'switchTab(\'reels\')' : 'switchTab(\'home\')'}">
                         ${item.mediaType === 'video' 
-                            ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>` 
+                            ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>
+                               <span class="absolute top-1.5 right-1.5 bg-black/60 rounded-full px-1.5 py-0.5 text-[9px] text-white"><i class="fa-solid fa-play text-[8px]"></i></span>`
                             : `<img src="${item.mediaUrl}" style="filter: ${item.filter || 'none'}" class="w-full h-full object-cover">`
                         }
                         <div class="absolute bottom-1 left-1 bg-black/70 px-1.5 py-0.5 rounded text-[9px] text-white flex items-center space-x-1">
@@ -1324,7 +1553,6 @@
             }
         };
 
-        // Unified Real-Time Search
         window.handleGlobalSearch = async function(e) {
             const q = e.target.value.toLowerCase().trim();
             const grid = document.getElementById('explore-grid');
@@ -1400,9 +1628,9 @@
                 }
 
                 if (matchedMedia.length > 0) {
-                    html += `<div class="col-span-3 pt-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">Posts & Videos</div>`;
+                    html += '<div class="col-span-3 pt-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">Posts & Videos</div>';
                     html += matchedMedia.map(item => `
-                        <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 cursor-pointer" onclick="${item.col === 'reels' ? `switchTab('reels')` : `switchTab('home')`}">
+                        <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 cursor-pointer" onclick="${item.col === 'reels' ? 'switchTab(\'reels\')' : 'switchTab(\'home\')'}">
                             ${item.mediaType === 'video' 
                                 ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>` 
                                 : `<img src="${item.mediaUrl}" style="filter: ${item.filter || 'none'}" class="w-full h-full object-cover">`
@@ -1420,7 +1648,6 @@
             }
         };
 
-        // WebRTC Live Stream
         window.loadActiveLiveHub = async function() {
             const container = document.getElementById('live-streams-list');
             try {
@@ -1429,7 +1656,7 @@
                 snap.forEach(d => streams.push({ id: d.id, ...d.data() }));
 
                 if (streams.length === 0) {
-                    container.innerHTML = `<div class="text-center text-gray-500 py-12 text-xs">No active live streams right now.</div>`;
+                    container.innerHTML = '<div class="text-center text-gray-500 py-12 text-xs">No active live streams right now.</div>';
                     return;
                 }
 
@@ -1597,7 +1824,6 @@
             loadActiveLiveHub();
         };
 
-        // Mutual Follow System
         window.toggleFollowUserCloud = async function(targetName, targetEmail) {
             const user = auth.currentUser;
             if (!user || user.email === targetEmail) return;
@@ -1633,7 +1859,7 @@
             const user = auth.currentUser;
             if (!user) return;
 
-            list.innerHTML = `<div class="text-center text-gray-500 py-4">Loading...</div>`;
+            list.innerHTML = '<div class="text-center text-gray-500 py-4">Loading...</div>';
             document.getElementById('follow-modal').classList.remove('hidden');
 
             try {
@@ -1655,7 +1881,7 @@
                     </div>
                 `).join('');
             } catch(e) {
-                list.innerHTML = `<div class="text-center text-gray-500 py-4">Failed to load</div>`;
+                list.innerHTML = '<div class="text-center text-gray-500 py-4">Failed to load</div>';
             }
         };
 
@@ -1663,7 +1889,6 @@
             document.getElementById('follow-modal').classList.add('hidden');
         };
 
-        // Likes, Saves, Comments
         window.toggleCloudLike = async function(col, id) {
             const user = auth.currentUser;
             if (!user) return;
@@ -1716,7 +1941,7 @@
                 const snap = await getDocs(collection(db, activeCommentCol));
                 let comments = [];
                 snap.forEach(d => { if (d.id === activeCommentId) comments = d.data().comments || []; });
-                list.innerHTML = comments.length === 0 ? `<div class="text-center text-gray-500 py-6">No comments yet.</div>` : comments.map(c => `
+                list.innerHTML = comments.length === 0 ? '<div class="text-center text-gray-500 py-6">No comments yet.</div>' : comments.map(c => `
                     <div class="p-2.5 clay-card space-y-0.5">
                         <span class="font-bold text-white text-[11px]">${c.user}</span>
                         <p class="text-gray-300 text-xs">${c.text}</p>
@@ -1739,7 +1964,6 @@
             } catch(e) {}
         };
 
-        // Profile Tabs
         window.switchProfileTab = async function(tab) {
             const grid = document.getElementById('profile-grid');
             const user = auth.currentUser;
@@ -1754,7 +1978,7 @@
                 const snap = await getDocs(collection(db, "reels"));
                 const myReels = [];
                 snap.forEach(d => { const r = d.data(); if(r.authorEmail === user.email) myReels.push(r); });
-                grid.innerHTML = myReels.length === 0 ? `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No reels yet</div>` : myReels.map(r => `
+                grid.innerHTML = myReels.length === 0 ? '<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No reels yet</div>' : myReels.map(r => `
                     <div class="h-28 clay-card rounded-xl overflow-hidden flex items-center justify-center">
                         <video src="${r.videoUrl}" class="w-full h-full object-cover"></video>
                     </div>
@@ -1763,7 +1987,7 @@
                 const snap = await getDocs(collection(db, "posts"));
                 const saved = [];
                 snap.forEach(d => { const p = d.data(); if((p.savedBy || []).includes(user.email)) saved.push(p); });
-                grid.innerHTML = saved.length === 0 ? `<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No saved posts</div>` : saved.map(p => `
+                grid.innerHTML = saved.length === 0 ? '<div class="text-center text-gray-500 col-span-3 py-6 text-xs">No saved posts</div>' : saved.map(p => `
                     <div class="h-28 clay-card rounded-xl overflow-hidden flex items-center justify-center">
                         <img src="${p.mediaUrl}" class="w-full h-full object-cover">
                     </div>
@@ -1773,7 +1997,6 @@
             }
         };
 
-        // Authentication State
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('auth-modal').classList.add('hidden');
