@@ -155,7 +155,8 @@
                 </span>
                 <div class="flex items-center space-x-3">
                     <span id="profile-privacy-badge" class="text-[10px] bg-zinc-800 px-2 py-0.5 rounded-full text-gray-400 font-semibold hidden">Private</span>
-                    <button onclick="openSettingsModal()" class="text-white text-lg icon-btn p-1">
+                    <!-- Top Three-line Settings Button -->
+                    <button type="button" onclick="openSettingsModal()" class="text-white text-lg icon-btn p-2 cursor-pointer z-20">
                         <i class="fa-solid fa-bars"></i>
                     </button>
                 </div>
@@ -240,7 +241,7 @@
                 </div>
             </div>
 
-            <!-- Private Account Locked Notice -->
+            <!-- Private Account Notice -->
             <div id="pub-private-locked" class="clay-card p-8 text-center space-y-2 hidden">
                 <i class="fa-solid fa-lock text-3xl text-gray-500 mb-2"></i>
                 <h3 class="text-sm font-bold text-white">This account is private</h3>
@@ -332,7 +333,7 @@
         </div>
     </div>
 
-    <!-- EDIT PROFILE MODAL (WITH 10-DAY LOCK & DP CHANGER) -->
+    <!-- EDIT PROFILE MODAL (10-DAY LOCK & DP CHANGER) -->
     <div id="modal-edit-profile" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="closeEditProfileModal()">
         <div class="clay-card w-full max-w-md rounded-t-3xl p-5 space-y-4" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -443,7 +444,6 @@
                 <video id="story-vid" class="w-full h-full object-cover hidden" playsinline></video>
             </div>
 
-            <!-- Touch Zones (Left = Prev, Right = Next) -->
             <div class="absolute inset-y-16 inset-x-0 z-20 flex">
                 <div id="story-zone-prev" class="w-1/2 h-full cursor-pointer"></div>
                 <div id="story-zone-next" class="w-1/2 h-full cursor-pointer"></div>
@@ -579,7 +579,7 @@
         </div>
     </div>
 
-    <!-- AUTH MODAL (WITH LIVE USERNAME GREEN TICK & FORGOT PASS) -->
+    <!-- AUTH MODAL -->
     <div id="modal-auth" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
         <div class="clay-card p-6 w-full max-w-sm space-y-3.5">
             <h2 class="text-3xl font-black text-center text-white">IB65</h2>
@@ -587,7 +587,6 @@
             
             <input type="text" id="auth-input-name" placeholder="Full Name" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
             
-            <!-- Handle with Real-time Availability Check -->
             <div>
                 <div class="relative flex items-center">
                     <input type="text" id="auth-input-handle" oninput="checkSignupHandleAvailability(event)" placeholder="Username (@handle)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 pr-8 text-xs text-white">
@@ -671,6 +670,119 @@
         window.auth = auth;
         window.db = db;
 
+        // GLOBAL MODAL CONTROLLERS (FIX FOR THREE-DOTS MENU & DRAWERS)
+        window.openSettingsModal = function() {
+            const m = document.getElementById('modal-settings');
+            if (m) m.classList.remove('hidden');
+        };
+        window.closeSettingsModal = function() {
+            const m = document.getElementById('modal-settings');
+            if (m) m.classList.add('hidden');
+        };
+
+        window.openEditProfileModal = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
+            try {
+                const snap = await getDoc(doc(db, "users", user.email));
+                if (snap.exists()) {
+                    const d = snap.data();
+                    document.getElementById('edit-input-name').value = d.name || '';
+                    document.getElementById('edit-input-bio').value = d.bio || '';
+
+                    const handleInput = document.getElementById('edit-input-handle');
+                    const handleStatus = document.getElementById('edit-handle-status-icon');
+                    const handleNotice = document.getElementById('edit-handle-notice');
+                    handleInput.value = d.handle || '';
+
+                    const lastChange = d.lastHandleChange || 0;
+                    const diff = Date.now() - lastChange;
+                    const cooldown = 864000000;
+
+                    if (diff < cooldown && lastChange !== 0) {
+                        const daysLeft = Math.ceil((cooldown - diff) / 86400000);
+                        handleInput.disabled = true;
+                        handleStatus.innerHTML = '<i class="fa-solid fa-lock text-gray-500"></i>';
+                        handleNotice.innerText = `Username is locked. You can change it again in ${daysLeft} days.`;
+                        handleNotice.className = "text-[10px] text-yellow-500 mt-1 block font-semibold";
+                    } else {
+                        handleInput.disabled = false;
+                        handleStatus.innerHTML = '';
+                        handleNotice.innerText = "You can change your username once every 10 days.";
+                        handleNotice.className = "text-[10px] text-gray-400 mt-1 block";
+                    }
+
+                    const avBox = document.getElementById('edit-avatar-preview');
+                    if (d.photoUrl) {
+                        avBox.innerHTML = `<img src="${d.photoUrl}" class="w-full h-full object-cover">`;
+                    } else {
+                        avBox.innerHTML = `<span class="text-2xl font-bold">${(d.name || 'U')[0].toUpperCase()}</span>`;
+                    }
+                }
+            } catch(e) {}
+            document.getElementById('modal-edit-profile').classList.remove('hidden');
+        };
+
+        window.closeEditProfileModal = function() {
+            document.getElementById('modal-edit-profile').classList.add('hidden');
+        };
+
+        window.openProfessionalDashboard = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
+            document.getElementById('modal-pro-dashboard').classList.remove('hidden');
+
+            try {
+                const uDoc = await getDoc(doc(db, "users", user.email));
+                const ud = uDoc.data() || {};
+                const totalViews = ud.totalViews || 0;
+                const totalShares = ud.totalShares || 0;
+                const totalSeconds = ud.totalWatchSeconds || 0;
+                const totalHours = (totalSeconds / 3600).toFixed(2);
+
+                document.getElementById('dash-total-reach').innerText = `${totalViews} Unique Accounts Reached`;
+                document.getElementById('dash-stat-views').innerText = totalViews;
+                document.getElementById('dash-stat-shares').innerText = totalShares;
+                document.getElementById('dash-stat-watch').innerText = `${totalHours}h`;
+
+                const [pSnap, rSnap] = await Promise.all([
+                    getDocs(collection(db, "posts")),
+                    getDocs(collection(db, "reels"))
+                ]);
+                const myVids = [];
+                const grabVids = (snap, col) => {
+                    snap.forEach(d => {
+                        const data = d.data();
+                        if (data.authorEmail === user.email && (data.mediaType === 'video' || col === 'reels')) {
+                            myVids.push({ id: d.id, ...data });
+                        }
+                    });
+                };
+                grabVids(pSnap, 'posts');
+                grabVids(rSnap, 'reels');
+
+                const list = document.getElementById('dash-breakdown-list');
+                list.innerHTML = myVids.length === 0 ? '<div class="text-center text-gray-500 py-6 text-xs">No video data available</div>' : myVids.map(v => `
+                    <div class="clay-card p-3 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800">
+                                <video src="${v.mediaUrl || v.videoUrl}#t=0.001" class="w-full h-full object-cover"></video>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white line-clamp-1">${v.caption || 'Untitled'}</p>
+                                <p class="text-[10px] text-gray-400">👁️ ${v.views || 0} unique • 🔗 ${v.shares || 0} shares</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-extrabold text-blue-400">${(((v.watchSeconds || 0)) / 3600).toFixed(2)}h</span>
+                    </div>
+                `).join('');
+            } catch(e) {}
+        };
+
+        window.closeProfessionalDashboard = function() {
+            document.getElementById('modal-pro-dashboard').classList.add('hidden');
+        };
+
         let currentTab = 'home';
         let uploadType = 'post';
         let profileGridTab = 'uploads';
@@ -678,26 +790,17 @@
         let selectedFileUrl = '';
         let selectedFileType = 'image';
 
-        // Story Queue
         let storiesQueue = [];
         let currentStoryIndex = 0;
         let storyTimer = null;
-
-        // Active Trackers & State
         let isSignupHandleAvailable = false;
         let isEditHandleAvailable = true;
-        let activeDirectRecipient = null;
-        let chatSnapshotUnsub = null;
         let watchIntervals = {};
 
-        // WebRTC Live
         let peerInstance = null;
         let activeLiveStreamId = null;
         let isHostingLive = false;
         let localStreamMedia = null;
-        let liveSnapshotUnsub = null;
-        let liveHeartbeatInterval = null;
-
         let reelsObserver = null;
         let feedVideosObserver = null;
 
@@ -759,7 +862,6 @@
             }, { passive: false });
         }
 
-        // AUTH & USER STATE
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('modal-auth').classList.add('hidden');
@@ -787,7 +889,6 @@
             } catch(e) {}
         }
 
-        // SIGNUP HANDLE LIVE AVAILABILITY CHECK (GREEN TICK / RED ERROR)
         let signupHandleTimer = null;
         window.checkSignupHandleAvailability = function(e) {
             clearTimeout(signupHandleTimer);
@@ -833,8 +934,8 @@
                 return; 
             }
             if (!isSignupHandleAvailable) {
-                showToast("Choose an available unique username!");
-                return;
+                showToast("Choose an available unique username!"); 
+                return; 
             }
 
             try {
@@ -880,7 +981,7 @@
         window.handleForgotPassword = async function() {
             const email = document.getElementById('auth-input-email').value.trim();
             if (!email) {
-                showToast("Pehle apna registered Gmail enter karein!");
+                showToast("Pehle registered Gmail enter karein!");
                 return;
             }
             try {
@@ -899,7 +1000,6 @@
             loadPostsFeed();
         }
 
-        // STORIES LIFECYCLE (24h AUTO-ARCHIVE & 30-DAY PURGE)
         async function loadStoriesTray() {
             const tray = document.getElementById('stories-tray-items');
             try {
@@ -911,32 +1011,23 @@
                     const s = { id: d.id, ...d.data() };
                     const age = now - (s.createdAt || 0);
 
-                    // 1. If 24 hours passed naturally -> auto-archive
                     if (age >= 86400000 && !s.isArchived) {
-                        updateDoc(doc(db, "stories", s.id), {
-                            isArchived: true,
-                            archivedAt: now
-                        }).catch(()=>{});
-                    }
-                    // 2. If active and under 24 hours -> display in tray
-                    else if (age < 86400000 && !s.isArchived) {
+                        updateDoc(doc(db, "stories", s.id), { isArchived: true, archivedAt: now }).catch(()=>{});
+                    } else if (age < 86400000 && !s.isArchived) {
                         stories.push(s);
                     }
-                    // 3. If archived for 30 days -> permanently delete
                     if (s.isArchived && (now - (s.archivedAt || s.createdAt || 0)) >= 2592000000) {
                         deleteDoc(doc(db, "stories", s.id)).catch(()=>{});
                     }
                 });
 
                 stories.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
-
                 if (stories.length === 0) {
                     tray.innerHTML = '<span class="text-[11px] text-gray-500 pl-2">No active stories</span>';
                     return;
                 }
 
                 storiesQueue = stories;
-
                 tray.innerHTML = stories.map((s, idx) => {
                     const rawAuthor = (s.author || s.handle || 'Creator').replace(/^@+/, '');
                     const isVid = s.mediaType === 'video';
@@ -1012,7 +1103,6 @@
             }, 7000);
         }
 
-        // Tap zones for Left & Right navigation
         document.getElementById('story-zone-prev').addEventListener('click', (e) => {
             e.stopPropagation();
             if (currentStoryIndex > 0) openStoryQueueIndex(currentStoryIndex - 1);
@@ -1036,7 +1126,6 @@
             if (!confirm("Permanently delete this story? (Will NOT go to archive)")) return;
 
             try {
-                // Immediate permanent deletion without saving to archive
                 await deleteDoc(doc(db, "stories", st.id));
                 showToast("Story permanently deleted");
                 closeStory();
@@ -1082,7 +1171,6 @@
             document.getElementById('modal-archive').classList.add('hidden');
         };
 
-        // COMBINED FEED (WITH INSTAGRAM CAPTION, BOOKMARKS & STRICT UNIQUE VIEWS)
         async function loadPostsFeed() {
             const container = document.getElementById('posts-stream');
             try {
@@ -1187,7 +1275,6 @@
                                     <i class="fa-solid fa-paper-plane text-base"></i>
                                 </button>
                             </div>
-                            <!-- Bookmark/Save Button -->
                             <button onclick="toggleSavePost('${p.id}')" class="icon-btn">
                                 <i class="${isSaved ? 'fa-solid text-white' : 'fa-regular text-gray-400'} fa-bookmark text-lg"></i>
                             </button>
@@ -1205,18 +1292,15 @@
             } catch(e) {}
         }
 
-        // STRICT UNIQUE VIEWS & WATCH HOURS ENGINE
         window.startWatchTracking = async function(col, docId, authorEmail) {
             const user = auth.currentUser;
             if (!user) return;
 
-            // Self-view restriction: Do not count views for your own video
             if (user.email !== authorEmail) {
                 try {
                     const snap = await getDoc(doc(db, col, docId));
                     if (snap.exists()) {
                         const viewed = snap.data().viewedUsers || [];
-                        // STRICT RULE: Only increment view if watching for the very first time
                         if (!viewed.includes(user.email)) {
                             await updateDoc(doc(db, col, docId), {
                                 viewedUsers: arrayUnion(user.email),
@@ -1230,7 +1314,6 @@
                 } catch(e) {}
             }
 
-            // Continuous Real Watch Time Accumulation
             clearInterval(watchIntervals[docId]);
             watchIntervals[docId] = setInterval(async () => {
                 try {
@@ -1246,7 +1329,6 @@
             clearInterval(watchIntervals[docId]);
         };
 
-        // BOOKMARK / SAVE FUNCTIONALITY
         window.toggleSavePost = async function(postId) {
             const user = auth.currentUser;
             if (!user) return;
@@ -1265,58 +1347,6 @@
                 }
                 loadPostsFeed();
             } catch(e) {}
-        };
-
-        // PROFILE EDIT WITH 10-DAY LOCK & DP CHANGER
-        window.openEditProfileModal = async function() {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            try {
-                const snap = await getDoc(doc(db, "users", user.email));
-                if (snap.exists()) {
-                    const d = snap.data();
-                    document.getElementById('edit-input-name').value = d.name || '';
-                    document.getElementById('edit-input-bio').value = d.bio || '';
-
-                    const handleInput = document.getElementById('edit-input-handle');
-                    const handleStatus = document.getElementById('edit-handle-status-icon');
-                    const handleNotice = document.getElementById('edit-handle-notice');
-
-                    handleInput.value = d.handle || '';
-
-                    // 10-Day Cooldown Calculation (864,000,000 ms)
-                    const lastChange = d.lastHandleChange || 0;
-                    const diff = Date.now() - lastChange;
-                    const cooldown = 864000000;
-
-                    if (diff < cooldown && lastChange !== 0) {
-                        const daysLeft = Math.ceil((cooldown - diff) / 86400000);
-                        handleInput.disabled = true;
-                        handleStatus.innerHTML = '<i class="fa-solid fa-lock text-gray-500"></i>';
-                        handleNotice.innerText = `Username is locked. You can change it again in ${daysLeft} days.`;
-                        handleNotice.className = "text-[10px] text-yellow-500 mt-1 block font-semibold";
-                    } else {
-                        handleInput.disabled = false;
-                        handleStatus.innerHTML = '';
-                        handleNotice.innerText = "You can change your username once every 10 days.";
-                        handleNotice.className = "text-[10px] text-gray-400 mt-1 block";
-                    }
-
-                    // Avatar Preview
-                    const avBox = document.getElementById('edit-avatar-preview');
-                    if (d.photoUrl) {
-                        avBox.innerHTML = `<img src="${d.photoUrl}" class="w-full h-full object-cover">`;
-                    } else {
-                        avBox.innerHTML = `<span class="text-2xl font-bold">${(d.name || 'U')[0].toUpperCase()}</span>`;
-                    }
-                }
-            } catch(e) {}
-            document.getElementById('modal-edit-profile').classList.remove('hidden');
-        };
-
-        window.closeEditProfileModal = function() {
-            document.getElementById('modal-edit-profile').classList.add('hidden');
         };
 
         let editHandleTimer = null;
@@ -1396,7 +1426,7 @@
                 const payload = { name: newName, bio: newBio };
                 if (!isInputDisabled && newHandle !== oldHandle) {
                     payload.handle = newHandle;
-                    payload.lastHandleChange = Date.now(); // reset 10-day cooldown
+                    payload.lastHandleChange = Date.now();
                 }
 
                 await updateDoc(doc(db, "users", user.email), payload);
@@ -1407,7 +1437,6 @@
             } catch(e) { showToast(e.message); }
         };
 
-        // PROFILE PHOTO VIEWER & DP LIKES
         window.openProfilePhotoViewer = async function(photoUrl) {
             if (!photoUrl) return;
             document.getElementById('viewer-dp-image').src = photoUrl;
@@ -1446,7 +1475,6 @@
             } catch(e) {}
         };
 
-        // PRIVACY AUTO-CONVERSION PROTOCOL
         window.togglePrivacySetting = async function() {
             const user = auth.currentUser;
             if (!user) return;
@@ -1457,10 +1485,7 @@
                 const isPriv = !snap.data()?.isPrivate;
 
                 const payload = { isPrivate: isPriv };
-                // Strict Rule: If turning Private, automatically convert to Personal Account
-                if (isPriv) {
-                    payload.accountType = 'personal';
-                }
+                if (isPriv) payload.accountType = 'personal';
 
                 await updateDoc(uRef, payload);
                 showToast(isPriv ? "Account is now PRIVATE (Shifted to Personal)" : "Account is now PUBLIC");
@@ -1480,10 +1505,7 @@
                 const next = cur === 'professional' ? 'personal' : 'professional';
 
                 const payload = { accountType: next };
-                // Professional accounts cannot be private
-                if (next === 'professional') {
-                    payload.isPrivate = false;
-                }
+                if (next === 'professional') payload.isPrivate = false;
 
                 await updateDoc(uRef, payload);
                 showToast(`Switched to ${next.toUpperCase()} Account`);
@@ -1492,7 +1514,6 @@
             } catch(e) {}
         };
 
-        // FOLLOW REQUESTS & PRIVATE ACCOUNT PROTECTION
         window.handleFollowButtonAction = async function(targetEmail) {
             const user = auth.currentUser;
             if (!user || user.email === targetEmail) return;
@@ -1506,14 +1527,11 @@
                 const targetData = targetSnap.data() || {};
                 const targetRequests = targetData.followRequests || [];
 
-                // Already Following -> Unfollow
                 if (myFollowing.includes(targetEmail)) {
                     await updateDoc(myRef, { followingList: arrayRemove(targetEmail), following: increment(-1) });
                     await updateDoc(targetRef, { followersList: arrayRemove(user.email), followers: increment(-1) });
                     showToast("Unfollowed");
-                }
-                // Target is Private -> Send / Cancel Follow Request
-                else if (targetData.isPrivate) {
+                } else if (targetData.isPrivate) {
                     if (targetRequests.includes(user.email)) {
                         await updateDoc(targetRef, { followRequests: arrayRemove(user.email) });
                         showToast("Follow request cancelled");
@@ -1521,9 +1539,7 @@
                         await updateDoc(targetRef, { followRequests: arrayUnion(user.email) });
                         showToast("Follow request sent");
                     }
-                }
-                // Public Account -> Direct Follow
-                else {
+                } else {
                     await updateDoc(myRef, { followingList: arrayUnion(targetEmail), following: increment(1) });
                     await updateDoc(targetRef, { followersList: arrayUnion(user.email), followers: increment(1) });
                     showToast("Following");
@@ -1609,7 +1625,6 @@
             } catch(e) {}
         };
 
-        // PUBLIC PROFILE VIEW WITH PRIVACY LOCKS
         window.openPublicProfile = async function(email) {
             const user = auth.currentUser;
             if (user && user.email === email) {
@@ -1660,7 +1675,6 @@
                 document.getElementById('pub-private-locked').classList.toggle('hidden', !isLocked);
                 document.getElementById('pub-media-grid').classList.toggle('hidden', isLocked);
 
-                // Lock followers list click if private
                 document.getElementById('pub-box-followers').onclick = () => {
                     if (isLocked) showToast("Follow this account to see followers");
                     else openFollowListModal(email, 'followers');
@@ -1693,7 +1707,6 @@
             } catch(e) {}
         };
 
-        // MY PROFILE & SAVED POSTS
         async function loadMyProfile() {
             const user = auth.currentUser;
             if (!user) return;
@@ -1795,65 +1808,6 @@
             } catch(e) {}
         }
 
-        // PROFESSIONAL DASHBOARD (ORIGINAL WATCH HOURS & UNIQUE VIEWS)
-        window.openProfessionalDashboard = async function() {
-            const user = auth.currentUser;
-            if (!user) return;
-            document.getElementById('modal-pro-dashboard').classList.remove('hidden');
-
-            try {
-                const uDoc = await getDoc(doc(db, "users", user.email));
-                const ud = uDoc.data() || {};
-
-                const totalViews = ud.totalViews || 0;
-                const totalShares = ud.totalShares || 0;
-                const totalSeconds = ud.totalWatchSeconds || 0;
-                const totalHours = (totalSeconds / 3600).toFixed(2);
-
-                document.getElementById('dash-total-reach').innerText = `${totalViews} Unique Accounts Reached`;
-                document.getElementById('dash-stat-views').innerText = totalViews;
-                document.getElementById('dash-stat-shares').innerText = totalShares;
-                document.getElementById('dash-stat-watch').innerText = `${totalHours}h`;
-
-                const [pSnap, rSnap] = await Promise.all([
-                    getDocs(collection(db, "posts")),
-                    getDocs(collection(db, "reels"))
-                ]);
-                const myVids = [];
-                const grabVids = (snap, col) => {
-                    snap.forEach(d => {
-                        const data = d.data();
-                        if (data.authorEmail === user.email && (data.mediaType === 'video' || col === 'reels')) {
-                            myVids.push({ id: d.id, ...data });
-                        }
-                    });
-                };
-                grabVids(pSnap, 'posts');
-                grabVids(rSnap, 'reels');
-
-                const list = document.getElementById('dash-breakdown-list');
-                list.innerHTML = myVids.length === 0 ? '<div class="text-center text-gray-500 py-6 text-xs">No video data available</div>' : myVids.map(v => `
-                    <div class="clay-card p-3 flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-12 h-12 bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800">
-                                <video src="${v.mediaUrl || v.videoUrl}#t=0.001" class="w-full h-full object-cover"></video>
-                            </div>
-                            <div>
-                                <p class="text-xs font-bold text-white line-clamp-1">${v.caption || 'Untitled'}</p>
-                                <p class="text-[10px] text-gray-400">👁️ ${v.views || 0} unique • 🔗 ${v.shares || 0} shares</p>
-                            </div>
-                        </div>
-                        <span class="text-xs font-extrabold text-blue-400">${(((v.watchSeconds || 0)) / 3600).toFixed(2)}h</span>
-                    </div>
-                `).join('');
-            } catch(e) {}
-        };
-
-        window.closeProfessionalDashboard = function() {
-            document.getElementById('modal-pro-dashboard').classList.add('hidden');
-        };
-
-        // PUBLISH WITH MANDATORY CAPTION
         window.publishMedia = async function() {
             const user = auth.currentUser;
             if (!user) { showToast("Login required!"); return; }
@@ -1932,7 +1886,6 @@
             }
         };
 
-        // LIVE BROADCAST ENGINE WITH 24H REPLAY STORY
         window.startBroadcast = async function() {
             const user = auth.currentUser;
             if (!user) { showToast("Login to broadcast live!"); return; }
@@ -1946,9 +1899,7 @@
                 isHostingLive = true;
 
                 if (peerInstance) peerInstance.destroy();
-                peerInstance = new Peer({
-                    config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
-                });
+                peerInstance = new Peer({ config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } });
 
                 peerInstance.on('open', async (peerId) => {
                     const docRef = await addDoc(collection(db, "lives"), {
@@ -1981,7 +1932,6 @@
                 const user = auth.currentUser;
                 await deleteDoc(doc(db, "lives", activeLiveStreamId)).catch(()=>{});
                 
-                // Add to 24-hour Live Replay Story
                 await addDoc(collection(db, "stories"), {
                     author: user.displayName || user.email.split('@')[0],
                     authorEmail: user.email,
@@ -1993,7 +1943,7 @@
                     createdAt: Date.now()
                 }).catch(()=>{});
 
-                showToast("Live stream added to your story for 24h!");
+                showToast("Live stream added to story for 24h!");
             }
 
             if (localStreamMedia) {
