@@ -1,7 +1,7 @@
 {
   "name": "IB65 — Social Platform",
   "short_name": "IB65",
-  "description": "IB65 Social Universe & Creator Platform",
+  "description": "IB65 Social Universe and Creator Platform",
   "start_url": "https://sunny2001kk-cmd.github.io/IB65/",
   "scope": "https://sunny2001kk-cmd.github.io/IB65/",
   "display": "standalone",
@@ -10,15 +10,15 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23000000' stroke='%230099ff' stroke-width='16'/%3E%3Cpath d='M180 150 L256 60 L332 150 L380 90 L340 180 L172 180 L132 90 Z' fill='%230099ff'/%3E%3Ctext x='50%25' y='65%25' font-family='sans-serif' font-weight='900' font-size='155' font-style='italic' fill='%23ffffff' text-anchor='middle'%3EIB65%3C/text%3E%3Cpath d='M120 375 Q 256 325 392 375' stroke='%230099ff' stroke-width='14' fill='none' stroke-linecap='round'/%3E%3Ctext x='50%25' y='86%25' font-family='sans-serif' font-weight='700' font-size='24' fill='%23ffffff' letter-spacing='6' text-anchor='middle'%3E— SOCIAL PLATFORM —%3C/text%3E%3C/svg%3E",
+      "src": "https://dummyimage.com/192x192/000000/0099ff.png&text=IB65",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23000000' stroke='%230099ff' stroke-width='16'/%3E%3Cpath d='M180 150 L256 60 L332 150 L380 90 L340 180 L172 180 L132 90 Z' fill='%230099ff'/%3E%3Ctext x='50%25' y='65%25' font-family='sans-serif' font-weight='900' font-size='155' font-style='italic' fill='%23ffffff' text-anchor='middle'%3EIB65%3C/text%3E%3Cpath d='M120 375 Q 256 325 392 375' stroke='%230099ff' stroke-width='14' fill='none' stroke-linecap='round'/%3E%3Ctext x='50%25' y='86%25' font-family='sans-serif' font-weight='700' font-size='24' fill='%23ffffff' letter-spacing='6' text-anchor='middle'%3E— SOCIAL PLATFORM —%3C/text%3E%3C/svg%3E",
+      "src": "https://dummyimage.com/512x512/000000/0099ff.png&text=IB65",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
