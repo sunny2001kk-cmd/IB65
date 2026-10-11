@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IB65 — Social Universe</title>
+    <title>IB65 — Social Platform</title>
 
     <link rel="icon" type="image/png" sizes="192x192" href="./icon.png">
     <link rel="apple-touch-icon" href="./icon.png">
+    <link rel="manifest" href="./manifest.json">
 
     <meta name="theme-color" content="#000000">
     <meta name="mobile-web-app-capable" content="yes">
@@ -91,10 +92,10 @@
         </div>
     </header>
 
-    <!-- Main App Container -->
+    <!-- Main Container -->
     <main class="max-w-md mx-auto">
 
-        <!-- 1. HOME VIEW (Unified Feed) -->
+        <!-- 1. HOME VIEW -->
         <div id="view-home" class="space-y-3 pb-24">
             <div class="p-3 border-b border-zinc-900 overflow-x-auto flex space-x-3 items-center">
                 <div onclick="openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
@@ -213,7 +214,7 @@
                 </div>
             </div>
 
-            <!-- Profile Media Tabs (Uploads vs Saved) -->
+            <!-- Profile Media Tabs -->
             <div class="flex border-b border-zinc-800 text-center text-xs font-bold">
                 <button onclick="switchProfileGridTab('posts')" id="tab-profile-posts" class="flex-1 py-2.5 border-b-2 border-white text-white flex items-center justify-center space-x-1.5">
                     <i class="fa-solid fa-table-cells"></i>
@@ -696,14 +697,13 @@
         </div>
     </div>
 
-    <!-- AUTH & SIGNUP (With Real-Time Username Live Check) -->
+    <!-- AUTH & SIGNUP -->
     <div id="modal-auth" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
         <div class="clay-card p-6 w-full max-w-sm space-y-3">
             <h2 class="text-3xl font-black text-center text-white">IB65</h2>
             <p class="text-xs text-center text-gray-400">Social Universe</p>
             <input type="text" id="auth-input-name" placeholder="Full Name" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
             
-            <!-- Mandatory Username Input with Real-time Check -->
             <div>
                 <div class="relative">
                     <input type="text" id="auth-input-handle" oninput="checkHandleAvailability(this.value, 'signup')" placeholder="Unique Username (@handle)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white pr-9">
@@ -798,11 +798,9 @@
         let overlayText = '';
         let currentZoomScale = 1;
 
-        // Trimming state
         let trimStartSec = 0;
         let trimEndSec = 0;
 
-        // Camera State
         let cameraStream = null;
         let cameraFacing = 'environment';
         let mediaRecorder = null;
@@ -811,7 +809,6 @@
         let recordTimer = null;
         let recordDuration = 0;
 
-        // Editor state
         let editorVideoDuration = 0;
         let editorTimeInterval = null;
         const filterPresets = [
@@ -823,22 +820,18 @@
         ];
         let filterIndex = 0;
 
-        // Stories State
         let storiesQueue = [];
         let currentStoryIndex = 0;
         let storyTimer = null;
 
-        // Direct Messaging & Presence
         window.activePublicUserEmail = null;
         let activeDirectRecipient = null;
         let chatSnapshotUnsub = null;
         let presenceInterval = null;
 
-        // Comments
         let activeCommentCol = 'posts';
         let activeCommentDocId = null;
 
-        // Live WebRTC
         let peerInstance = null;
         let activeLiveStreamId = null;
         let isHostingLive = false;
@@ -846,12 +839,10 @@
         let liveSnapshotUnsub = null;
         let liveHeartbeatInterval = null;
 
-        // Observers & Active Watching
         let reelsObserver = null;
         let feedVideosObserver = null;
         let watchInterval = null;
 
-        // Username Debounce
         let handleCheckTimer = null;
         let isSignupHandleValid = false;
         let isEditHandleValid = true;
@@ -902,7 +893,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // REELS TOUCH GUARD FOR TWO-WAY SNAP SCROLL
         const reelsContainerEl = document.getElementById('reels-container');
         if (reelsContainerEl) {
             let startTouchY = 0;
@@ -918,7 +908,6 @@
             }, { passive: false });
         }
 
-        // PRESENCE TRACKING
         function initPresenceTracking(user) {
             if (!user) return;
             const updateOnlineStatus = async (isOnline) => {
@@ -941,7 +930,6 @@
             window.addEventListener('beforeunload', () => updateOnlineStatus(false));
         }
 
-        // AUTH & REAL-TIME USERNAME AVAILABILITY CHECK
         window.checkHandleAvailability = function(val, mode) {
             clearTimeout(handleCheckTimer);
             const clean = val.toLowerCase().trim().replace(/[^a-z0-9._]/g, '');
@@ -1035,7 +1023,7 @@
                     savedPosts: [],
                     accountType: 'personal',
                     isPrivate: false,
-                    lastHandleChange: 0, // Never locked on start
+                    lastHandleChange: 0,
                     totalViews: 0,
                     totalShares: 0,
                     totalWatchSeconds: 0,
@@ -1077,7 +1065,6 @@
             showToast("Logged out");
         };
 
-        // NOTIFICATIONS & FOLLOW REQUESTS ENGINE
         function listenPendingNotifications(userEmail) {
             onSnapshot(doc(db, "users", userEmail), snap => {
                 if (!snap.exists()) return;
@@ -1130,13 +1117,11 @@
             const user = auth.currentUser;
             if (!user) return;
             try {
-                // Add to current user's followers
                 await updateDoc(doc(db, "users", user.email), {
                     followRequests: arrayRemove(reqEmail),
                     followersList: arrayUnion(reqEmail),
                     followers: increment(1)
                 });
-                // Add to requester's following
                 await updateDoc(doc(db, "users", reqEmail), {
                     followingList: arrayUnion(user.email),
                     following: increment(1)
@@ -1158,7 +1143,6 @@
             } catch(e) { showToast(e.message); }
         };
 
-        // PROFILE PHOTO UNIVERSAL VIEWER & LIKES
         window.openProfilePhotoViewer = async function(email) {
             if (!email) return;
             const modal = document.getElementById('modal-dp-viewer');
@@ -1228,7 +1212,6 @@
             toggleDpLike();
         };
 
-        // PROFILE PHOTO SELECTION & UPLOAD
         window.handleDpFileSelected = async function(e) {
             const file = e.target.files && e.target.files[0];
             if (!file) return;
@@ -1254,7 +1237,6 @@
             } catch(e) { showToast("Upload failed: " + e.message); }
         };
 
-        // 24-HOUR AUTO ARCHIVE & 30-DAY AUTO PURGE
         async function cleanupExpiredStories() {
             try {
                 const snap = await getDocs(collection(db, "stories"));
@@ -1262,14 +1244,12 @@
 
                 snap.forEach(async (d) => {
                     const st = d.data();
-                    // Rule 1: Move to Archive after 24 hours
                     if (!st.isArchived && (now - (st.createdAt || 0) >= 86400000)) {
                         await updateDoc(doc(db, "stories", d.id), {
                             isArchived: true,
                             archivedAt: now
                         });
                     }
-                    // Rule 2: 30 days after archiving, auto permanent purge
                     if (st.isArchived && (now - (st.archivedAt || 0) >= 2592000000)) {
                         await deleteDoc(doc(db, "stories", d.id));
                     }
@@ -1311,7 +1291,6 @@
             document.getElementById('modal-archive').classList.add('hidden');
         };
 
-        // BOOKMARK / SAVE POSTS ENGINE
         window.toggleSavePost = async function(docId) {
             const user = auth.currentUser;
             if (!user) return;
@@ -1384,7 +1363,6 @@
             } catch(e) {}
         }
 
-        // FEED & PLAYBACK TRACKING (STRICT UNIQUE VIEWS & WATCH HOURS)
         async function safeLoadHome() {
             loadStoriesTray();
             loadPostsFeed();
@@ -1541,7 +1519,6 @@
             showToast("Reply sent!");
         };
 
-        // COMBINED POSTS FEED
         async function loadPostsFeed() {
             const container = document.getElementById('posts-stream');
             try {
@@ -1687,7 +1664,6 @@
             document.querySelectorAll('.feed-video-card').forEach(v => feedVideosObserver.observe(v));
         }
 
-        // FULL SCREEN REELS FEED
         async function loadReelsFeed() {
             const container = document.getElementById('reels-container');
             try {
@@ -1799,12 +1775,10 @@
             document.querySelectorAll('.reel-item-box').forEach(box => reelsObserver.observe(box));
         }
 
-        // STRICT UNIQUE VIEWS & GENUINE WATCH TIME LOGIC
         window.startWatchTracking = async function(col, docId, authorEmail) {
             const user = auth.currentUser;
             if (!user) return;
 
-            // Only count unique view on first touch (Self-views blocked)
             if (user.email !== authorEmail) {
                 try {
                     const docRef = doc(db, col, docId);
@@ -1824,7 +1798,6 @@
                 } catch(e) {}
             }
 
-            // Real playback watch seconds (Counts every time, even when returning)
             clearInterval(watchInterval);
             watchInterval = setInterval(async () => {
                 try {
@@ -1950,7 +1923,6 @@
             } catch(e) {}
         };
 
-        // EXPLORE & SEARCH
         async function loadExploreMedia() {
             const grid = document.getElementById('explore-grid');
             try {
@@ -2102,7 +2074,6 @@
             } catch(e) {}
         };
 
-        // PROFILE & PROFESSIONAL DASHBOARD
         async function loadMyProfile() {
             const user = auth.currentUser;
             if (!user) return;
@@ -2116,7 +2087,6 @@
                     document.getElementById('my-profile-handle').innerText = '@' + cleanHandle;
                     document.getElementById('my-profile-bio').innerText = d.bio || '';
 
-                    // Universal DP
                     const avatarImg = document.getElementById('my-profile-avatar-img');
                     const avatarTxt = document.getElementById('my-profile-avatar');
                     if (d.photoUrl) {
@@ -2196,7 +2166,6 @@
                 const cur = snap.data()?.accountType || 'personal';
 
                 if (cur === 'personal') {
-                    // Switching to professional forces Public mode
                     await updateDoc(uRef, { accountType: 'professional', isPrivate: false });
                     showToast("Switched to Professional Account (Public)");
                 } else {
@@ -2216,7 +2185,6 @@
                 const snap = await getDoc(uRef);
                 const isPriv = !snap.data()?.isPrivate;
 
-                // Switching to Private forces personal account mode
                 if (isPriv) {
                     await updateDoc(uRef, { isPrivate: true, accountType: 'personal' });
                     showToast("Account is now PRIVATE (Auto-converted to Personal)");
@@ -2292,7 +2260,6 @@
             document.getElementById('modal-pro-dashboard').classList.add('hidden');
         };
 
-        // EDIT PROFILE WITH 10-DAY LOCK INDICATOR
         window.openEditProfileModal = async function() {
             const user = auth.currentUser;
             if (!user) return;
@@ -2306,11 +2273,10 @@
                     handleInput.value = cleanHandle;
                     document.getElementById('edit-input-bio').value = data.bio || '';
 
-                    // 10 Days Cooldown Lock Check
                     const now = Date.now();
                     const lastChange = data.lastHandleChange || 0;
                     const diff = now - lastChange;
-                    const cooldown = 864000000; // 10 days in ms
+                    const cooldown = 864000000;
 
                     const lockInd = document.getElementById('edit-handle-lock-indicator');
                     const helper = document.getElementById('edit-handle-helper');
@@ -2363,7 +2329,6 @@
 
                 let updates = { name: newName, bio: newBio };
 
-                // If handle changed
                 if (!handleInput.disabled && newHandle !== currentHandle) {
                     if (!isEditHandleValid) {
                         showToast("Chosen username is not available!");
@@ -2382,7 +2347,6 @@
             } catch(e) { showToast(e.message); }
         };
 
-        // PUBLIC CREATOR PROFILE & PRIVATE LOCK ENGINE
         window.openPublicProfile = async function(email) {
             const user = auth.currentUser;
             if (user && user.email === email) {
@@ -2444,12 +2408,10 @@
                 const msgBtn = document.getElementById('pub-msg-btn');
                 msgBtn.onclick = () => openDirectChatWithUser(email, d.name || cleanHandle);
 
-                // Lock check
                 const isLocked = d.isPrivate && !isFollowing;
                 document.getElementById('pub-private-locked').classList.toggle('hidden', !isLocked);
                 document.getElementById('pub-media-grid').classList.toggle('hidden', isLocked);
 
-                // Follow lists click protection
                 document.getElementById('pub-followers-btn').onclick = () => {
                     if (isLocked) showToast("This account is private.");
                     else openFollowListModal(email, 'followers');
@@ -2501,7 +2463,6 @@
                 const myFollowing = mySnap.exists() ? (mySnap.data().followingList || []) : [];
 
                 if (myFollowing.includes(targetEmail)) {
-                    // Unfollow
                     await updateDoc(myRef, {
                         followingList: arrayRemove(targetEmail),
                         following: Math.max(0, (mySnap.data().following || 1) - 1)
@@ -2512,7 +2473,6 @@
                     });
                     showToast("Unfollowed " + targetName);
                 } else if (isTargetPrivate) {
-                    // Send or Cancel Follow Request
                     const reqs = targetData.followRequests || [];
                     if (reqs.includes(user.email)) {
                         await updateDoc(targetRef, { followRequests: arrayRemove(user.email) });
@@ -2522,7 +2482,6 @@
                         showToast("Follow request sent");
                     }
                 } else {
-                    // Direct Public Follow
                     await updateDoc(myRef, {
                         followingList: arrayUnion(targetEmail),
                         following: (mySnap.data().following || 0) + 1
@@ -2590,7 +2549,6 @@
             document.getElementById('modal-follow-list').classList.add('hidden');
         };
 
-        // CREATE & PUBLISH WITH MANDATORY CAPTION
         window.openCreateModal = function(type) {
             setUploadType(type || 'post');
             document.getElementById('modal-create').classList.remove('hidden');
@@ -2846,7 +2804,6 @@
             }
         };
 
-        // CAMERA RECORDER
         window.openCameraRecorder = async function() {
             const modal = document.getElementById('modal-camera');
             modal.classList.remove('hidden');
@@ -2968,7 +2925,6 @@
             }
         }
 
-        // IB65 LIVE BROADCAST
         async function loadLiveBroadcasters() {
             const list = document.getElementById('live-rooms-list');
             try {
@@ -3149,7 +3105,6 @@
             if (activeLiveStreamId && !forced) {
                 if (isHostingLive) {
                     await deleteDoc(doc(db, "lives", activeLiveStreamId)).catch(()=>{});
-                    // Convert live stream to 24-hour Story Replay
                     if (user) {
                         await addDoc(collection(db, "stories"), {
                             author: (user.displayName || user.email.split('@')[0]).replace(/^@+/, ''),
@@ -3184,7 +3139,6 @@
             loadLiveBroadcasters();
         };
 
-        // DIRECT MESSAGING
         window.openDirectInbox = async function() {
             const user = auth.currentUser;
             if (!user) return;
@@ -3257,7 +3211,7 @@
             chatSnapshotUnsub = onSnapshot(collection(db, "chats", roomId, "messages"), snap => {
                 const msgs = [];
                 snap.forEach(d => msgs.push({ id: d.id, ...d.data() }));
-                msgs.sort((a,b) => (a.createdAt || 0) - (b.createdAt || 0));
+                msgs.sort((a,b) => (a.createdAt || 0) - (a.createdAt || 0));
 
                 scrollBox.innerHTML = msgs.map(m => {
                     const isMe = m.sender === user.email;
