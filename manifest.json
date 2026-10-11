@@ -10,15 +10,15 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=512&auto=format&fit=crop&q=80",
+      "src": "https://res.cloudinary.com/mhj8jvag/image/upload/v1718000000/ib65_logo_crown.png",
       "sizes": "192x192",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=512&auto=format&fit=crop&q=80",
+      "src": "https://res.cloudinary.com/mhj8jvag/image/upload/v1718000000/ib65_logo_crown.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
