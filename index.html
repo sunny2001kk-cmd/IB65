@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IB65 — Social Universe</title>
 
-    <!-- PWA Web App Manifest -->
-    <link rel="manifest" href="./manifest.json">
-
-    <!-- App Icon Links -->
+    <!-- App Icon & Standalone Meta Tags (Without manifest.json) -->
     <link rel="icon" type="image/png" sizes="192x192" href="./icon.png">
     <link rel="icon" type="image/png" sizes="512x512" href="./icon.png">
     <link rel="apple-touch-icon" href="./icon.png">
 
-    <!-- Mobile Theme -->
     <meta name="theme-color" content="#000000">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -74,7 +70,7 @@
         <p class="text-xs text-gray-500 tracking-widest uppercase">Cloud Universe</p>
     </div>
 
-    <!-- Global Early Navigation Guard (Buttons kabhi fail nahi honge) -->
+    <!-- Global Early Navigation Guard -->
     <script>
         setTimeout(() => {
             const splash = document.getElementById('anime-intro');
@@ -659,7 +655,7 @@
             try { await loadSuggestions(); } catch(e) { console.warn(e); }
         }
 
-        // Live Lens Camera Handlers (Robust permission fallback)
+        // Live Lens Camera Handlers
         window.openLiveCamera = async function() {
             const modal = document.getElementById('inapp-camera-modal');
             if (modal) modal.classList.remove('hidden');
@@ -669,7 +665,6 @@
                     cameraMediaStream.getTracks().forEach(t => t.stop());
                 }
 
-                // Pehle video+audio try karega, agar mic blocked ho toh sirf video chalayega
                 try {
                     cameraMediaStream = await navigator.mediaDevices.getUserMedia({
                         video: { facingMode: cameraFacing },
@@ -1051,7 +1046,7 @@
                                     ? `<video src="${p.mediaUrl}" class="w-full max-h-72 object-cover" controls playsinline></video>` 
                                     : `<img src="${p.mediaUrl}" style="filter: ${p.filter || 'none'}" class="w-full max-h-72 object-cover">`
                                 }
-                                ${p.overlayText ? `<div class="absolute px-3 py-1 rounded-xl bg-black/60 text-xs font-bold" style="color: ${p.overlayColor || '#ffffff'}">${p.overlayText}</div>` : ''}
+                                ${p.overlayText ? `<div class="absolute px-3 py-1 rounded-xl bg-black/60 text-xs font-bold" style="color: ${p.overlayColor \vert{}\vert{} '#ffffff'}">${p.overlayText}</div>` : ''}
                             </div>
                         ` : ''}
                         <div class="flex items-center space-x-4 pt-2 border-t border-gray-900 text-white text-xs">
@@ -1105,7 +1100,7 @@
                     <div class="relative w-full max-w-sm h-[75vh] bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-end p-4 border border-gray-900">
                         <video src="${r.videoUrl}" style="filter: ${r.filter || 'none'}" class="absolute inset-0 w-full h-full object-cover" autoplay loop controls playsinline></video>
                         
-                        ${r.overlayText ? `<div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10"><span class="px-3 py-1.5 rounded-xl bg-black/60 text-sm font-bold" style="color: ${r.overlayColor \vert{}\vert{} '#ffffff'}">${r.overlayText}</span></div>` : ''}
+                        ${r.overlayText ? `<div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10"><span class="px-3 py-1.5 rounded-xl bg-black/60 text-sm font-bold" style="color: ${r.overlayColor || '#ffffff'}">${r.overlayText}</span></div>` : ''}
 
                         <div class="absolute right-3 bottom-20 flex flex-col items-center space-y-4 z-20 text-white">
                             <button onclick="toggleCloudLike('reels', '${r.id}')" class="flex flex-col items-center space-y-1 icon-3d ${isLiked ? 'text-red-500' : ''}">
@@ -1380,7 +1375,7 @@
                     html += matchedMedia.map(item => `
                         <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 cursor-pointer" onclick="${item.col === 'reels' ? `switchTab('reels')` : `switchTab('home')`}">
                             ${item.mediaType === 'video' 
-                                ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>` 
+                                ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>
                                 : `<img src="${item.mediaUrl}" style="filter: ${item.filter || 'none'}" class="w-full h-full object-cover">`
                             }
                             <div class="absolute bottom-1 left-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[9px] text-white truncate">
@@ -1431,7 +1426,6 @@
             if (!user) { showToast("Login to broadcast live!"); return; }
 
             try {
-                // Stream permission check
                 try {
                     localLiveStreamMedia = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 } catch(audioErr) {
