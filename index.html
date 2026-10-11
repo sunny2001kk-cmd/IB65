@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IB65 — Social Universe</title>
 
-    <!-- Manifest Connection -->
+    <!-- Mobile Console Debugger Tool (Screen par niche gear icon aayega) -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+
+    <!-- Manifest Link -->
     <link rel="manifest" href="./manifest.json">
 
     <!-- App Icon Links -->
@@ -74,7 +78,7 @@
         <p class="text-xs text-gray-500 tracking-widest uppercase">Cloud Universe</p>
     </div>
 
-    <!-- Global Early Navigation Guard (Buttons kabhi block nahi honge) -->
+    <!-- Global Early Navigation Guard -->
     <script>
         setTimeout(() => {
             const splash = document.getElementById('anime-intro');
@@ -564,7 +568,7 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
+    <!-- Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-gray-900 py-3 px-6 flex justify-around items-center z-40">
         <button onclick="switchTab('home')" id="nav-home" class="text-white icon-3d text-xl"><i class="fa-solid fa-house"></i></button>
         <button onclick="switchTab('search')" id="nav-search" class="text-gray-500 icon-3d text-xl"><i class="fa-solid fa-compass"></i></button>
@@ -659,7 +663,7 @@
             try { await loadSuggestions(); } catch(e) { console.warn(e); }
         }
 
-        // Live Lens Camera Handlers
+        // Live Lens Camera Handlers (Fail-Safe & Direct Diagnostics)
         window.openLiveCamera = async function() {
             const modal = document.getElementById('inapp-camera-modal');
             if (modal) modal.classList.remove('hidden');
@@ -667,27 +671,36 @@
             try {
                 if (cameraMediaStream) {
                     cameraMediaStream.getTracks().forEach(t => t.stop());
+                    cameraMediaStream = null;
                 }
 
+                // Pehle basic video try karega (microphone failure se bachaane ke liye)
+                let stream = null;
                 try {
-                    cameraMediaStream = await navigator.mediaDevices.getUserMedia({
+                    stream = await navigator.mediaDevices.getUserMedia({
                         video: { facingMode: cameraFacing },
-                        audio: true
+                        audio: false
                     });
-                } catch(audioErr) {
-                    cameraMediaStream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: cameraFacing },
+                } catch(camErr) {
+                    // Agar specific facingMode fail ho toh bina constraint ke try karega
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
                         audio: false
                     });
                 }
 
+                cameraMediaStream = stream;
                 const vid = document.getElementById('camera-stream');
                 if (vid) {
-                    vid.srcObject = cameraMediaStream;
+                    vid.srcObject = stream;
+                    vid.setAttribute('playsinline', '');
+                    vid.setAttribute('autoplay', '');
+                    vid.muted = true;
                     await vid.play();
                 }
             } catch(e) {
-                showToast("Camera error: " + (e.message || "Permission denied"));
+                console.error("Camera Error:", e);
+                alert("Camera Error: " + (e.name || "Error") + " - " + (e.message || "Cannot access device camera"));
                 if (modal) modal.classList.add('hidden');
             }
         };
@@ -736,9 +749,22 @@
             }, 'image/jpeg', 0.95);
         };
 
-        window.toggleVideoRecording = function() {
-            if (!isRecordingVideo) startVideoRecording();
-            else stopVideoRecording();
+        window.toggleVideoRecording = async function() {
+            if (!isRecordingVideo) {
+                // Audio track add karne ki koshish karein recording ke liye
+                try {
+                    const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    const audioTrack = audioStream.getAudioTracks()[0];
+                    if (audioTrack && cameraMediaStream) {
+                        cameraMediaStream.addTrack(audioTrack);
+                    }
+                } catch(e) {
+                    console.warn("Audio recording disabled:", e);
+                }
+                startVideoRecording();
+            } else {
+                stopVideoRecording();
+            }
         };
 
         function startVideoRecording() {
@@ -789,7 +815,7 @@
                     document.getElementById('record-timer').innerText = `${mins}:${secs}`;
                 }, 1000);
             } catch(e) {
-                showToast("Recording error: " + e.message);
+                alert("Recording error: " + e.message);
             }
         }
 
@@ -974,7 +1000,7 @@
             }
         };
 
-        // Delete Media Handler
+        // Delete Posts & Reels Handler
         window.deleteCloudMedia = async function(col, docId, authorEmail) {
             const user = auth.currentUser;
             if (!user) return;
@@ -1284,8 +1310,7 @@
                 grid.innerHTML = items.map(item => `
                     <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 cursor-pointer" onclick="${item.col === 'reels' ? `switchTab('reels')` : `switchTab('home')`}">
                         ${item.mediaType === 'video' 
-                            ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>
-                               <span class="absolute top-1.5 right-1.5 bg-black/60 rounded-full px-1.5 py-0.5 text-[9px] text-white"><i class="fa-solid fa-play text-[8px]"></i></span>`
+                            ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>` 
                             : `<img src="${item.mediaUrl}" style="filter: ${item.filter || 'none'}" class="w-full h-full object-cover">`
                         }
                         <div class="absolute bottom-1 left-1 bg-black/70 px-1.5 py-0.5 rounded text-[9px] text-white flex items-center space-x-1">
@@ -1467,7 +1492,7 @@
                     listenLiveStreamRealtime(activeLiveStreamId);
                 });
             } catch(e) {
-                showToast("Live error: " + (e.message || "Camera access required"));
+                alert("Live Broadcast Error: " + (e.message || "Camera access required"));
             }
         };
 
