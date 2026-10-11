@@ -5,14 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IB65 — Social Universe</title>
 
-    <!-- App Icon & Manifest Links -->
+    <!-- PWA Web App Manifest -->
+    <link rel="manifest" href="./manifest.json">
+
+    <!-- App Icon Links -->
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon.png">
     <link rel="icon" type="image/png" sizes="512x512" href="./icon.png">
     <link rel="apple-touch-icon" href="./icon.png">
-    <meta name="apple-mobile-web-app-title" content="IB65">
-    <meta name="application-name" content="IB65">
+
+    <!-- Mobile & Status Bar Theme -->
     <meta name="theme-color" content="#000000">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IB65">
+    <meta name="application-name" content="IB65">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1639,7 +1646,7 @@
                     html += matchedMedia.map(item => `
                         <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 cursor-pointer" onclick="${item.col === 'reels' ? `switchTab('reels')` : `switchTab('home')`}">
                             ${item.mediaType === 'video' 
-                                ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>`
+                                ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>` 
                                 : `<img src="${item.mediaUrl}" style="filter: ${item.filter || 'none'}" class="w-full h-full object-cover">`
                             }
                             <div class="absolute bottom-1 left-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[9px] text-white truncate">
