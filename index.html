@@ -61,13 +61,14 @@
 </head>
 <body class="min-h-screen pb-24 select-none bg-black text-white">
 
-    <!-- Independent Fail-Safe Splash Screen -->
+    <!-- Splash Screen -->
     <div id="anime-intro" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center space-y-3 transition-opacity duration-500">
         <h1 class="text-5xl font-black tracking-widest text-white">IB65</h1>
         <p class="text-xs text-gray-500 tracking-widest uppercase">Cloud Universe</p>
     </div>
+
+    <!-- Global Early Navigation Guard (Buttons kabhi lock nahi honge) -->
     <script>
-        // Guaranteed Splash Removal without Script-Lock
         setTimeout(() => {
             const splash = document.getElementById('anime-intro');
             if (splash) {
@@ -75,6 +76,52 @@
                 setTimeout(() => splash.remove(), 400);
             }
         }, 900);
+
+        window.switchTab = function(tab) {
+            const tabs = ['home', 'search', 'reels', 'live', 'profile', 'public-profile'];
+            tabs.forEach(t => {
+                const el = document.getElementById('view-' + t);
+                const nav = document.getElementById('nav-' + t);
+                if (el) el.classList.add('hidden');
+                if (nav) nav.className = 'text-gray-500 icon-3d text-xl';
+            });
+            const active = document.getElementById('view-' + tab);
+            const activeNav = document.getElementById('nav-' + tab);
+            if (active) active.classList.remove('hidden');
+            if (activeNav) activeNav.className = 'text-white icon-3d text-xl';
+            if (tab === 'search' && typeof window.loadExploreGrid === 'function') window.loadExploreGrid();
+            if (tab === 'live' && typeof window.loadActiveLiveHub === 'function') window.loadActiveLiveHub();
+            if (tab === 'profile' && typeof window.loadUserProfileData === 'function') window.loadUserProfileData();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.openCreateModalPage = function(t) {
+            if (typeof window.setUploadType === 'function') window.setUploadType(t || 'post');
+            document.getElementById('create-modal-page').classList.remove('hidden');
+        };
+        window.closeCreateModalPage = function() {
+            document.getElementById('create-modal-page').classList.add('hidden');
+        };
+        window.toggleNotifications = function() {
+            document.getElementById('notif-modal').classList.toggle('hidden');
+        };
+        window.toggleSettingsModal = function() {
+            document.getElementById('settings-modal').classList.toggle('hidden');
+        };
+        window.openFullMessageInbox = function() {
+            document.getElementById('full-msg-page').classList.remove('hidden');
+            if (typeof window.loadDMInbox === 'function') window.loadDMInbox();
+        };
+        window.closeFullMessageInbox = function() {
+            document.getElementById('full-msg-page').classList.add('hidden');
+        };
+        window.showToast = function(msg) {
+            const t = document.getElementById('toast');
+            if (!t) return;
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 2500);
+        };
     </script>
 
     <!-- Top Header -->
@@ -190,7 +237,7 @@
         </div>
     </div>
 
-    <!-- Main Container -->
+    <!-- Main Views Container -->
     <main class="max-w-xl mx-auto p-4 space-y-4">
         
         <!-- HOME FEED -->
@@ -219,7 +266,7 @@
 
             <!-- Posts List -->
             <div id="posts-container" class="space-y-4">
-                <div class="text-center text-gray-500 py-10 text-xs">Loading feed...</div>
+                <div class="text-center text-gray-500 py-10 text-xs">Connecting feed...</div>
             </div>
         </div>
 
@@ -540,7 +587,7 @@
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white text-xs px-4 py-2 rounded-full border border-gray-800 shadow-2xl hidden z-50"></div>
 
-    <!-- Complete Firebase & Application Engine -->
+    <!-- Firebase Application Engine -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -599,16 +646,6 @@
         let activeCommentCol = 'posts';
         let activeCommentId = null;
 
-        // Initialization
-        window.addEventListener('load', () => {
-            const splash = document.getElementById('anime-intro');
-            if (splash) {
-                splash.style.opacity = '0';
-                setTimeout(() => splash.remove(), 400);
-            }
-            safeLoadAll();
-        });
-
         window.addEventListener('beforeunload', () => {
             if (isHostingLive && activeLiveStreamId) {
                 deleteDoc(doc(db, "lives", activeLiveStreamId)).catch(()=>{});
@@ -616,36 +653,18 @@
         });
 
         async function safeLoadAll() {
-            setTimeout(() => {
-                try { loadCloudPosts().catch(()=>{}); } catch(e) {}
-                try { loadCloudReels().catch(()=>{}); } catch(e) {}
-                try { loadCloudStories().catch(()=>{}); } catch(e) {}
-                try { loadActiveLiveHub().catch(()=>{}); } catch(e) {}
-                try { loadSuggestions().catch(()=>{}); } catch(e) {}
-            }, 200);
-        }
-
-        window.showToast = function(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 2500);
-        }
-
-        // Settings Slide-up Drawer
-        window.toggleSettingsModal = function() {
-            document.getElementById('settings-modal').classList.toggle('hidden');
+            try { await loadCloudPosts(); } catch(e) { console.warn(e); }
+            try { await loadCloudReels(); } catch(e) { console.warn(e); }
+            try { await loadCloudStories(); } catch(e) { console.warn(e); }
+            try { await loadActiveLiveHub(); } catch(e) { console.warn(e); }
+            try { await loadSuggestions(); } catch(e) { console.warn(e); }
         }
 
         window.toggleAccountPrivacy = function() {
             const lbl = document.getElementById('privacy-lbl');
             lbl.innerText = lbl.innerText === 'Public' ? 'Private' : 'Public';
             showToast("Account privacy: " + lbl.innerText);
-        }
-
-        window.toggleNotifications = function() {
-            document.getElementById('notif-modal').classList.toggle('hidden');
-        }
+        };
 
         // Edit Profile Modal
         window.openEditProfileModal = async function() {
@@ -661,11 +680,11 @@
                 document.getElementById('edit-avatar-url').value = d.avatar || '';
             }
             document.getElementById('edit-profile-modal').classList.remove('hidden');
-        }
+        };
 
         window.closeEditProfileModal = function() {
             document.getElementById('edit-profile-modal').classList.add('hidden');
-        }
+        };
 
         window.saveProfileChanges = async function() {
             const user = auth.currentUser;
@@ -693,9 +712,9 @@
             } catch(e) {
                 showToast("Save error: " + e.message);
             }
-        }
+        };
 
-        async function loadUserProfileData() {
+        window.loadUserProfileData = async function() {
             const user = auth.currentUser;
             if (!user) return;
             const uDoc = await getDoc(doc(db, "users", user.email));
@@ -716,10 +735,10 @@
                 document.getElementById('stat-followers').innerText = (d.followers || []).length;
                 document.getElementById('stat-following').innerText = (d.following || []).length;
             }
-        }
+        };
 
         // Suggestions / Suggested For You
-        async function loadSuggestions() {
+        window.loadSuggestions = async function() {
             const box = document.getElementById('suggestions-box');
             const list = document.getElementById('suggestions-list');
             const user = auth.currentUser;
@@ -749,14 +768,14 @@
                             ${s.avatar ? `<img src="${s.avatar}" class="w-full h-full object-cover">` : (s.name || 'U')[0]}
                         </div>
                         <div class="w-full">
-                            <p class="font-bold text-xs truncate">${s.name}</p>
+                            <p class="font-bold text-xs truncate">${s.name || 'User'}</p>
                             <p class="text-[10px] text-gray-500 truncate">@${s.username || s.email.split('@')[0]}</p>
                         </div>
-                        <button onclick="toggleFollowUserCloud('${s.name}', '${s.email}')" class="w-full clay-btn py-1 text-[10px] font-bold">Follow</button>
+                        <button onclick="toggleFollowUserCloud('${s.name || 'User'}', '${s.email}')" class="w-full clay-btn py-1 text-[10px] font-bold">Follow</button>
                     </div>
                 `).join('');
             } catch(e) {}
-        }
+        };
 
         // Public User Profile Inspection
         window.openPublicProfile = async function(email) {
@@ -792,7 +811,7 @@
                 fBtn.innerText = isFollowing ? "Following" : "Follow";
                 fBtn.className = isFollowing ? "flex-1 border border-gray-600 text-gray-300 py-2 text-xs font-bold rounded-2xl" : "flex-1 clay-btn py-2 text-xs font-bold";
                 fBtn.onclick = async () => {
-                    await toggleFollowUserCloud(d.name, email);
+                    await toggleFollowUserCloud(d.name || 'User', email);
                     openPublicProfile(email);
                 };
 
@@ -818,11 +837,10 @@
                 document.getElementById('view-public-profile').classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch(e) {}
-        }
+        };
 
         // Direct Messaging (1-on-1 Chat)
-        window.openFullMessageInbox = async function() {
-            document.getElementById('full-msg-page').classList.remove('hidden');
+        window.loadDMInbox = async function() {
             const list = document.getElementById('dm-chats-list');
             const user = auth.currentUser;
             if (!user) return;
@@ -849,11 +867,7 @@
                     </div>
                 `).join('');
             } catch(e) {}
-        }
-
-        window.closeFullMessageInbox = function() {
-            document.getElementById('full-msg-page').classList.add('hidden');
-        }
+        };
 
         window.startDirectChat = function(recipientEmail, recipientName) {
             activeChatRecipient = recipientEmail;
@@ -886,7 +900,7 @@
                 }).join('');
                 chatBox.scrollTop = chatBox.scrollHeight;
             });
-        }
+        };
 
         window.closeSingleChat = function() {
             if (chatMessagesUnsubscribe) {
@@ -895,7 +909,7 @@
             }
             activeChatRecipient = null;
             document.getElementById('single-chat-modal').classList.add('hidden');
-        }
+        };
 
         window.sendDirectMessage = async function() {
             const input = document.getElementById('single-chat-input');
@@ -919,7 +933,7 @@
             } catch(e) {
                 showToast("Message error: " + e.message);
             }
-        }
+        };
 
         // Camera & Media Recording
         window.openLiveCamera = async function() {
@@ -935,7 +949,7 @@
                 showToast("Camera error: " + e.message);
                 closeLiveCamera();
             }
-        }
+        };
 
         window.closeLiveCamera = function() {
             if (isRecordingVideo) stopVideoRecording();
@@ -944,13 +958,13 @@
                 cameraMediaStream = null;
             }
             document.getElementById('inapp-camera-modal').classList.add('hidden');
-        }
+        };
 
         window.flipCamera = function() {
             if (isRecordingVideo) { showToast("Recording in progress!"); return; }
             cameraFacing = cameraFacing === 'environment' ? 'user' : 'environment';
             openLiveCamera();
-        }
+        };
 
         window.capturePhoto = function() {
             if (isRecordingVideo) return;
@@ -977,12 +991,12 @@
                 closeLiveCamera();
                 showToast("Photo captured!");
             }, 'image/jpeg', 0.95);
-        }
+        };
 
         window.toggleVideoRecording = function() {
             if (!isRecordingVideo) startVideoRecording();
             else stopVideoRecording();
-        }
+        };
 
         function startVideoRecording() {
             if (!cameraMediaStream) return;
@@ -1050,7 +1064,6 @@
             }
         }
 
-        // Instagram Video/Image Pro Editing Handlers
         window.applyEditorFilter = function(f) {
             currentFilter = f;
             const vid = document.getElementById('prev-vid');
@@ -1058,7 +1071,7 @@
             if (vid) vid.style.filter = f;
             if (img) img.style.filter = f;
             showToast("Filter applied");
-        }
+        };
 
         window.toggleVideoMute = function() {
             const vid = document.getElementById('prev-vid');
@@ -1071,7 +1084,7 @@
                 ? `<i class="fa-solid fa-volume-xmark text-red-500"></i>` 
                 : `<i class="fa-solid fa-volume-high text-white"></i>`;
             showToast(isVideoMuted ? "Video Muted" : "Sound Enabled");
-        }
+        };
 
         window.openTextOverlayPrompt = function() {
             const txt = prompt("Overlay text on media:", videoOverlayText || "");
@@ -1086,22 +1099,13 @@
                 videoOverlayText = '';
                 textBox.classList.add('hidden');
             }
-        }
+        };
 
         window.changeOverlayTextColor = function(e) {
             overlayTextColor = e.target.value;
             const textVal = document.getElementById('video-overlay-text-val');
             if (textVal) textVal.style.color = overlayTextColor;
-        }
-
-        window.openCreateModalPage = function(type = 'post') {
-            setUploadType(type);
-            document.getElementById('create-modal-page').classList.remove('hidden');
-        }
-
-        window.closeCreateModalPage = function() {
-            document.getElementById('create-modal-page').classList.add('hidden');
-        }
+        };
 
         window.setUploadType = function(type) {
             uploadType = type;
@@ -1110,7 +1114,7 @@
                 if (el) el.className = t === type ? 'font-bold text-white pb-1 border-b border-white px-3' : 'text-gray-500 pb-1 px-3';
             });
             document.getElementById('create-title-lbl').innerText = 'Upload ' + type.toUpperCase();
-        }
+        };
 
         window.handleFileSelected = function(e) {
             const file = e.target.files[0];
@@ -1133,7 +1137,7 @@
                 pImg.classList.remove('hidden');
                 pVid.classList.add('hidden');
             }
-        }
+        };
 
         // Cloud Media Publisher
         window.publishContent = async function() {
@@ -1228,7 +1232,7 @@
                 btn.innerText = "Share";
                 btn.disabled = false;
             }
-        }
+        };
 
         // Delete Posts & Reels Handler
         window.deleteCloudMedia = async function(col, docId, authorEmail) {
@@ -1249,9 +1253,9 @@
             } catch(e) {
                 showToast("Delete failed: " + e.message);
             }
-        }
+        };
 
-        // Posts Loader with Delete Option & Clickable Profiles
+        // Posts Loader
         window.loadCloudPosts = async function() {
             const container = document.getElementById('posts-container');
             const profileGrid = document.getElementById('profile-grid');
@@ -1325,10 +1329,12 @@
                     </div>
                 `;
                 }).join('');
-            } catch(e) {}
-        }
+            } catch(e) {
+                container.innerHTML = `<div class="text-center text-gray-500 py-10 text-xs">No posts available right now</div>`;
+            }
+        };
 
-        // Reels Loader with Delete Option & Overlay Text
+        // Reels Loader
         window.loadCloudReels = async function() {
             const container = document.getElementById('reels-container');
             try {
@@ -1386,7 +1392,7 @@
                 `;
                 }).join('');
             } catch(e) {}
-        }
+        };
 
         // Stories Tray & Full-Screen Viewer
         window.loadCloudStories = async function() {
@@ -1417,7 +1423,7 @@
                     </div>
                 `).join('');
             } catch(e) {}
-        }
+        };
 
         window.viewInstagramStory = function(story) {
             clearTimeout(storyTimeout);
@@ -1451,7 +1457,7 @@
             storyTimeout = setTimeout(() => {
                 closeStoryViewer();
             }, 7000);
-        }
+        };
 
         window.closeStoryViewer = function() {
             clearTimeout(storyTimeout);
@@ -1459,7 +1465,7 @@
             if (vid) vid.pause();
             document.getElementById('story-viewer-modal').classList.add('hidden');
             currentStoryData = null;
-        }
+        };
 
         window.openAuthorProfileFromStory = function() {
             if (currentStoryData && currentStoryData.authorEmail) {
@@ -1467,7 +1473,7 @@
                 closeStoryViewer();
                 openPublicProfile(target);
             }
-        }
+        };
 
         window.sendStoryReply = async function() {
             const input = document.getElementById('story-reply-input');
@@ -1490,20 +1496,20 @@
             } catch(e) {
                 showToast("Reply error: " + e.message);
             }
-        }
+        };
 
         window.likeCurrentStory = function() {
             const btn = document.getElementById('story-like-btn');
             btn.classList.toggle('text-red-500');
             showToast("❤️ Liked story!");
-        }
+        };
 
         window.shareCurrentStory = function() {
             navigator.clipboard.writeText(window.location.href);
             showToast("Story link copied!");
-        }
+        };
 
-        // Auto-Playing Popular Explore Grid
+        // Explore Grid Loader
         window.loadExploreGrid = async function() {
             const grid = document.getElementById('explore-grid');
             grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">Loading popular explore feed...</div>';
@@ -1551,9 +1557,9 @@
             } catch(e) {
                 grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">Could not load explore feed</div>';
             }
-        }
+        };
 
-        // Unified Real-Time Search: User + Title/Caption + Tag
+        // Unified Real-Time Search
         window.handleGlobalSearch = async function(e) {
             const q = e.target.value.toLowerCase().trim();
             const grid = document.getElementById('explore-grid');
@@ -1632,7 +1638,7 @@
                     html += `<div class="col-span-3 pt-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">Posts & Videos</div>`;
                     html += matchedMedia.map(item => `
                         <div class="relative h-36 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 cursor-pointer" onclick="${item.col === 'reels' ? `switchTab('reels')` : `switchTab('home')`}">
-                            ${item.mediaType === 'video'
+                            ${item.mediaType === 'video' 
                                 ? `<video src="${item.mediaUrl}" autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none"></video>`
                                 : `<img src="${item.mediaUrl}" style="filter: ${item.filter || 'none'}" class="w-full h-full object-cover">`
                             }
@@ -1647,7 +1653,7 @@
             } catch(e) {
                 grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10 text-xs">Search failed</div>';
             }
-        }
+        };
 
         // WebRTC Live Stream
         window.loadActiveLiveHub = async function() {
@@ -1677,7 +1683,7 @@
                     </div>
                 `).join('');
             } catch(e) {}
-        }
+        };
 
         window.startHostingLive = async function() {
             const user = auth.currentUser;
@@ -1719,7 +1725,7 @@
             } catch(e) {
                 showToast("Live error: " + e.message);
             }
-        }
+        };
 
         window.joinLiveStream = async function(liveId, hostName, hostPeerId) {
             activeLiveStreamId = liveId;
@@ -1747,7 +1753,7 @@
                 document.getElementById('live-player-modal').classList.remove('hidden');
                 listenLiveStreamRealtime(liveId);
             });
-        }
+        };
 
         function listenLiveStreamRealtime(liveId) {
             if (liveSnapshotUnsubscribe) liveSnapshotUnsubscribe();
@@ -1782,7 +1788,7 @@
                 });
                 input.value = '';
             } catch(e) {}
-        }
+        };
 
         window.leaveOrEndLive = async function(forced = false) {
             if (liveSnapshotUnsubscribe) {
@@ -1820,7 +1826,7 @@
             isHostingLive = false;
             document.getElementById('live-player-modal').classList.add('hidden');
             loadActiveLiveHub();
-        }
+        };
 
         // Mutual Follow System
         window.toggleFollowUserCloud = async function(targetName, targetEmail) {
@@ -1850,7 +1856,7 @@
             } catch(e) {
                 showToast("Action error: " + e.message);
             }
-        }
+        };
 
         window.openFollowListModal = async function(type) {
             document.getElementById('follow-modal-title').innerText = type === 'followers' ? 'Followers' : 'Following';
@@ -1882,11 +1888,11 @@
             } catch(e) {
                 list.innerHTML = `<div class="text-center text-gray-500 py-4">Failed to load</div>`;
             }
-        }
+        };
 
         window.closeFollowListModal = function() {
             document.getElementById('follow-modal').classList.add('hidden');
-        }
+        };
 
         // Likes, Saves, Comments
         window.toggleCloudLike = async function(col, id) {
@@ -1905,7 +1911,7 @@
                 if (col === 'posts') loadCloudPosts();
                 else loadCloudReels();
             } catch(e) {}
-        }
+        };
 
         window.toggleCloudSave = async function(id) {
             const user = auth.currentUser;
@@ -1924,16 +1930,16 @@
                 }
                 loadCloudPosts();
             } catch(e) {}
-        }
+        };
 
         window.openCommentsModal = function(col, id) {
             activeCommentCol = col;
             activeCommentId = id;
             document.getElementById('comments-modal').classList.remove('hidden');
             loadComments();
-        }
+        };
 
-        window.closeCommentsModal = function() { document.getElementById('comments-modal').classList.add('hidden'); }
+        window.closeCommentsModal = function() { document.getElementById('comments-modal').classList.add('hidden'); };
 
         window.loadComments = async function() {
             const list = document.getElementById('comments-list');
@@ -1948,7 +1954,7 @@
                     </div>
                 `).join('');
             } catch(e) {}
-        }
+        };
 
         window.postComment = async function() {
             const txt = document.getElementById('comment-input').value.trim();
@@ -1962,7 +1968,7 @@
                 if (activeCommentCol === 'posts') loadCloudPosts();
                 else loadCloudReels();
             } catch(e) {}
-        }
+        };
 
         // Profile Tabs
         window.switchProfileTab = async function(tab) {
@@ -1996,7 +2002,7 @@
             } else {
                 loadCloudPosts();
             }
-        }
+        };
 
         // Authentication State
         onAuthStateChanged(auth, async (user) => {
@@ -2043,7 +2049,7 @@
                 });
                 showToast("Account created!");
             } catch(e) { showToast(e.message); }
-        }
+        };
 
         window.handleLogin = async function() {
             const email = document.getElementById('auth-email').value;
@@ -2052,28 +2058,9 @@
                 await signInWithEmailAndPassword(auth, email, pass);
                 showToast("Logged in!");
             } catch(e) { showToast("Login failed: " + e.message); }
-        }
+        };
 
-        window.handleLogout = async function() { await signOut(auth); showToast("Logged out"); }
-
-        window.switchTab = function(tab) {
-            ['home', 'search', 'reels', 'live', 'profile', 'public-profile'].forEach(t => {
-                const el = document.getElementById('view-' + t);
-                const nav = document.getElementById('nav-' + t);
-                if (el) el.classList.add('hidden');
-                if (nav) nav.className = 'text-gray-500 icon-3d text-xl';
-            });
-
-            const activeEl = document.getElementById('view-' + tab);
-            const activeNav = document.getElementById('nav-' + tab);
-            if (activeEl) activeEl.classList.remove('hidden');
-            if (activeNav) activeNav.className = 'text-white icon-3d text-xl';
-
-            if (tab === 'search') loadExploreGrid();
-            if (tab === 'live') loadActiveLiveHub();
-            if (tab === 'profile') loadUserProfileData();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        window.handleLogout = async function() { await signOut(auth); showToast("Logged out"); };
     </script>
 </body>
 </html>
