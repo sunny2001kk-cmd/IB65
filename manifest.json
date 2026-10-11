@@ -2,21 +2,21 @@
   "name": "IB65 — Social Platform",
   "short_name": "IB65",
   "description": "IB65 Social Universe & Creator Platform",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "https://sunny2001kk-cmd.github.io/IB65/",
+  "scope": "https://sunny2001kk-cmd.github.io/IB65/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "./icon.png",
+      "src": "https://sunny2001kk-cmd.github.io/IB65/icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "./icon.png",
+      "src": "https://sunny2001kk-cmd.github.io/IB65/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
