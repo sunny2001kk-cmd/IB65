@@ -35,7 +35,6 @@
         .icon-btn:active { transform: scale(0.85); transition: transform 0.1s; }
         ::-webkit-scrollbar { display: none; }
         
-        /* Double Tap Heart Animation */
         @keyframes heartBurst {
             0% { transform: scale(0); opacity: 0; }
             50% { transform: scale(1.4); opacity: 0.95; }
@@ -45,7 +44,6 @@
             animation: heartBurst 0.75s ease-out forwards;
         }
 
-        /* Story Progress Bar */
         @keyframes storyBar {
             from { width: 0%; }
             to { width: 100%; }
@@ -54,7 +52,6 @@
             animation: storyBar 7s linear forwards;
         }
 
-        /* Live Heart Float */
         @keyframes flyHeart {
             0% { transform: translateY(0) scale(0.8); opacity: 1; }
             100% { transform: translateY(-160px) scale(1.4); opacity: 0; }
@@ -63,7 +60,6 @@
             animation: flyHeart 1.5s ease-out forwards;
         }
 
-        /* Recording Ring Pulse */
         @keyframes recordPulse {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
             70% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
@@ -77,7 +73,7 @@
     <!-- Splash Screen -->
     <div id="splash" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center space-y-2 transition-opacity duration-300">
         <h1 class="text-4xl font-black tracking-widest text-white">IB65</h1>
-        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Instagram Experience</p>
+        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Connect & Live</p>
     </div>
 
     <!-- Top Navigation Header -->
@@ -102,7 +98,6 @@
 
         <!-- 1. HOME VIEW -->
         <div id="view-home" class="space-y-3 pb-8">
-            <!-- Stories Tray -->
             <div class="p-3 border-b border-zinc-900 overflow-x-auto flex space-x-3 items-center">
                 <div onclick="openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-pink-600 to-purple-600 flex items-center justify-center relative">
@@ -116,7 +111,6 @@
                 <div id="stories-tray-items" class="flex space-x-3"></div>
             </div>
 
-            <!-- Feed Posts -->
             <div id="posts-stream" class="space-y-4 px-2">
                 <div class="text-center text-gray-500 py-16 text-xs">Connecting feed...</div>
             </div>
@@ -129,10 +123,8 @@
                 <input type="text" id="global-search-input" oninput="handleSearch(event)" placeholder="Search users, captions, handles..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none">
             </div>
 
-            <!-- Search Results (Users List) -->
             <div id="search-users-results" class="space-y-2 hidden"></div>
 
-            <!-- Instagram Style Explore Grid -->
             <div>
                 <p class="text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Explore</p>
                 <div id="explore-grid" class="grid grid-cols-3 gap-1">
@@ -154,9 +146,9 @@
                 <div>
                     <h2 class="text-sm font-bold text-white flex items-center space-x-1.5">
                         <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
-                        <span>Instagram Live</span>
+                        <span>IB65 Live</span>
                     </h2>
-                    <p class="text-[10px] text-gray-400">Broadcast video & chat in real time</p>
+                    <p class="text-[10px] text-gray-400">Broadcast video & chat with users</p>
                 </div>
                 <button onclick="startBroadcast()" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
             </div>
@@ -191,7 +183,6 @@
                 </div>
             </div>
 
-            <!-- Profile Media Grid -->
             <div>
                 <div class="grid grid-cols-3 gap-1" id="my-media-grid">
                     <div class="text-center text-gray-500 col-span-3 py-10 text-xs">No media yet</div>
@@ -221,6 +212,7 @@
                 </div>
                 <div class="flex space-x-2 pt-1">
                     <button id="pub-follow-btn" class="flex-1 clay-btn py-2 text-xs font-bold">Follow</button>
+                    <!-- Real-Time Direct Message Trigger -->
                     <button id="pub-msg-btn" class="flex-1 bg-zinc-800 py-2 rounded-xl text-xs font-bold border border-zinc-700">Message</button>
                 </div>
             </div>
@@ -229,6 +221,38 @@
         </div>
 
     </main>
+
+    <!-- REAL-TIME 1-ON-1 CHAT WINDOW -->
+    <div id="modal-direct-chat" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
+        <div class="p-3 border-b border-zinc-900 flex justify-between items-center bg-black/95">
+            <div class="flex items-center space-x-3">
+                <button onclick="closeDirectChat()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
+                    <div class="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center text-xs font-bold" id="chat-user-avatar">U</div>
+                </div>
+                <div>
+                    <p class="font-bold text-xs text-white" id="chat-user-name">User</p>
+                    <p class="text-[10px] text-green-500 font-semibold">Online</p>
+                </div>
+            </div>
+        </div>
+        <div id="chat-messages-scroll" class="flex-1 overflow-y-auto p-4 space-y-2.5 text-xs"></div>
+        <div class="p-3 border-t border-zinc-900 flex items-center space-x-2 bg-black">
+            <input type="text" id="chat-input-field" placeholder="Message..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
+            <button onclick="sendChatMessageDirect()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
+        </div>
+    </div>
+
+    <!-- DIRECT INBOX LIST -->
+    <div id="modal-direct-inbox" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
+        <div class="p-4 border-b border-zinc-900 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <button onclick="closeDirectInbox()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
+                <span class="font-bold text-sm">Direct Messages</span>
+            </div>
+        </div>
+        <div id="direct-inbox-list" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
+    </div>
 
     <!-- BOTTOM NAVBAR -->
     <nav class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-zinc-900 py-2.5 px-6 flex justify-around items-center z-40">
@@ -242,14 +266,12 @@
     <!-- INSTAGRAM STORY VIEWER MODAL -->
     <div id="modal-story" class="fixed inset-0 z-50 bg-black flex items-center justify-center hidden" onclick="closeStory()">
         <div class="relative w-full max-w-md h-full bg-black flex flex-col justify-between p-3" onclick="event.stopPropagation()">
-            <!-- Story Progress Bar -->
             <div class="w-full flex space-x-1 pt-2 z-20">
                 <div class="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
                     <div id="story-progress-bar" class="h-full bg-white w-0"></div>
                 </div>
             </div>
 
-            <!-- Top Creator Bar (Tap to open creator profile) -->
             <div class="flex justify-between items-center z-20 pt-2">
                 <div class="flex items-center space-x-2.5 cursor-pointer bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full" onclick="openProfileFromStory()">
                     <div class="w-8 h-8 rounded-full bg-zinc-800 text-white font-extrabold flex items-center justify-center text-xs" id="story-top-avatar">U</div>
@@ -258,17 +280,14 @@
                 <button onclick="closeStory()" class="text-white text-lg p-2"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- Story Media with Double Tap Container -->
             <div class="absolute inset-0 flex items-center justify-center overflow-hidden" ondblclick="triggerDoubleTapLike('story', currentStoryId, event)">
                 <img id="story-img" class="w-full h-full object-cover hidden">
                 <video id="story-vid" class="w-full h-full object-cover hidden" playsinline></video>
-                <!-- Double Tap Heart -->
                 <div class="absolute pointer-events-none hidden" id="story-heart-burst">
                     <i class="fa-solid fa-heart text-red-500 text-7xl drop-shadow-2xl"></i>
                 </div>
             </div>
 
-            <!-- Story Bottom Actions -->
             <div class="z-20 flex items-center space-x-2.5 pb-2 bg-gradient-to-t from-black/90 to-transparent pt-4">
                 <input type="text" id="story-reply-msg" placeholder="Send message..." class="flex-1 bg-zinc-900/80 border border-zinc-700 rounded-full px-4 py-2 text-xs text-white focus:outline-none">
                 <button onclick="sendStoryReply()" class="text-white text-sm bg-white/20 px-3 py-2 rounded-full icon-btn"><i class="fa-solid fa-paper-plane"></i></button>
@@ -278,7 +297,7 @@
         </div>
     </div>
 
-    <!-- INSTAGRAM COMMENTS BOTTOM DRAWER -->
+    <!-- COMMENTS MODAL -->
     <div id="modal-comments" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="closeComments()">
         <div class="clay-card w-full max-w-md h-[60vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
@@ -293,7 +312,7 @@
         </div>
     </div>
 
-    <!-- FOLLOWERS / FOLLOWING LIST MODAL -->
+    <!-- FOLLOWERS LIST MODAL -->
     <div id="modal-follow-list" class="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 hidden" onclick="closeFollowListModal()">
         <div class="clay-card p-4 w-full max-w-sm space-y-3" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
@@ -304,7 +323,7 @@
         </div>
     </div>
 
-    <!-- POST & REEL FULL VIEW MODAL (From Explore) -->
+    <!-- EXPLORE VIEWER MODAL -->
     <div id="modal-media-viewer" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-3 hidden">
         <div class="flex justify-between items-center pt-2">
             <button onclick="closeMediaViewer()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -313,7 +332,7 @@
         <div class="flex-1 flex items-center justify-center overflow-hidden my-3" id="media-viewer-content"></div>
     </div>
 
-    <!-- CREATE MODAL (Post / Reel / Story) with Video Editor -->
+    <!-- CREATE MODAL -->
     <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
             <button onclick="closeCreateModal()" class="text-white text-base"><i class="fa-solid fa-xmark"></i></button>
@@ -321,7 +340,6 @@
             <button onclick="publishMedia()" id="btn-publish" class="clay-btn px-4 py-1.5 text-xs font-bold">Share</button>
         </div>
         <div class="flex-1 p-4 space-y-3 max-w-md mx-auto w-full overflow-y-auto">
-            <!-- Tabs -->
             <div class="flex space-x-2 border-b border-zinc-800 pb-2 text-xs">
                 <button onclick="setUploadType('post')" id="type-btn-post" class="font-bold text-white border-b-2 border-white pb-1 px-3">Post</button>
                 <button onclick="setUploadType('reel')" id="type-btn-reel" class="text-gray-500 pb-1 px-3">Reel</button>
@@ -329,7 +347,6 @@
             </div>
             <input type="text" id="create-caption-input" placeholder="Write a caption, tags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none">
             
-            <!-- Source Selector -->
             <div class="grid grid-cols-2 gap-2">
                 <label class="cursor-pointer block clay-card p-4 text-center border border-zinc-800 hover:border-zinc-500 transition">
                     <i class="fa-solid fa-images text-2xl mb-1 text-white"></i>
@@ -338,13 +355,11 @@
                 </label>
                 <button type="button" onclick="openCameraRecorder()" class="clay-card p-4 text-center border border-zinc-800 hover:border-zinc-500 transition">
                     <i class="fa-solid fa-video text-2xl mb-1 text-red-500"></i>
-                    <p class="text-[10px] text-gray-300">Instagram Camera</p>
+                    <p class="text-[10px] text-gray-300">Live Lens</p>
                 </button>
             </div>
 
-            <!-- Video & Image Editing Suite -->
             <div id="editor-preview-container" class="hidden space-y-3 pt-2">
-                <!-- Filters & Sound Control -->
                 <div class="flex justify-between items-center bg-zinc-900 p-2.5 rounded-xl text-xs">
                     <button type="button" onclick="toggleEditorAudio()" id="btn-editor-mute" class="bg-zinc-800 px-3 py-1.5 rounded-lg text-white">
                         <i class="fa-solid fa-volume-high"></i>
@@ -359,7 +374,6 @@
                     </div>
                 </div>
 
-                <!-- Filter Strip -->
                 <div class="flex space-x-2 overflow-x-auto py-1 text-xs">
                     <button onclick="setMediaFilter('none')" class="bg-zinc-900 px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">Normal</button>
                     <button onclick="setMediaFilter('contrast(125%) saturate(130%)')" class="bg-zinc-900 px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">Vivid</button>
@@ -380,7 +394,7 @@
         </div>
     </div>
 
-    <!-- INSTAGRAM LIVE CAMERA & VIDEO RECORDER -->
+    <!-- CAMERA RECORDER -->
     <div id="modal-camera" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
         <div class="flex justify-between items-center z-10">
             <button onclick="closeCameraRecorder()" class="text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
@@ -397,7 +411,6 @@
         </div>
 
         <div class="flex justify-around items-center py-4 z-10 px-8">
-            <!-- Capture Photo -->
             <button onclick="capturePhotoNow()" class="flex flex-col items-center space-y-1 icon-btn">
                 <div class="w-14 h-14 rounded-full border-2 border-white p-1 flex items-center justify-center">
                     <div class="w-full h-full bg-white rounded-full"></div>
@@ -405,7 +418,6 @@
                 <span class="text-[10px] text-gray-300 font-bold">Photo</span>
             </button>
 
-            <!-- Record Video (Instagram style) -->
             <button id="cam-record-btn" onclick="toggleVideoRecord()" class="flex flex-col items-center space-y-1 icon-btn">
                 <div id="record-ring" class="w-16 h-16 rounded-full border-4 border-red-600 p-1 flex items-center justify-center transition">
                     <div id="record-circle" class="w-full h-full bg-red-600 rounded-full"></div>
@@ -415,21 +427,23 @@
         </div>
     </div>
 
-    <!-- LIVE BROADCAST VIEW (WebRTC) -->
+    <!-- IB65 LIVE BROADCAST VIEW (WebRTC) -->
     <div id="modal-live-room" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
         <div class="flex justify-between items-center z-20">
             <div class="flex items-center space-x-2">
-                <span class="bg-red-600 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold animate-pulse">LIVE</span>
+                <span class="bg-red-600 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold animate-pulse">IB65 LIVE</span>
                 <span id="live-viewers-tag" class="text-xs font-bold text-white">👁️ 1</span>
-                <span id="live-host-title" class="text-xs text-gray-300 font-semibold pl-2">Host</span>
+                <!-- Real Creator Name Banner -->
+                <div class="flex items-center space-x-1.5 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-zinc-800">
+                    <div class="w-4 h-4 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-[9px]" id="live-host-avatar">U</div>
+                    <span id="live-host-title" class="text-xs text-white font-bold">Host</span>
+                </div>
             </div>
             <button onclick="exitLiveRoom()" class="text-xs bg-red-600 px-3.5 py-1.5 rounded-xl text-white font-bold">End</button>
         </div>
 
-        <!-- Video stream -->
         <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
             <video id="live-room-video" autoplay playsinline class="w-full h-full object-cover"></video>
-            <!-- Floating Hearts Area -->
             <div id="live-hearts-container" class="absolute right-4 bottom-24 pointer-events-none"></div>
         </div>
 
@@ -447,7 +461,7 @@
     <div id="modal-auth" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
         <div class="clay-card p-6 w-full max-w-sm space-y-3.5">
             <h2 class="text-3xl font-black text-center text-white">IB65</h2>
-            <p class="text-xs text-center text-gray-400">Instagram Experience</p>
+            <p class="text-xs text-center text-gray-400">Social Universe</p>
             <input type="text" id="auth-input-name" placeholder="Full Name" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
             <input type="email" id="auth-input-email" placeholder="Email" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
             <input type="password" id="auth-input-pass" placeholder="Password (6+ chars)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
@@ -458,10 +472,8 @@
         </div>
     </div>
 
-    <!-- Global Toast -->
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
-    <!-- FIREBASE & APPLICATION ENGINE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -480,7 +492,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // State Store
         window.auth = auth;
         window.db = db;
         let currentTab = 'home';
@@ -493,7 +504,6 @@
         let overlayText = '';
         let overlayTextColor = '#ffffff';
 
-        // Camera State
         let cameraStream = null;
         let cameraFacing = 'environment';
         let mediaRecorder = null;
@@ -502,23 +512,22 @@
         let recordTimer = null;
         let recordDuration = 0;
 
-        // Story State
         let currentStory = null;
         let storyTimer = null;
 
-        // Active Comments Target
         let activeCommentCol = 'posts';
         let activeCommentDocId = null;
 
-        // Public Profile & Live State
         let activePublicUserEmail = null;
+        let activeDirectRecipient = null;
+        let chatSnapshotUnsub = null;
+
         let peerInstance = null;
         let activeLiveStreamId = null;
         let isHostingLive = false;
         let localStreamMedia = null;
         let liveSnapshotUnsub = null;
 
-        // Splash dismiss
         setTimeout(() => {
             const sp = document.getElementById('splash');
             if (sp) { sp.style.opacity = '0'; setTimeout(() => sp.remove(), 350); }
@@ -532,7 +541,6 @@
             setTimeout(() => t.classList.add('hidden'), 2300);
         };
 
-        // Navigation Switcher
         window.switchTab = function(tab) {
             currentTab = tab;
             ['home', 'search', 'reels', 'live', 'profile', 'public-profile'].forEach(t => {
@@ -554,7 +562,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // Auth Listeners
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('modal-auth').classList.add('hidden');
@@ -603,13 +610,11 @@
             showToast("Logged out");
         };
 
-        // Safe Load Home (Feed + Stories)
         async function safeLoadHome() {
             loadStoriesTray();
             loadPostsFeed();
         }
 
-        // STORIES SYSTEM
         async function loadStoriesTray() {
             const tray = document.getElementById('stories-tray-items');
             try {
@@ -720,7 +725,6 @@
             showToast("Reply sent to " + (currentStory.author || 'creator'));
         };
 
-        // POSTS FEED (Instagram Style with Double Tap, Like, Comment, Share, Follow, Delete)
         async function loadPostsFeed() {
             const container = document.getElementById('posts-stream');
             try {
@@ -736,7 +740,6 @@
                 posts.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
                 const user = auth.currentUser;
 
-                // Get Current User Following List
                 let myFollowing = [];
                 if (user) {
                     const uSnap = await getDoc(doc(db, "users", user.email));
@@ -754,7 +757,6 @@
 
                     return `
                     <div class="clay-card p-3 space-y-2.5">
-                        <!-- Post Header -->
                         <div class="flex justify-between items-center">
                             <div class="flex items-center space-x-2.5 cursor-pointer" onclick="openPublicProfile('${authorEmail}')">
                                 <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
@@ -777,16 +779,13 @@
                             </div>
                         </div>
 
-                        <!-- Post Media with Double Tap Container -->
                         <div class="relative w-full max-h-80 rounded-2xl overflow-hidden bg-black flex items-center justify-center" ondblclick="triggerDoubleTapLike('posts', '${p.id}', event)">
                             ${isVid ? `<video src="${media}" class="w-full max-h-80 object-cover" controls playsinline></video>` : `<img src="${media}" style="filter: ${p.filter || 'none'}" class="w-full max-h-80 object-cover">`}
-                            <!-- Heart Burst -->
                             <div class="absolute pointer-events-none hidden" id="burst-${p.id}">
                                 <i class="fa-solid fa-heart text-red-500 text-7xl drop-shadow-2xl"></i>
                             </div>
                         </div>
 
-                        <!-- Action Bar (Instagram Like, Comment, Share) -->
                         <div class="flex items-center space-x-4 pt-1 text-white text-base">
                             <button onclick="toggleCloudLike('posts', '${p.id}')" class="flex items-center space-x-1.5 icon-btn ${isLiked ? 'text-red-500' : ''}">
                                 <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-lg"></i>
@@ -810,7 +809,6 @@
             }
         }
 
-        // REELS FEED (Full Screen Style with Double Tap, Like, Comment, Follow, Delete)
         async function loadReelsFeed() {
             const container = document.getElementById('reels-container');
             try {
@@ -844,12 +842,10 @@
                     <div class="relative w-full max-w-sm h-[78vh] bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-end p-4 border border-zinc-900" ondblclick="triggerDoubleTapLike('reels', '${r.id}', event)">
                         <video src="${vidUrl}" style="filter: ${r.filter || 'none'}" class="absolute inset-0 w-full h-full object-cover" autoplay loop controls playsinline></video>
                         
-                        <!-- Double Tap Heart -->
                         <div class="absolute inset-0 flex items-center justify-center pointer-events-none hidden" id="burst-${r.id}">
                             <i class="fa-solid fa-heart text-red-500 text-7xl drop-shadow-2xl"></i>
                         </div>
 
-                        <!-- Right Actions (Instagram Style) -->
                         <div class="absolute right-3 bottom-16 flex flex-col items-center space-y-4 z-20 text-white">
                             <button onclick="toggleCloudLike('reels', '${r.id}')" class="flex flex-col items-center space-y-1 icon-btn ${isLiked ? 'text-red-500' : ''}">
                                 <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-2xl"></i>
@@ -869,7 +865,6 @@
                             ` : ''}
                         </div>
 
-                        <!-- Creator Card Bottom -->
                         <div class="relative z-10 flex justify-between items-center bg-gradient-to-t from-black/90 via-black/50 to-transparent p-2.5 rounded-2xl">
                             <div class="flex items-center space-x-2 cursor-pointer" onclick="openPublicProfile('${authorEmail}')">
                                 <div class="w-8 h-8 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs">${authorName[0].toUpperCase()}</div>
@@ -887,7 +882,6 @@
             } catch(e) {}
         }
 
-        // DOUBLE TAP LIKE ANIMATION (Posts, Reels & Stories)
         window.triggerDoubleTapLike = async function(col, docId, event) {
             const burst = document.getElementById('burst-' + docId) || document.getElementById('story-heart-burst');
             if (burst) {
@@ -910,7 +904,6 @@
             }
         };
 
-        // LIKE TOGGLE
         window.toggleCloudLike = async function(col, id) {
             const user = auth.currentUser;
             if (!user) return;
@@ -929,15 +922,14 @@
             } catch(e) {}
         };
 
-        // DELETE OPTION (Instagram Style)
         window.deleteMyContent = async function(col, docId, authorEmail) {
             const user = auth.currentUser;
             if (!user || user.email !== authorEmail) {
-                showToast("You can only delete your own posts!");
+                showToast("You can only delete your own content!");
                 return;
             }
 
-            if (!confirm("Delete this " + (col === 'posts' ? 'post' : 'reel') + "?")) return;
+            if (!confirm("Delete this permanently?")) return;
 
             try {
                 await deleteDoc(doc(db, col, docId));
@@ -947,7 +939,6 @@
             } catch(e) { showToast("Delete error: " + e.message); }
         };
 
-        // INSTAGRAM COMMENTS DRAWER
         window.openComments = function(col, id) {
             activeCommentCol = col;
             activeCommentDocId = id;
@@ -966,7 +957,7 @@
                 const comments = snap.exists() ? (snap.data().comments || []) : [];
 
                 if (comments.length === 0) {
-                    list.innerHTML = '<div class="text-center text-gray-500 py-8">No comments yet. Be first!</div>';
+                    list.innerHTML = '<div class="text-center text-gray-500 py-8">No comments yet.</div>';
                     return;
                 }
 
@@ -996,7 +987,6 @@
             } catch(e) {}
         };
 
-        // SEARCH & EXPLORE (Instagram Style Grid with Full View)
         async function loadExploreMedia() {
             const grid = document.getElementById('explore-grid');
             try {
@@ -1053,7 +1043,6 @@
             document.getElementById('modal-media-viewer').classList.add('hidden');
         };
 
-        // GLOBAL SEARCH (Real Users & Real Posts)
         window.handleSearch = async function(e) {
             const q = e.target.value.toLowerCase().trim();
             const resultsBox = document.getElementById('search-users-results');
@@ -1095,7 +1084,109 @@
             } catch(e) {}
         };
 
-        // PUBLIC PROFILE & REAL FOLLOWERS / FOLLOWING
+        // REAL-TIME 1-ON-1 MESSAGING (Instagram Direct Messages)
+        window.openDirectChatWithUser = function(recipientEmail, recipientName) {
+            const user = auth.currentUser;
+            if (!user) { showToast("Login to send messages!"); return; }
+
+            activeDirectRecipient = recipientEmail;
+            document.getElementById('chat-user-name').innerText = recipientName;
+            document.getElementById('chat-user-avatar').innerText = recipientName[0].toUpperCase();
+            document.getElementById('modal-direct-chat').classList.remove('hidden');
+
+            const chatId = [user.email, recipientEmail].sort().join('_').replace(/[^a-zA-Z0-9]/g, '');
+
+            if (chatSnapshotUnsub) chatSnapshotUnsub();
+
+            chatSnapshotUnsub = onSnapshot(doc(db, "chats", chatId), (docSnap) => {
+                const chatBox = document.getElementById('chat-messages-scroll');
+                if (!docSnap.exists()) {
+                    chatBox.innerHTML = '<div class="text-center text-gray-500 py-10">Start chatting with ' + recipientName + '!</div>';
+                    return;
+                }
+                const msgs = docSnap.data().messages || [];
+                chatBox.innerHTML = msgs.map(m => {
+                    const isMe = m.sender === user.email;
+                    return `
+                        <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                            <div class="max-w-[75%] px-3.5 py-2 rounded-2xl ${isMe ? 'bg-white text-black font-medium' : 'bg-zinc-800 text-white'}">
+                                ${m.text}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        };
+
+        window.closeDirectChat = function() {
+            if (chatSnapshotUnsub) {
+                chatSnapshotUnsub();
+                chatSnapshotUnsub = null;
+            }
+            activeDirectRecipient = null;
+            document.getElementById('modal-direct-chat').classList.add('hidden');
+        };
+
+        window.sendChatMessageDirect = async function() {
+            const input = document.getElementById('chat-input-field');
+            const txt = input.value.trim();
+            const user = auth.currentUser;
+            if (!txt || !user || !activeDirectRecipient) return;
+
+            const chatId = [user.email, activeDirectRecipient].sort().join('_').replace(/[^a-zA-Z0-9]/g, '');
+            const chatRef = doc(db, "chats", chatId);
+
+            try {
+                const snap = await getDoc(chatRef);
+                const msgObj = { sender: user.email, text: txt, time: Date.now() };
+
+                if (!snap.exists()) {
+                    await setDoc(chatRef, { messages: [msgObj] });
+                } else {
+                    await updateDoc(chatRef, { messages: arrayUnion(msgObj) });
+                }
+                input.value = '';
+            } catch(e) { showToast("Message send failed: " + e.message); }
+        };
+
+        window.openDirectInbox = async function() {
+            const user = auth.currentUser;
+            if (!user) { showToast("Login to open inbox!"); return; }
+
+            const list = document.getElementById('direct-inbox-list');
+            list.innerHTML = '<div class="text-center text-gray-500 py-8">Loading conversations...</div>';
+            document.getElementById('modal-direct-inbox').classList.remove('hidden');
+
+            try {
+                const uDoc = await getDoc(doc(db, "users", user.email));
+                const allContacts = [...new Set([...(uDoc.data()?.followersList || []), ...(uDoc.data()?.followingList || [])])];
+
+                if (allContacts.length === 0) {
+                    list.innerHTML = '<div class="text-center text-gray-500 py-10 text-xs">No active chats. Follow creators to message them!</div>';
+                    return;
+                }
+
+                list.innerHTML = allContacts.map(cEmail => `
+                    <div onclick="closeDirectInbox(); openDirectChatWithUser('${cEmail}', '${cEmail.split('@')[0]}')" class="clay-card p-3 flex items-center justify-between cursor-pointer">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-sm">${cEmail[0].toUpperCase()}</div>
+                            <div>
+                                <p class="font-bold text-xs text-white">${cEmail.split('@')[0]}</p>
+                                <p class="text-[10px] text-gray-400">Tap to chat in real time</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
+                    </div>
+                `).join('');
+            } catch(e) {}
+        };
+
+        window.closeDirectInbox = function() {
+            document.getElementById('modal-direct-inbox').classList.add('hidden');
+        };
+
+        // PUBLIC PROFILE
         window.openPublicProfile = async function(email) {
             const user = auth.currentUser;
             if (user && user.email === email) {
@@ -1120,7 +1211,6 @@
                 document.getElementById('pub-stat-followers').innerText = fCount;
                 document.getElementById('pub-stat-following').innerText = fgCount;
 
-                // Follow Button State
                 const mySnap = await getDoc(doc(db, "users", user.email));
                 const myFollowing = mySnap.exists() ? (mySnap.data().followingList || []) : [];
                 const isFollowing = myFollowing.includes(email);
@@ -1133,7 +1223,12 @@
                     openPublicProfile(email);
                 };
 
-                // Creator Media Grid
+                // Connect Real-Time Chat Trigger to Message Button
+                const msgBtn = document.getElementById('pub-msg-btn');
+                msgBtn.onclick = () => {
+                    openDirectChatWithUser(email, d.name || d.handle || 'Creator');
+                };
+
                 const pSnap = await getDocs(collection(db, "posts"));
                 const posts = [];
                 pSnap.forEach(p => { if (p.data().authorEmail === email) posts.push(p.data()); });
@@ -1151,7 +1246,6 @@
             } catch(e) {}
         };
 
-        // REAL MUTUAL FOLLOW SYSTEM
         window.toggleFollowUser = async function(targetEmail, targetName) {
             const user = auth.currentUser;
             if (!user || user.email === targetEmail) return;
@@ -1191,7 +1285,6 @@
             } catch(e) { showToast("Follow error: " + e.message); }
         };
 
-        // FOLLOWERS / FOLLOWING LIST MODAL
         window.openFollowListModal = async function(email, type) {
             document.getElementById('follow-list-title').innerText = type === 'followers' ? 'Followers' : 'Following';
             const list = document.getElementById('follow-list-container');
@@ -1223,7 +1316,6 @@
             document.getElementById('modal-follow-list').classList.add('hidden');
         };
 
-        // MY PROFILE LOADER
         async function loadMyProfile() {
             const user = auth.currentUser;
             if (!user) return;
@@ -1242,7 +1334,6 @@
                     document.getElementById('my-stat-following').innerText = fgCount;
                 }
 
-                // Load My Posts
                 const pSnap = await getDocs(collection(db, "posts"));
                 const myPosts = [];
                 pSnap.forEach(p => { if (p.data().authorEmail === user.email) myPosts.push({ id: p.id, ...p.data() }); });
@@ -1268,7 +1359,6 @@
             }
         };
 
-        // CREATE MEDIA & CLOUDINARY UPLOADER
         window.openCreateModal = function(type) {
             setUploadType(type || 'post');
             document.getElementById('modal-create').classList.remove('hidden');
@@ -1307,7 +1397,6 @@
             }
         };
 
-        // VIDEO & PHOTO EDITOR CONTROLS
         window.setMediaFilter = function(filterVal) {
             currentFilter = filterVal;
             const img = document.getElementById('edit-img-preview');
@@ -1409,7 +1498,6 @@
             }
         };
 
-        // INSTAGRAM CAMERA & VIDEO RECORDER
         window.openCameraRecorder = async function() {
             const modal = document.getElementById('modal-camera');
             modal.classList.remove('hidden');
@@ -1539,7 +1627,7 @@
             }
         }
 
-        // INSTAGRAM LIVE BROADCAST (WebRTC)
+        // IB65 LIVE BROADCAST (Real Names & IB65 Branding)
         async function loadLiveBroadcasters() {
             const list = document.getElementById('live-rooms-list');
             try {
@@ -1559,8 +1647,8 @@
                                 <div class="w-full h-full bg-white text-black font-extrabold rounded-full flex items-center justify-center text-xs">${(s.host || 'H')[0]}</div>
                             </div>
                             <div>
-                                <h4 class="text-xs font-bold text-white">${s.host}</h4>
-                                <p class="text-[10px] text-gray-400">Tap to watch live</p>
+                                <h4 class="text-xs font-bold text-white">${s.host} is LIVE</h4>
+                                <p class="text-[10px] text-gray-400">Tap to watch broadcast</p>
                             </div>
                         </div>
                         <span class="bg-red-600/30 text-red-500 border border-red-600 text-[10px] px-2 py-0.5 rounded-full font-bold">👁️ ${s.viewers || 1}</span>
@@ -1573,6 +1661,8 @@
             const user = auth.currentUser;
             if (!user) { showToast("Login to broadcast live!"); return; }
 
+            const hostDisplayName = user.displayName || user.email.split('@')[0];
+
             try {
                 localStreamMedia = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 isHostingLive = true;
@@ -1582,7 +1672,7 @@
 
                 peerInstance.on('open', async (peerId) => {
                     const docRef = await addDoc(collection(db, "lives"), {
-                        host: user.displayName || 'Host',
+                        host: hostDisplayName,
                         hostEmail: user.email,
                         peerId: peerId,
                         viewers: 1,
@@ -1591,7 +1681,8 @@
                     });
 
                     activeLiveStreamId = docRef.id;
-                    document.getElementById('live-host-title').innerText = (user.displayName || 'Host') + " (You)";
+                    document.getElementById('live-host-title').innerText = hostDisplayName;
+                    document.getElementById('live-host-avatar').innerText = hostDisplayName[0].toUpperCase();
                     document.getElementById('live-viewers-tag').innerText = "👁️ 1";
 
                     const vid = document.getElementById('live-room-video');
@@ -1627,6 +1718,7 @@
                 if (snap.exists()) await updateDoc(ref, { viewers: (snap.data().viewers || 1) + 1 });
 
                 document.getElementById('live-host-title').innerText = hostName;
+                document.getElementById('live-host-avatar').innerText = hostName[0].toUpperCase();
                 document.getElementById('modal-live-room').classList.remove('hidden');
                 listenLiveUpdates(liveId);
             });
@@ -1703,10 +1795,6 @@
         window.shareLink = function() {
             navigator.clipboard.writeText(window.location.href);
             showToast("🔗 Link copied to clipboard!");
-        };
-
-        window.openDirectInbox = function() {
-            showToast("Direct messages ready");
         };
     </script>
 </body>
