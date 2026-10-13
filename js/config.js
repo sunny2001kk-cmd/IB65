@@ -28,6 +28,7 @@ import {
     increment 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// Firebase App Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBlM05NZl4bKjRsrZ0ZUDpjYi0fdPP2-X4",
     authDomain: "ib65-67f62.firebaseapp.com",
@@ -41,6 +42,7 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
+// Export Authentication & Firestore methods
 export {
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
@@ -65,11 +67,13 @@ export {
     increment
 };
 
+// Cloudinary Storage Config
 export const CLOUDINARY_CONFIG = {
     cloudName: "mhj8jvag",
     uploadPreset: "ib65_upload"
 };
 
+// Global Floating Notification
 export function showToast(msg) {
     const t = document.getElementById('toast');
     if (!t) return;
@@ -78,7 +82,7 @@ export function showToast(msg) {
     setTimeout(() => t.classList.add('hidden'), 2300);
 }
 
-// Missing function jo JS ko crash kar raha tha:
+// Relative Time Formatter (Fixes feed.js crash)
 export function getRelativeTime(timestamp) {
     if (!timestamp) return 'Just now';
     const diff = Math.floor((Date.now() - timestamp) / 1000);
@@ -89,6 +93,7 @@ export function getRelativeTime(timestamp) {
     return `${Math.floor(diff / 604800)}w`;
 }
 
+// Verified Badge Icons
 export function getVerificationBadgeSvg(badgeType) {
     if (badgeType === 'gold_red') {
         return `
