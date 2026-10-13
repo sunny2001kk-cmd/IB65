@@ -74,6 +74,20 @@
         <p class="text-[10px] text-gray-500 uppercase tracking-widest">Connect & Live</p>
     </div>
 
+    <!-- Fail-safe Auto-Dismiss Script for Splash Screen -->
+    <script>
+        setTimeout(function() {
+            var sp = document.getElementById('splash');
+            if (sp) {
+                sp.style.opacity = '0';
+                setTimeout(function() { 
+                    sp.style.display = 'none'; 
+                    if (sp.parentNode) sp.parentNode.removeChild(sp);
+                }, 350);
+            }
+        }, 1200);
+    </script>
+
     <!-- Top Navigation Header -->
     <header id="main-app-header" class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-zinc-900 px-4 py-2.5 flex justify-between items-center">
         <h1 class="text-2xl font-black tracking-wider text-white">IB65</h1>
@@ -88,7 +102,7 @@
         </div>
     </header>
 
-    <!-- Main Container -->
+    <!-- Main Views Container -->
     <main class="max-w-md mx-auto">
 
         <!-- 1. HOME VIEW -->
@@ -115,7 +129,7 @@
         <div id="view-search" class="space-y-3 p-3 hidden pb-24">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-xs"></i>
-                <input type="text" id="global-search-input" oninput="window.handleSearch?.(event)" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none">
+                <input type="text" id="global-search-input" oninput="window.handleSearch(event)" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none">
             </div>
 
             <div id="search-users-results" class="space-y-2 hidden"></div>
@@ -302,7 +316,7 @@
                 </div>
             </div>
 
-            <!-- Dynamic Demographics Container (No Hardcoded Dummy Data) -->
+            <!-- Demographics Container (100% Dynamic innerHTML - Zero Hardcoded Values) -->
             <div class="clay-card p-4 space-y-3">
                 <div class="flex justify-between items-center">
                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Audience Demographics</h4>
@@ -517,7 +531,7 @@
         </div>
     </div>
 
-    <!-- DIRECT INBOX & MESSAGING (WITH CLICKABLE PROFILE HEADER) -->
+    <!-- DIRECT INBOX & MESSAGING (WITH CLICKABLE PROFILE HEADER FIX) -->
     <div id="modal-direct-inbox" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-zinc-900 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -533,7 +547,7 @@
             <div class="flex items-center space-x-3">
                 <button onclick="window.closeDirectChat()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
                 
-                <!-- CLICKABLE CHAT HEADER FIX -->
+                <!-- CLICKABLE CHAT HEADER -->
                 <div class="flex items-center space-x-2.5 cursor-pointer icon-btn" onclick="window.navigateToChatUserProfile()">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 overflow-hidden">
                         <div class="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center text-xs font-bold" id="chat-user-avatar">U</div>
@@ -550,6 +564,15 @@
             <input type="text" id="chat-input-field" placeholder="Message..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
             <button onclick="window.sendChatMessageDirect()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
         </div>
+    </div>
+
+    <!-- MEDIA VIEWER MODAL -->
+    <div id="modal-media-viewer" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-3 hidden">
+        <div class="flex justify-between items-center pt-2">
+            <button onclick="window.closeMediaViewer()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <span class="text-xs font-bold text-gray-400">IB65 View</span>
+        </div>
+        <div class="flex-1 flex items-center justify-center overflow-hidden my-3" id="media-viewer-content"></div>
     </div>
 
     <!-- AUTH MODAL -->
@@ -592,7 +615,7 @@
 
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
-    <!-- MODULAR JS CONNECTOR -->
+    <!-- MODULAR SCRIPT ENTRY POINT -->
     <script type="module" src="./js/app.js"></script>
 </body>
 </html>
