@@ -41,7 +41,7 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Exporting direct auth/firestore methods to keep modules consistent
+// Exporting auth & firestore methods for all modules
 export {
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
@@ -71,7 +71,7 @@ export const CLOUDINARY_CONFIG = {
     uploadPreset: "ib65_upload"
 };
 
-// Global Toast Helper
+// Global Toast Message
 export function showToast(msg) {
     const t = document.getElementById('toast');
     if (!t) return;
@@ -80,7 +80,18 @@ export function showToast(msg) {
     setTimeout(() => t.classList.add('hidden'), 2300);
 }
 
-// Consistent Verified Badge Vector
+// Relative Time Formatter (Missing Export Fixed)
+export function getRelativeTime(timestamp) {
+    if (!timestamp) return 'Just now';
+    const diff = Math.floor((Date.now() - timestamp) / 1000);
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
+    return `${Math.floor(diff / 604800)}w`;
+}
+
+// Consistent Verified Badge SVG
 export function getVerificationBadgeSvg(badgeType) {
     if (badgeType === 'gold_red') {
         return `
@@ -103,14 +114,4 @@ export function getVerificationBadgeSvg(badgeType) {
         </svg>`;
     }
     return '';
-}
-// js/config.js ke aakhri me ye add karein
-export function getRelativeTime(timestamp) {
-    if (!timestamp) return 'Just now';
-    const diff = Math.floor((Date.now() - timestamp) / 1000);
-    if (diff < 60) return 'Just now';
-    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-    if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
-    return `${Math.floor(diff / 604800)}w`;
 }
