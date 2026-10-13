@@ -32,7 +32,7 @@ export function initGlobalSingleVideoObserver() {
     if (globalVideoObserver) globalVideoObserver.disconnect();
     
     globalVideoObserver = new IntersectionObserver((entries) => {
-        if (isEditorActive || isLiveBroadcasting) return; // Don't interrupt editor or live stream
+        if (isEditorActive || isLiveBroadcasting) return;
 
         entries.forEach(entry => {
             const vid = entry.target;
@@ -401,7 +401,7 @@ export async function loadReelsFeed() {
     } catch(e) {}
 }
 
-// 5. Explore Media Loader with Zero Broken Images
+// 5. Explore Media Loader
 export async function loadExploreMedia() {
     const grid = document.getElementById('explore-grid');
     if (!grid) return;
@@ -459,7 +459,194 @@ export async function loadExploreMedia() {
     } catch(e) {}
 }
 
-// 6. Watch Tracking Math
+// 6. Media Viewer Modal Fix
+export function openMediaViewer(it) {
+    const modal = document.getElementById('modal-media-viewer');
+    const container = document.getElementById('media-viewer-content');
+    if (!modal || !container) return;
+
+    const media = it.mediaUrl || it.url || it.videoUrl || '';
+    const isVid = it.mediaType === 'video' || it.col === 'reels';
+    const cleanAuthor = (it.author || it.handle || 'Creator').replace(/^@+/, '');
+    const badgeSvg = getVerificationBadgeSvg(cleanAuthor.toLowerCase() === 'ib65' ? 'gold_red' : 'none');
+
+    container.innerHTML = `
+        <div class="clay-card p-3 w-full max-w-sm space-y-3">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="window.closeMediaViewer(); window.openPublicProfile('${it.authorEmail || ''}')">
+                <div class="w-8 h-8 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs">${cleanAuthor[0]}</div>
+                <span class="font-bold text-xs text-white flex items-center">@${cleanAuthor} ${badgeSvg}</span>
+            </div>
+            <div class="rounded-xl overflow-hidden bg-black max-h-80 flex items-center justify-center">
+                ${isVid ? `<video src="${media}" poster="${it.thumbnailUrl || ''}" class="w-full max-h-80 object-cover" controls autoplay playsinline></video>` : `<img src="${media}" class="w-full max-h-80 object-cover">`}
+            </div>
+            ${it.caption || it.title ? `<p class="text-xs text-gray-200">${it.caption || it.title}</p>` : ''}
+        </div>
+    `;
+    modal.classList.remove('hidden');
+}
+
+export function closeMediaViewer() {
+    const modal = document.getElementById('modal-media-viewer');
+    const container = document.getElementById('media-viewer-content');
+    if (container) container.innerHTML = '';
+    if (modal) modal.classList.add('hidden');
+}
+
+// 7. Global Search Fix (Users + Hashtags)
+export async function handleSearch(e) {
+    const q = e.target.value.toLowerCase().trim();
+    const resultsBox = document.getElementById('search-users-results');
+    if (!resultsBox) return;
+
+    if (!q) {
+        resultsBox.classList.add('hidden');
+        loadExploreMedia();
+        return;
+    }
+
+    resultsBox.classList.remove('hidden');
+    try {
+        const [uSnap, pSnap, rSnap] = await Promise.all([
+            getDocs(collection(db, "users")),
+            getDocs(collection(db, "posts")),
+            getDocs(collection(db, "reels"))
+        ]);
+
+        const matchedUsers = [];
+        uSnap.forEach(d => {
+            const u = d.data();
+            const name = (u.name || '').toLowerCase();
+            const handle = (u.handle || d.id.split('@')[0]).toLowerCase();
+            if (name.includes(q) || handle.includes(q)) {
+                matchedUsers.push({ email: d.id, priority: handle === 'ib65' ? 1 : 0, ...u });
+            }
+        });
+
+        matchedUsers.sort((a,b) => b.priority - a.priority);
+
+        const matchedMedia = [];
+        const checkMatch = (d, col) => {
+            const data = d.data();
+            const cap = (data.caption || data.title || '').toLowerCase();
+            const tags = data.tags || [];
+            if (cap.includes(q) || tags.some(t => t.includes(q))) {
+                matchedMedia.push({ id: d.id, col, ...data });
+            }
+        };
+        pSnap.forEach(d => checkMatch(d, 'posts'));
+        rSnap.forEach(d => checkMatch(d, 'reels'));
+
+        let html = '';
+        if (matchedUsers.length > 0) {
+            html += matchedUsers.map(u => {
+                const bType = u.badgeType || (u.handle?.toLowerCase() === 'ib65' ? 'gold_red' : 'none');
+                return `
+                <div onclick="window.openPublicProfile('${u.email}')" class="clay-card p-2.5 flex justify-between items-center cursor-pointer hover:border-zinc-500 transition">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-9 h-9 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs overflow-hidden">
+                            ${u.photoUrl ? `<img src="${u.photoUrl}" class="w-full h-full object-cover">` : (u.name || 'U')[0]}
+                        </div>
+                        <div>
+                            <p class="font-bold text-xs text-white flex items-center">${u.name || 'User'} ${getVerificationBadgeSvg(bType)}</p>
+                            <p class="text-[10px] text-gray-400">@${(u.handle || u.email.split('@')[0]).replace(/^@+/, '')}</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-bold pr-2">Profile</span>
+                </div>
+                `;
+            }).join('');
+        }
+
+        if (matchedMedia.length > 0) {
+            html += `
+                <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase">Matching Posts & Tags</p>
+                <div class="grid grid-cols-3 gap-1">
+                    ${matchedMedia.map(m => `
+                        <div onclick='window.openMediaViewer(${JSON.stringify(m)})' class="h-24 bg-zinc-900 rounded overflow-hidden cursor-pointer border border-zinc-800">
+                            ${m.mediaType === 'video' || m.col === 'reels' ? `<video src="${m.mediaUrl || m.videoUrl}#t=0.001" poster="${m.thumbnailUrl || ''}" class="w-full h-full object-cover"></video>` : `<img src="${m.mediaUrl}" class="w-full h-full object-cover">`}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        if (!html) html = '<div class="text-gray-500 text-xs py-3 text-center">No results found for "' + q + '"</div>';
+        resultsBox.innerHTML = html;
+    } catch(e) {}
+}
+
+// 8. Like / Double Tap / Save Handlers
+export async function toggleCloudLike(col, id) {
+    const user = auth.currentUser;
+    if (!user) return;
+    const docRef = doc(db, col, id);
+    try {
+        const snap = await getDoc(docRef);
+        if (!snap.exists()) return;
+        const likes = snap.data()?.likes || [];
+        if (likes.includes(user.email)) {
+            await updateDoc(docRef, { likes: arrayRemove(user.email) });
+        } else {
+            await updateDoc(docRef, { likes: arrayUnion(user.email) });
+        }
+        if (col === 'posts') loadPostsFeed();
+        if (col === 'reels') loadReelsFeed();
+    } catch(e) {}
+}
+
+export async function triggerDoubleTapLike(col, docId, event) {
+    const burst = document.getElementById('burst-' + docId);
+    if (burst) {
+        burst.classList.remove('hidden');
+        burst.classList.remove('heart-burst-animate');
+        void burst.offsetWidth;
+        burst.classList.add('heart-burst-animate');
+        setTimeout(() => burst.classList.add('hidden'), 750);
+    }
+    const user = auth.currentUser;
+    if (!user) return;
+    await updateDoc(doc(db, col, docId), { likes: arrayUnion(user.email) }).catch(()=>{});
+    if (col === 'posts') loadPostsFeed();
+    if (col === 'reels') loadReelsFeed();
+}
+
+export async function toggleSavePost(docId) {
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+        const uRef = doc(db, "users", user.email);
+        const uSnap = await getDoc(uRef);
+        const saved = uSnap.data()?.savedPosts || [];
+
+        if (saved.includes(docId)) {
+            await updateDoc(uRef, { savedPosts: arrayRemove(docId) });
+            showToast("Removed from saved");
+        } else {
+            await updateDoc(uRef, { savedPosts: arrayUnion(docId) });
+            showToast("Saved to your collection");
+        }
+        loadPostsFeed();
+        loadReelsFeed();
+    } catch(e) {}
+}
+
+export async function deleteMyContent(col, docId, authorEmail) {
+    const user = auth.currentUser;
+    if (!user || user.email !== authorEmail) {
+        showToast("You can only delete your own content!");
+        return;
+    }
+    if (!confirm("Delete this permanently?")) return;
+
+    try {
+        await deleteDoc(doc(db, col, docId));
+        showToast("Deleted successfully");
+        if (col === 'posts') loadPostsFeed();
+        if (col === 'reels') loadReelsFeed();
+    } catch(e) { showToast(e.message); }
+}
+
+// 9. Watch Tracking
 export async function startWatchTracking(col, docId, authorEmail) {
     const user = auth.currentUser;
     if (!user) return;
@@ -508,7 +695,7 @@ export function stopWatchTracking() {
     clearInterval(watchInterval);
 }
 
-// 7. Comments Engine
+// 10. Comments
 export function openComments(col, id) {
     activeCommentCol = col;
     activeCommentDocId = id;
