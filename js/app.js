@@ -8,13 +8,9 @@ import {
     collection, 
     addDoc, 
     getDocs, 
-    query, 
-    where, 
-    onSnapshot, 
     arrayUnion, 
     arrayRemove, 
     increment, 
-    signOut, 
     showToast, 
     getVerificationBadgeSvg, 
     CLOUDINARY_CONFIG 
@@ -79,7 +75,14 @@ import {
     stopWatchTracking, 
     openComments, 
     closeComments, 
-    submitComment 
+    submitComment,
+    handleSearch,
+    openMediaViewer,
+    closeMediaViewer,
+    toggleCloudLike,
+    triggerDoubleTapLike,
+    toggleSavePost,
+    deleteMyContent
 } from './feed.js';
 
 let currentTab = 'home';
@@ -88,7 +91,7 @@ let selectedFileBlob = null;
 let selectedFileUrl = '';
 let selectedFileType = 'image';
 
-// Bind to Window for HTML onclick handlers
+// Bind All Functions to Window
 window.handleSignup = handleSignup;
 window.handleLogin = handleLogin;
 window.handleLogout = handleLogout;
@@ -131,6 +134,14 @@ window.openComments = openComments;
 window.closeComments = closeComments;
 window.submitComment = submitComment;
 
+window.handleSearch = handleSearch;
+window.openMediaViewer = openMediaViewer;
+window.closeMediaViewer = closeMediaViewer;
+window.toggleCloudLike = toggleCloudLike;
+window.triggerDoubleTapLike = triggerDoubleTapLike;
+window.toggleSavePost = toggleSavePost;
+window.deleteMyContent = deleteMyContent;
+
 // Tab Routing System
 window.switchTab = function(tab) {
     currentTab = tab;
@@ -167,7 +178,7 @@ window.switchTab = function(tab) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Profile Loading
+// Profile Loading Fix
 export async function loadMyProfile() {
     const user = auth.currentUser;
     if (!user) return;
@@ -256,7 +267,7 @@ export async function loadMyProfile() {
 
 window.loadMyProfile = loadMyProfile;
 
-// Public Creator Profile
+// Public Profile
 window.openPublicProfile = async function(email) {
     const user = auth.currentUser;
     if (user && user.email === email) {
@@ -345,7 +356,7 @@ window.openPublicProfile = async function(email) {
     } catch(e) {}
 };
 
-// Follow/Unfollow Engine
+// Follow Toggle
 window.toggleFollowUser = async function(targetEmail, targetName) {
     const user = auth.currentUser;
     if (!user || user.email === targetEmail) return;
@@ -383,7 +394,7 @@ window.toggleFollowUser = async function(targetEmail, targetName) {
     } catch(e) { showToast(e.message); }
 };
 
-// Create Modal & Upload Flow
+// Create & Upload Flow
 window.openCreateModal = function(type) {
     uploadType = type || 'post';
     document.getElementById('modal-create')?.classList.remove('hidden');
