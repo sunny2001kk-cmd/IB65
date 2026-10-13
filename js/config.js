@@ -41,7 +41,6 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Exporting auth & firestore methods for all modules
 export {
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
@@ -71,7 +70,6 @@ export const CLOUDINARY_CONFIG = {
     uploadPreset: "ib65_upload"
 };
 
-// Global Toast Message
 export function showToast(msg) {
     const t = document.getElementById('toast');
     if (!t) return;
@@ -80,7 +78,7 @@ export function showToast(msg) {
     setTimeout(() => t.classList.add('hidden'), 2300);
 }
 
-// Relative Time Formatter (Missing Export Fixed)
+// Missing function jo JS ko crash kar raha tha:
 export function getRelativeTime(timestamp) {
     if (!timestamp) return 'Just now';
     const diff = Math.floor((Date.now() - timestamp) / 1000);
@@ -91,7 +89,6 @@ export function getRelativeTime(timestamp) {
     return `${Math.floor(diff / 604800)}w`;
 }
 
-// Consistent Verified Badge SVG
 export function getVerificationBadgeSvg(badgeType) {
     if (badgeType === 'gold_red') {
         return `
