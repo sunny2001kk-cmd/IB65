@@ -30,8 +30,41 @@
         }
 
         .clay-card { background: #121212; border: 1px solid #262626; border-radius: 20px; }
-        .clay-btn { background: #ffffff; color: #000000; font-weight: 700; border-radius: 12px; transition: transform 0.15s ease; }
-        .clay-btn:active { transform: scale(0.94); }
+        
+        /* Halka Chamakta Hua Thin Red Neon Button */
+        .glow-btn-red {
+            border: 1px solid #ef4444 !important;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 6px rgba(239, 68, 68, 0.15) !important;
+            animation: pulseGlowRed 2.5s infinite ease-in-out;
+            transition: all 0.2s ease;
+        }
+        .glow-btn-red:active {
+            transform: scale(0.94);
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.7) !important;
+        }
+
+        /* Halka Chamakta Hua Thin Blue Neon Button */
+        .glow-btn-blue {
+            border: 1px solid #38bdf8 !important;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.45), inset 0 0 6px rgba(56, 189, 248, 0.2) !important;
+            animation: pulseGlowBlue 2.5s infinite ease-in-out;
+            transition: all 0.2s ease;
+        }
+        .glow-btn-blue:active {
+            transform: scale(0.94);
+            box-shadow: 0 0 16px rgba(56, 189, 248, 0.75) !important;
+        }
+
+        @keyframes pulseGlowRed {
+            0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.35); }
+            50% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.6); }
+        }
+
+        @keyframes pulseGlowBlue {
+            0%, 100% { box-shadow: 0 0 8px rgba(56, 189, 248, 0.35); }
+            50% { box-shadow: 0 0 14px rgba(56, 189, 248, 0.65); }
+        }
+
         .icon-btn:active { transform: scale(0.85); transition: transform 0.1s; }
         ::-webkit-scrollbar { display: none; }
 
@@ -92,6 +125,7 @@
     <header id="main-app-header" class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-zinc-900 px-4 py-2.5 flex justify-between items-center">
         <h1 class="text-2xl font-black tracking-wider text-white">IB65</h1>
         <div id="home-header-actions" class="flex items-center space-x-4">
+            <!-- LIVE BUTTON (NO OUTLINE GLOW CHANGE AS REQUESTED) -->
             <button onclick="window.switchTab('live')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5 shadow-lg icon-btn">
                 <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                 <span>LIVE</span>
@@ -102,7 +136,7 @@
         </div>
     </header>
 
-    <!-- Main Views Container -->
+    <!-- Main Container -->
     <main class="max-w-md mx-auto">
 
         <!-- 1. HOME VIEW -->
@@ -159,6 +193,7 @@
                     </h2>
                     <p class="text-[10px] text-gray-400">Broadcast video & chat in real time</p>
                 </div>
+                <!-- Go Live Button (Untouched as requested) -->
                 <button onclick="window.startBroadcast()" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
             </div>
             
@@ -220,7 +255,7 @@
                     <div><span id="my-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
                 <div class="flex space-x-2 pt-2">
-                    <button onclick="window.shareLink()" class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-2 rounded-xl text-xs font-bold text-white transition">
+                    <button onclick="window.shareLink()" class="flex-1 bg-zinc-900 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">
                         Share profile
                     </button>
                 </div>
@@ -255,8 +290,8 @@
                     <div><span id="pub-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
                 <div class="flex space-x-2 pt-1">
-                    <button id="pub-follow-btn" class="flex-1 clay-btn py-2 text-xs font-bold">Follow</button>
-                    <button id="pub-msg-btn" class="flex-1 bg-zinc-800 py-2 rounded-xl text-xs font-bold border border-zinc-700">Message</button>
+                    <button id="pub-follow-btn" class="flex-1 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Follow</button>
+                    <button id="pub-msg-btn" class="flex-1 bg-zinc-900 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">Message</button>
                 </div>
             </div>
 
@@ -276,7 +311,7 @@
             
             <div id="switcher-accounts-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
 
-            <button onclick="document.getElementById('modal-account-switcher').classList.add('hidden'); document.getElementById('modal-auth').classList.remove('hidden');" class="w-full p-3 clay-card flex items-center space-x-3 text-xs font-bold text-white hover:border-zinc-500">
+            <button onclick="document.getElementById('modal-account-switcher').classList.add('hidden'); document.getElementById('modal-auth').classList.remove('hidden');" class="w-full p-3 bg-zinc-900 rounded-xl flex items-center space-x-3 text-xs font-bold text-white glow-btn-blue">
                 <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-white"><i class="fa-solid fa-plus"></i></div>
                 <span>Add new IB65 account</span>
             </button>
@@ -316,7 +351,6 @@
                 </div>
             </div>
 
-            <!-- Demographics Container (100% Dynamic innerHTML - Zero Hardcoded Values) -->
             <div class="clay-card p-4 space-y-3">
                 <div class="flex justify-between items-center">
                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Audience Demographics</h4>
@@ -363,7 +397,7 @@
                 <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-xs"></i>
                 <span class="text-xs font-bold text-white tracking-wider">Pro Editor Studio</span>
             </div>
-            <button onclick="window.proceedToPublishFromEditor()" class="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-bold text-sm icon-btn shadow-lg">
+            <button onclick="window.proceedToPublishFromEditor()" class="w-9 h-9 rounded-full bg-zinc-900 text-white flex items-center justify-center font-bold text-sm icon-btn glow-btn-blue">
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
@@ -386,7 +420,7 @@
         </div>
 
         <div class="px-5 py-1.5 flex justify-between items-center text-xs">
-            <button onclick="window.toggleEditorPlayback()" class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-white icon-btn">
+            <button onclick="window.toggleEditorPlayback()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white glow-btn-red">
                 <i id="btn-play-pause-icon" class="fa-solid fa-play"></i>
             </button>
             <span id="editor-time-counter" class="text-gray-300 font-bold tracking-widest text-[11px]">0:00 / 0:00</span>
@@ -403,11 +437,11 @@
             </div>
 
             <div class="flex space-x-2">
-                <button onclick="window.captureCurrentThumbnailFrame()" class="flex-1 h-8 bg-zinc-900 rounded-lg border border-zinc-800 text-[11px] font-bold text-white flex items-center justify-center space-x-1.5 hover:border-zinc-500">
+                <button onclick="window.captureCurrentThumbnailFrame()" class="flex-1 h-8 bg-zinc-900 rounded-lg text-[11px] font-bold text-white flex items-center justify-center space-x-1.5 glow-btn-blue">
                     <i class="fa-solid fa-camera text-blue-400 text-xs"></i>
                     <span>Capture Cover Frame</span>
                 </button>
-                <div onclick="window.openAddTextTool()" class="flex-1 h-8 bg-zinc-900 rounded-lg border border-dashed border-zinc-800 flex items-center justify-center px-3 space-x-1.5 cursor-pointer text-gray-400 hover:text-white">
+                <div onclick="window.openAddTextTool()" class="flex-1 h-8 bg-zinc-900 rounded-lg flex items-center justify-center px-3 space-x-1.5 cursor-pointer text-gray-200 glow-btn-red">
                     <i class="fa-solid fa-plus text-[10px]"></i>
                     <span class="text-[11px] font-medium">Add text</span>
                 </div>
@@ -416,7 +450,7 @@
 
         <div class="bg-black border-t border-zinc-900 py-2.5 px-4 flex space-x-4 overflow-x-auto items-center">
             <button onclick="window.cycleFilterPresets()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 flex items-center justify-center text-white"><i class="fa-solid fa-circle-half-stroke text-sm"></i></div>
+                <div class="w-10 h-10 rounded-2xl bg-zinc-900 flex items-center justify-center text-white glow-btn-blue"><i class="fa-solid fa-circle-half-stroke text-sm"></i></div>
                 <span class="text-[10px] text-gray-300">Filters</span>
             </button>
         </div>
@@ -427,7 +461,7 @@
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
             <button onclick="window.closeCreateModal()" class="text-white text-base"><i class="fa-solid fa-xmark"></i></button>
             <span class="font-bold text-xs">Create New</span>
-            <button onclick="window.publishMedia()" id="btn-publish" class="clay-btn px-4 py-1.5 text-xs font-bold">Share</button>
+            <button onclick="window.publishMedia()" id="btn-publish" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Share</button>
         </div>
         <div class="flex-1 p-4 space-y-3 max-w-md mx-auto w-full overflow-y-auto">
             <div class="flex space-x-2 border-b border-zinc-800 pb-2 text-xs">
@@ -448,7 +482,7 @@
                 <input type="text" id="create-location-input" placeholder="e.g. Delhi, India" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
             </div>
             
-            <div class="clay-card p-6 text-center border border-zinc-800 hover:border-zinc-500 transition cursor-pointer" onclick="document.getElementById('file-gallery-picker').click()">
+            <div class="p-6 text-center rounded-2xl bg-zinc-900 transition cursor-pointer glow-btn-blue" onclick="document.getElementById('file-gallery-picker').click()">
                 <i class="fa-solid fa-images text-3xl mb-2 text-white"></i>
                 <p class="text-xs text-gray-300 font-bold">Select Media From Device</p>
             </div>
@@ -466,7 +500,7 @@
             <div id="comments-items-list" class="flex-1 overflow-y-auto space-y-2 py-3 text-xs"></div>
             <div class="flex space-x-2 pt-2 border-t border-zinc-800">
                 <input type="text" id="comment-text-input" placeholder="Add a comment..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-                <button onclick="window.submitComment()" class="clay-btn px-4 py-2 text-xs font-bold">Post</button>
+                <button onclick="window.submitComment()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Post</button>
             </div>
         </div>
     </div>
@@ -513,6 +547,7 @@
                     <span id="live-host-title" class="text-xs text-white font-bold flex items-center">Host</span>
                 </div>
             </div>
+            <!-- Live End Button (Protected) -->
             <button onclick="window.exitLiveRoom()" class="text-xs bg-red-600 px-3.5 py-1.5 rounded-xl text-white font-bold">End</button>
         </div>
 
@@ -525,7 +560,7 @@
             <div id="live-chat-messages" class="space-y-1.5 max-h-48 overflow-y-auto p-2 text-xs"></div>
             <div class="flex space-x-2">
                 <input type="text" id="live-input-msg" placeholder="Comment on live..." class="flex-1 bg-black/60 border border-zinc-700 rounded-xl p-2.5 text-xs text-white focus:outline-none">
-                <button onclick="window.sendLiveMsg()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
+                <button onclick="window.sendLiveMsg()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
                 <button onclick="window.triggerLiveHeartGlobal()" class="bg-red-600 text-white px-3.5 py-2 rounded-xl text-base icon-btn shadow-lg"><i class="fa-solid fa-heart"></i></button>
             </div>
         </div>
@@ -562,7 +597,7 @@
         <div id="chat-messages-scroll" class="flex-1 overflow-y-auto p-4 space-y-2.5 text-xs"></div>
         <div class="p-3 border-t border-zinc-900 flex items-center space-x-2 bg-black">
             <input type="text" id="chat-input-field" placeholder="Message..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
-            <button onclick="window.sendChatMessageDirect()" class="clay-btn px-4 py-2 text-xs font-bold">Send</button>
+            <button onclick="window.sendChatMessageDirect()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
         </div>
     </div>
 
@@ -598,8 +633,8 @@
             </div>
 
             <div class="flex space-x-2 pt-1">
-                <button onclick="window.handleLogin()" class="flex-1 bg-zinc-800 py-2.5 text-xs font-bold text-white rounded-xl">Login</button>
-                <button onclick="window.handleSignup()" id="btn-auth-signup" class="flex-1 clay-btn py-2.5 text-xs font-bold">Sign Up</button>
+                <button onclick="window.handleLogin()" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-blue">Login</button>
+                <button onclick="window.handleSignup()" id="btn-auth-signup" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-red">Sign Up</button>
             </div>
         </div>
     </div>
@@ -608,7 +643,8 @@
     <nav id="main-app-nav" class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-zinc-900 py-2.5 px-6 flex justify-around items-center z-40">
         <button onclick="window.switchTab('home')" id="nav-home" class="text-white text-xl icon-btn"><i class="fa-solid fa-house"></i></button>
         <button onclick="window.switchTab('search')" id="nav-search" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-        <button onclick="window.openCreateModal('post')" class="clay-btn w-10 h-10 rounded-full flex items-center justify-center text-black font-extrabold text-lg icon-btn -mt-2 shadow-lg"><i class="fa-solid fa-plus"></i></button>
+        <!-- Center Plus Upload Button (Chamakta Hua Thin Cyan/Blue) -->
+        <button onclick="window.openCreateModal('post')" class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-extrabold text-lg icon-btn -mt-2 glow-btn-blue"><i class="fa-solid fa-plus"></i></button>
         <button onclick="window.switchTab('reels')" id="nav-reels" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-clapperboard"></i></button>
         <button onclick="window.switchTab('profile')" id="nav-profile" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-user"></i></button>
     </nav>
