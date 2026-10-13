@@ -11,6 +11,7 @@ import {
     arrayUnion, 
     arrayRemove, 
     increment, 
+    onAuthStateChanged,
     showToast, 
     getVerificationBadgeSvg, 
     CLOUDINARY_CONFIG 
@@ -90,8 +91,9 @@ let uploadType = 'post';
 let selectedFileBlob = null;
 let selectedFileUrl = '';
 let selectedFileType = 'image';
+let presenceInterval = null;
 
-// Bind All Functions to Window
+// Bind All Functions Globally to Window
 window.handleSignup = handleSignup;
 window.handleLogin = handleLogin;
 window.handleLogout = handleLogout;
@@ -142,7 +144,7 @@ window.triggerDoubleTapLike = triggerDoubleTapLike;
 window.toggleSavePost = toggleSavePost;
 window.deleteMyContent = deleteMyContent;
 
-// Tab Routing System
+// Single-Page Tab Router
 window.switchTab = function(tab) {
     currentTab = tab;
     document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(v => v.pause());
@@ -178,7 +180,7 @@ window.switchTab = function(tab) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Profile Loading Fix
+// Profile Sync Logic
 export async function loadMyProfile() {
     const user = auth.currentUser;
     if (!user) return;
@@ -267,7 +269,7 @@ export async function loadMyProfile() {
 
 window.loadMyProfile = loadMyProfile;
 
-// Public Profile
+// Public Creator Profile
 window.openPublicProfile = async function(email) {
     const user = auth.currentUser;
     if (user && user.email === email) {
@@ -394,7 +396,7 @@ window.toggleFollowUser = async function(targetEmail, targetName) {
     } catch(e) { showToast(e.message); }
 };
 
-// Create & Upload Flow
+// Create / Publish Media Flow
 window.openCreateModal = function(type) {
     uploadType = type || 'post';
     document.getElementById('modal-create')?.classList.remove('hidden');
@@ -544,10 +546,51 @@ window.shareLink = function() {
     showToast("Link copied to clipboard!");
 };
 
-// Startup initialization
-setTimeout(() => {
-    const sp = document.getElementById('splash');
-    if (sp) { sp.style.opacity = '0'; setTimeout(() => sp.remove(), 350); }
-}, 600);
+// Presence Tracking
+function initPresenceTracking(user) {
+    if (!user) return;
+    const updateOnlineStatus = async (isOnline) => {
+        try {
+            await updateDoc(doc(db, "users", user.email), {
+                isOnline: isOnline,
+                lastSeen: Date.now()
+            });
+        } catch(e) {}
+    };
 
-window.switchTab('home');
+    updateOnlineStatus(true);
+    clearInterval(presenceInterval);
+    presenceInterval = setInterval(() => updateOnlineStatus(true), 25000);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') updateOnlineStatus(false);
+        else updateOnlineStatus(true);
+    });
+    window.addEventListener('beforeunload', () => updateOnlineStatus(false));
+}
+
+// Splash Screen Auto Dismiss
+function dismissSplashScreen() {
+    const sp = document.getElementById('splash');
+    if (sp) {
+        sp.style.opacity = '0';
+        setTimeout(() => {
+            sp.style.display = 'none';
+            sp.remove();
+        }, 350);
+    }
+}
+
+// Firebase Auth Lifecycle Observer
+onAuthStateChanged(auth, async (user) => {
+    dismissSplashScreen();
+    if (user) {
+        document.getElementById('modal-auth')?.classList.add('hidden');
+        initPresenceTracking(user);
+        window.loadMyProfile();
+        window.switchTab('home');
+    } else {
+        document.getElementById('modal-auth')?.classList.remove('hidden');
+        clearInterval(presenceInterval);
+    }
+});
