@@ -17,6 +17,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
@@ -29,43 +30,63 @@
             touch-action: pan-x pan-y;
         }
 
-        .clay-card { background: #121212; border: 1px solid #262626; border-radius: 20px; }
-        
-        /* Halka Chamakta Hua Thin Red Neon Button */
+        .clay-card { 
+            background: #111113; 
+            border: 1px solid #222225; 
+            border-radius: 20px; 
+        }
+
+        /* 🔥 RED NEON FIRE BUTTON EFFECT */
         .glow-btn-red {
-            border: 1px solid #ef4444 !important;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 6px rgba(239, 68, 68, 0.15) !important;
-            animation: pulseGlowRed 2.5s infinite ease-in-out;
-            transition: all 0.2s ease;
+            border: 1.5px solid #ff2b2b !important;
+            box-shadow: 0 0 8px #ff2b2b, 0 0 16px rgba(255, 68, 0, 0.6), inset 0 0 6px rgba(255, 43, 43, 0.3) !important;
+            animation: firePulseRed 2.2s infinite ease-in-out;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .glow-btn-red:active {
-            transform: scale(0.94);
-            box-shadow: 0 0 16px rgba(239, 68, 68, 0.7) !important;
+            transform: scale(0.93);
+            box-shadow: 0 0 20px #ff1a1a, 0 0 30px #ff4800 !important;
         }
 
-        /* Halka Chamakta Hua Thin Blue Neon Button */
+        @keyframes firePulseRed {
+            0%, 100% {
+                box-shadow: 0 0 8px #ff2b2b, 0 0 14px rgba(255, 68, 0, 0.5), inset 0 0 4px rgba(255, 43, 43, 0.25);
+                border-color: #ff3333;
+            }
+            50% {
+                box-shadow: 0 0 14px #ff1100, 0 0 24px rgba(255, 85, 0, 0.85), inset 0 0 8px rgba(255, 17, 0, 0.45);
+                border-color: #ff5533;
+            }
+        }
+
+        /* ⚡ BLUE NEON FIRE BUTTON EFFECT */
         .glow-btn-blue {
-            border: 1px solid #38bdf8 !important;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.45), inset 0 0 6px rgba(56, 189, 248, 0.2) !important;
-            animation: pulseGlowBlue 2.5s infinite ease-in-out;
-            transition: all 0.2s ease;
+            border: 1.5px solid #00f0ff !important;
+            box-shadow: 0 0 8px #00f0ff, 0 0 16px rgba(0, 119, 255, 0.6), inset 0 0 6px rgba(0, 240, 255, 0.3) !important;
+            animation: firePulseBlue 2.2s infinite ease-in-out;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .glow-btn-blue:active {
-            transform: scale(0.94);
-            box-shadow: 0 0 16px rgba(56, 189, 248, 0.75) !important;
+            transform: scale(0.93);
+            box-shadow: 0 0 20px #00d9ff, 0 0 32px #0066ff !important;
         }
 
-        @keyframes pulseGlowRed {
-            0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.35); }
-            50% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.6); }
+        @keyframes firePulseBlue {
+            0%, 100% {
+                box-shadow: 0 0 8px #00f0ff, 0 0 14px rgba(0, 119, 255, 0.5), inset 0 0 4px rgba(0, 240, 255, 0.25);
+                border-color: #00e1ff;
+            }
+            50% {
+                box-shadow: 0 0 14px #00ffff, 0 0 24px rgba(0, 153, 255, 0.85), inset 0 0 8px rgba(0, 255, 255, 0.45);
+                border-color: #38bdf8;
+            }
         }
 
-        @keyframes pulseGlowBlue {
-            0%, 100% { box-shadow: 0 0 8px rgba(56, 189, 248, 0.35); }
-            50% { box-shadow: 0 0 14px rgba(56, 189, 248, 0.65); }
+        .icon-btn:active { 
+            transform: scale(0.85); 
+            transition: transform 0.1s ease; 
         }
-
-        .icon-btn:active { transform: scale(0.85); transition: transform 0.1s; }
+        
         ::-webkit-scrollbar { display: none; }
 
         .reels-scroll-container {
@@ -118,25 +139,25 @@
                     if (sp.parentNode) sp.parentNode.removeChild(sp);
                 }, 350);
             }
-        }, 1200);
+        }, 900);
     </script>
 
     <!-- Top Navigation Header -->
     <header id="main-app-header" class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-zinc-900 px-4 py-2.5 flex justify-between items-center">
         <h1 class="text-2xl font-black tracking-wider text-white">IB65</h1>
         <div id="home-header-actions" class="flex items-center space-x-4">
-            <!-- LIVE BUTTON (NO OUTLINE GLOW CHANGE AS REQUESTED) -->
-            <button onclick="window.switchTab('live')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5 shadow-lg icon-btn">
+            <!-- LIVE BUTTON (PRESERVED SOLID RED PILL) -->
+            <button onclick="window.switchTab('live')" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5 shadow-lg icon-btn">
                 <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                 <span>LIVE</span>
             </button>
-            <button onclick="window.openDirectInbox()" class="text-white text-lg icon-btn relative">
+            <button onclick="window.openDirectInbox()" class="text-white text-lg icon-btn relative p-1">
                 <i class="fa-brands fa-facebook-messenger"></i>
             </button>
         </div>
     </header>
 
-    <!-- Main Container -->
+    <!-- Main Views Container -->
     <main class="max-w-md mx-auto">
 
         <!-- 1. HOME VIEW -->
@@ -155,7 +176,10 @@
             </div>
 
             <div id="posts-stream" class="space-y-4 px-2">
-                <div class="text-center text-gray-500 py-16 text-xs">Connecting feed...</div>
+                <div class="text-center text-gray-500 py-16 text-xs flex flex-col items-center justify-center space-y-2">
+                    <i class="fa-solid fa-circle-notch animate-spin text-zinc-600 text-base"></i>
+                    <span>Connecting feed...</span>
+                </div>
             </div>
         </div>
 
@@ -163,7 +187,7 @@
         <div id="view-search" class="space-y-3 p-3 hidden pb-24">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-xs"></i>
-                <input type="text" id="global-search-input" oninput="window.handleSearch(event)" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none">
+                <input type="text" id="global-search-input" oninput="window.handleSearch(event)" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-700">
             </div>
 
             <div id="search-users-results" class="space-y-2 hidden"></div>
@@ -193,7 +217,7 @@
                     </h2>
                     <p class="text-[10px] text-gray-400">Broadcast video & chat in real time</p>
                 </div>
-                <!-- Go Live Button (Untouched as requested) -->
+                <!-- Go Live Button -->
                 <button onclick="window.startBroadcast()" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
             </div>
             
@@ -255,6 +279,7 @@
                     <div><span id="my-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
                 <div class="flex space-x-2 pt-2">
+                    <!-- Blue Neon Fire Share Button -->
                     <button onclick="window.shareLink()" class="flex-1 bg-zinc-900 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">
                         Share profile
                     </button>
@@ -290,7 +315,9 @@
                     <div><span id="pub-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
                 <div class="flex space-x-2 pt-1">
+                    <!-- Red Neon Fire Follow Button -->
                     <button id="pub-follow-btn" class="flex-1 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Follow</button>
+                    <!-- Blue Neon Fire Message Button -->
                     <button id="pub-msg-btn" class="flex-1 bg-zinc-900 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">Message</button>
                 </div>
             </div>
@@ -311,6 +338,7 @@
             
             <div id="switcher-accounts-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
 
+            <!-- Blue Neon Fire Add Account Button -->
             <button onclick="document.getElementById('modal-account-switcher').classList.add('hidden'); document.getElementById('modal-auth').classList.remove('hidden');" class="w-full p-3 bg-zinc-900 rounded-xl flex items-center space-x-3 text-xs font-bold text-white glow-btn-blue">
                 <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-white"><i class="fa-solid fa-plus"></i></div>
                 <span>Add new IB65 account</span>
@@ -397,6 +425,7 @@
                 <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-xs"></i>
                 <span class="text-xs font-bold text-white tracking-wider">Pro Editor Studio</span>
             </div>
+            <!-- Blue Neon Fire Editor Advance Button -->
             <button onclick="window.proceedToPublishFromEditor()" class="w-9 h-9 rounded-full bg-zinc-900 text-white flex items-center justify-center font-bold text-sm icon-btn glow-btn-blue">
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
@@ -420,6 +449,7 @@
         </div>
 
         <div class="px-5 py-1.5 flex justify-between items-center text-xs">
+            <!-- Red Neon Fire Play/Pause Button -->
             <button onclick="window.toggleEditorPlayback()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white glow-btn-red">
                 <i id="btn-play-pause-icon" class="fa-solid fa-play"></i>
             </button>
@@ -437,10 +467,12 @@
             </div>
 
             <div class="flex space-x-2">
+                <!-- Blue Neon Fire Capture Cover Frame Button -->
                 <button onclick="window.captureCurrentThumbnailFrame()" class="flex-1 h-8 bg-zinc-900 rounded-lg text-[11px] font-bold text-white flex items-center justify-center space-x-1.5 glow-btn-blue">
                     <i class="fa-solid fa-camera text-blue-400 text-xs"></i>
                     <span>Capture Cover Frame</span>
                 </button>
+                <!-- Red Neon Fire Add Text Button -->
                 <div onclick="window.openAddTextTool()" class="flex-1 h-8 bg-zinc-900 rounded-lg flex items-center justify-center px-3 space-x-1.5 cursor-pointer text-gray-200 glow-btn-red">
                     <i class="fa-solid fa-plus text-[10px]"></i>
                     <span class="text-[11px] font-medium">Add text</span>
@@ -461,6 +493,7 @@
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
             <button onclick="window.closeCreateModal()" class="text-white text-base"><i class="fa-solid fa-xmark"></i></button>
             <span class="font-bold text-xs">Create New</span>
+            <!-- Red Neon Fire Share Button -->
             <button onclick="window.publishMedia()" id="btn-publish" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Share</button>
         </div>
         <div class="flex-1 p-4 space-y-3 max-w-md mx-auto w-full overflow-y-auto">
@@ -482,6 +515,7 @@
                 <input type="text" id="create-location-input" placeholder="e.g. Delhi, India" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
             </div>
             
+            <!-- Blue Neon Fire Gallery Picker Area -->
             <div class="p-6 text-center rounded-2xl bg-zinc-900 transition cursor-pointer glow-btn-blue" onclick="document.getElementById('file-gallery-picker').click()">
                 <i class="fa-solid fa-images text-3xl mb-2 text-white"></i>
                 <p class="text-xs text-gray-300 font-bold">Select Media From Device</p>
@@ -500,6 +534,7 @@
             <div id="comments-items-list" class="flex-1 overflow-y-auto space-y-2 py-3 text-xs"></div>
             <div class="flex space-x-2 pt-2 border-t border-zinc-800">
                 <input type="text" id="comment-text-input" placeholder="Add a comment..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+                <!-- Red Neon Fire Post Comment Button -->
                 <button onclick="window.submitComment()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Post</button>
             </div>
         </div>
@@ -560,6 +595,7 @@
             <div id="live-chat-messages" class="space-y-1.5 max-h-48 overflow-y-auto p-2 text-xs"></div>
             <div class="flex space-x-2">
                 <input type="text" id="live-input-msg" placeholder="Comment on live..." class="flex-1 bg-black/60 border border-zinc-700 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                <!-- Blue Neon Fire Send Message Button -->
                 <button onclick="window.sendLiveMsg()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
                 <button onclick="window.triggerLiveHeartGlobal()" class="bg-red-600 text-white px-3.5 py-2 rounded-xl text-base icon-btn shadow-lg"><i class="fa-solid fa-heart"></i></button>
             </div>
@@ -597,6 +633,7 @@
         <div id="chat-messages-scroll" class="flex-1 overflow-y-auto p-4 space-y-2.5 text-xs"></div>
         <div class="p-3 border-t border-zinc-900 flex items-center space-x-2 bg-black">
             <input type="text" id="chat-input-field" placeholder="Message..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
+            <!-- Blue Neon Fire Send Chat Button -->
             <button onclick="window.sendChatMessageDirect()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
         </div>
     </div>
@@ -633,7 +670,9 @@
             </div>
 
             <div class="flex space-x-2 pt-1">
+                <!-- Blue Neon Fire Login Button -->
                 <button onclick="window.handleLogin()" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-blue">Login</button>
+                <!-- Red Neon Fire Sign Up Button -->
                 <button onclick="window.handleSignup()" id="btn-auth-signup" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-red">Sign Up</button>
             </div>
         </div>
@@ -643,15 +682,58 @@
     <nav id="main-app-nav" class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-zinc-900 py-2.5 px-6 flex justify-around items-center z-40">
         <button onclick="window.switchTab('home')" id="nav-home" class="text-white text-xl icon-btn"><i class="fa-solid fa-house"></i></button>
         <button onclick="window.switchTab('search')" id="nav-search" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-        <!-- Center Plus Upload Button (Chamakta Hua Thin Cyan/Blue) -->
-        <button onclick="window.openCreateModal('post')" class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-extrabold text-lg icon-btn -mt-2 glow-btn-blue"><i class="fa-solid fa-plus"></i></button>
+        <!-- Center Plus Upload Button (Electric Glowing Blue Fire Neon) -->
+        <button onclick="window.openCreateModal('post')" class="w-11 h-11 rounded-full bg-zinc-950 flex items-center justify-center text-white font-extrabold text-xl icon-btn -mt-3 glow-btn-blue shadow-2xl">
+            <i class="fa-solid fa-plus"></i>
+        </button>
         <button onclick="window.switchTab('reels')" id="nav-reels" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-clapperboard"></i></button>
         <button onclick="window.switchTab('profile')" id="nav-profile" class="text-gray-500 text-xl icon-btn"><i class="fa-solid fa-user"></i></button>
     </nav>
 
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
-    <!-- MODULAR SCRIPT ENTRY POINT -->
-    <script type="module" src="./js/app.js"></script>
+    <!-- INLINE SAFEGUARD FALLBACK (Ensures All Buttons Work Instantly) -->
+    <script>
+        window.switchTab = window.switchTab || function(tab) {
+            ['home', 'search', 'reels', 'live', 'profile', 'public-profile'].forEach(function(t) {
+                var el = document.getElementById('view-' + t);
+                var nav = document.getElementById('nav-' + t);
+                if (el) el.classList.add('hidden');
+                if (nav) nav.className = 'text-gray-500 text-xl icon-btn';
+            });
+            var active = document.getElementById('view-' + tab);
+            var activeNav = document.getElementById('nav-' + tab);
+            if (active) active.classList.remove('hidden');
+            if (activeNav) activeNav.className = 'text-white text-xl icon-btn';
+        };
+
+        window.openCreateModal = window.openCreateModal || function(type) {
+            var m = document.getElementById('modal-create');
+            if (m) m.classList.remove('hidden');
+        };
+
+        window.closeCreateModal = window.closeCreateModal || function() {
+            var m = document.getElementById('modal-create');
+            if (m) m.classList.add('hidden');
+        };
+
+        window.openDirectInbox = window.openDirectInbox || function() {
+            var m = document.getElementById('modal-direct-inbox');
+            if (m) m.classList.remove('hidden');
+        };
+
+        window.closeDirectInbox = window.closeDirectInbox || function() {
+            var m = document.getElementById('modal-direct-inbox');
+            if (m) m.classList.add('hidden');
+        };
+
+        window.openAccountSwitcher = window.openAccountSwitcher || function() {
+            var m = document.getElementById('modal-account-switcher');
+            if (m) m.classList.remove('hidden');
+        };
+    </script>
+
+    <!-- MODULAR SCRIPT ENTRY POINT WITH CACHE-BUSTER -->
+    <script type="module" src="./js/app.js?v=3"></script>
 </body>
 </html>
