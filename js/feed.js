@@ -29,14 +29,16 @@ let activeCommentDocId = null;
 
 // 1. Single Active Video Observer
 export function initGlobalSingleVideoObserver() {
-    if (globalVideoObserver) globalVideoObserver.disconnect();
+    if (globalVideoObserver) {
+        try { globalVideoObserver.disconnect(); } catch(e) {}
+    }
     
     globalVideoObserver = new IntersectionObserver((entries) => {
         if (isEditorActive || isLiveBroadcasting) return;
 
         entries.forEach(entry => {
             const vid = entry.target;
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.65) {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
                 document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(v => {
                     if (v !== vid && !v.paused) v.pause();
                 });
@@ -45,7 +47,7 @@ export function initGlobalSingleVideoObserver() {
                 if (!vid.paused) vid.pause();
             }
         });
-    }, { threshold: 0.65 });
+    }, { threshold: 0.6 });
 
     document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(el => globalVideoObserver.observe(el));
 }
@@ -139,13 +141,6 @@ function renderActiveStory(story) {
     const likeIcon = document.getElementById('story-like-icon');
     if (likeIcon) likeIcon.innerHTML = isLiked ? '<i class="fa-solid fa-heart text-red-500"></i>' : '<i class="fa-regular fa-heart"></i>';
 
-    const user = auth.currentUser;
-    const delBtn = document.getElementById('btn-delete-story-opt');
-    if (delBtn) {
-        if (user && story.authorEmail === user.email) delBtn.classList.remove('hidden');
-        else delBtn.classList.add('hidden');
-    }
-
     document.getElementById('modal-story')?.classList.remove('hidden');
     storyTimer = setTimeout(() => {
         openStoryQueueIndex(currentStoryIndex + 1);
@@ -167,29 +162,33 @@ export function openProfileFromStory() {
     }
 }
 
-// 3. Home Feed (Safe-Loaded - Never Freezes)
+// 3. Home Feed (Safe-Loaded - Directly Replaces Connecting Feed Spinner)
 export async function loadPostsFeed() {
     const container = document.getElementById('posts-stream');
     if (!container) return;
 
     try {
-        const [postsSnap, reelsSnap] = await Promise.all([
+        const [postsSnap, reelsSnap] = await Promise.allSettled([
             getDocs(collection(db, "posts")),
             getDocs(collection(db, "reels"))
         ]);
 
         const allItems = [];
-        postsSnap.forEach(d => allItems.push({ id: d.id, col: 'posts', ...d.data() }));
-        reelsSnap.forEach(d => {
-            const data = d.data();
-            allItems.push({ 
-                id: d.id, 
-                col: 'reels', 
-                mediaType: 'video', 
-                mediaUrl: data.videoUrl || data.mediaUrl || data.url, 
-                ...data 
+        if (postsSnap.status === 'fulfilled') {
+            postsSnap.value.forEach(d => allItems.push({ id: d.id, col: 'posts', ...d.data() }));
+        }
+        if (reelsSnap.status === 'fulfilled') {
+            reelsSnap.value.forEach(d => {
+                const data = d.data();
+                allItems.push({ 
+                    id: d.id, 
+                    col: 'reels', 
+                    mediaType: 'video', 
+                    mediaUrl: data.videoUrl || data.mediaUrl || data.url, 
+                    ...data 
+                });
             });
-        });
+        }
 
         if (allItems.length === 0) {
             container.innerHTML = `
@@ -430,32 +429,36 @@ export async function loadExploreMedia() {
     if (!grid) return;
 
     try {
-        const [postsSnap, reelsSnap] = await Promise.all([
+        const [postsSnap, reelsSnap] = await Promise.allSettled([
             getDocs(collection(db, "posts")),
             getDocs(collection(db, "reels"))
         ]);
 
         const items = [];
-        postsSnap.forEach(d => {
-            const data = d.data();
-            if (data.mediaUrl || data.url) items.push({ id: d.id, col: 'posts', ...data });
-        });
-        reelsSnap.forEach(d => {
-            const data = d.data();
-            const vidUrl = data.videoUrl || data.mediaUrl || data.url;
-            if (vidUrl) {
-                items.push({ 
-                    id: d.id, 
-                    col: 'reels', 
-                    mediaType: 'video', 
-                    mediaUrl: vidUrl, 
-                    ...data 
-                });
-            }
-        });
+        if (postsSnap.status === 'fulfilled') {
+            postsSnap.value.forEach(d => {
+                const data = d.data();
+                if (data.mediaUrl || data.url) items.push({ id: d.id, col: 'posts', ...data });
+            });
+        }
+        if (reelsSnap.status === 'fulfilled') {
+            reelsSnap.value.forEach(d => {
+                const data = d.data();
+                const vidUrl = data.videoUrl || data.mediaUrl || data.url;
+                if (vidUrl) {
+                    items.push({ 
+                        id: d.id, 
+                        col: 'reels', 
+                        mediaType: 'video', 
+                        mediaUrl: vidUrl, 
+                        ...data 
+                    });
+                }
+            });
+        }
 
         if (items.length === 0) {
-            grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-12 text-xs">No media found</div>';
+            grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-12 text-xs">No explore media found</div>';
             return;
         }
 
@@ -479,10 +482,12 @@ export async function loadExploreMedia() {
                 </div>
             `;
         }).join('');
-    } catch(e) {}
+    } catch(e) {
+        grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-12 text-xs">Explore loading error</div>';
+    }
 }
 
-// 6. Media Viewer Modal Fix
+// 6. Media Viewer Modal
 export function openMediaViewer(it) {
     const modal = document.getElementById('modal-media-viewer');
     const container = document.getElementById('media-viewer-content');
@@ -515,7 +520,7 @@ export function closeMediaViewer() {
     if (modal) modal.classList.add('hidden');
 }
 
-// 7. Global Search (Users + Tags)
+// 7. Global Search
 export async function handleSearch(e) {
     const q = e.target.value.toLowerCase().trim();
     const resultsBox = document.getElementById('search-users-results');
@@ -646,7 +651,7 @@ export async function toggleSavePost(docId) {
             showToast("Removed from saved");
         } else {
             await updateDoc(uRef, { savedPosts: arrayUnion(docId) });
-            showToast("Saved to your collection");
+            showToast("Saved to collection");
         }
         loadPostsFeed();
         loadReelsFeed();
@@ -681,22 +686,12 @@ export async function startWatchTracking(col, docId, authorEmail) {
             if (snap.exists()) {
                 const viewed = snap.data().viewedUsers || [];
                 if (!viewed.includes(user.email)) {
-                    const viewerDoc = await getDoc(doc(db, "users", user.email));
-                    const vData = viewerDoc.data() || {};
-                    const viewerCity = vData.city || "Delhi, IN";
-                    const viewerGender = vData.gender || "male";
-
                     await updateDoc(docRef, {
                         viewedUsers: arrayUnion(user.email),
                         views: increment(1)
                     });
-
                     if (authorEmail) {
-                        await updateDoc(doc(db, "users", authorEmail), {
-                            totalViews: increment(1),
-                            [`demographics_locations.${viewerCity}`]: increment(1),
-                            [`demographics_genders.${viewerGender}`]: increment(1)
-                        });
+                        await updateDoc(doc(db, "users", authorEmail), { totalViews: increment(1) });
                     }
                 }
             }
@@ -718,7 +713,7 @@ export function stopWatchTracking() {
     clearInterval(watchInterval);
 }
 
-// 10. Comments Modal & Engine
+// 10. Comments
 export function openComments(col, id) {
     activeCommentCol = col;
     activeCommentDocId = id;
