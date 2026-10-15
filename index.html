@@ -95,7 +95,7 @@
                 border-color: #00e1ff;
             }
             50% {
-                box-shadow: 0 0 14px #00ffff, 0 0 24px rgba(0, 153, 255, 0.85), inset 0 0 8px rgba(255, 255, 0.45);
+                box-shadow: 0 0 14px #00ffff, 0 0 24px rgba(0, 153, 255, 0.85), inset 0 0 8px rgba(0, 255, 255, 0.45);
                 border-color: #38bdf8;
             }
         }
@@ -123,12 +123,22 @@
             height: calc(100vh - 65px);
         }
 
-        @keyframes heartBurst {
-            0% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1.4); opacity: 0.95; }
-            100% { transform: scale(1); opacity: 0; }
+        /* 🎈 SHARED FLOATING HEART ANIMATION */
+        @keyframes flyHeartFloat {
+            0% { transform: translateY(0) scale(0.7) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-110px) scale(1.3) rotate(-15deg); opacity: 0.9; }
+            100% { transform: translateY(-240px) scale(1.5) rotate(15deg); opacity: 0; }
         }
-        .heart-burst-animate { animation: heartBurst 0.75s ease-out forwards; }
+        .live-heart-fly { animation: flyHeartFloat 1.5s ease-out forwards; }
+
+        /* 🔥 LIVE RING GLOW ANIMATION */
+        @keyframes liveRingGlow {
+            0%, 100% { box-shadow: 0 0 6px #ff0000, 0 0 14px #ff3300; }
+            50% { box-shadow: 0 0 16px #ff0000, 0 0 28px #ff5500; }
+        }
+        .live-story-ring {
+            animation: liveRingGlow 1.8s infinite ease-in-out;
+        }
     </style>
 </head>
 <body class="min-h-screen select-none bg-black text-white">
@@ -176,9 +186,10 @@
     <!-- Main Container -->
     <main class="max-w-md mx-auto">
 
-        <!-- 1. HOME VIEW -->
+        <!-- 1. HOME VIEW (WITH DUAL STORY TRAY: OLD STORY + ADJACENT LIVE CIRCLE) -->
         <div id="view-home" class="space-y-3 pb-24">
             <div class="p-3 border-b border-zinc-900 overflow-x-auto flex space-x-3 items-center">
+                <!-- 1.1 Purana Normal Story Circle -->
                 <div onclick="window.openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-pink-600 to-purple-600 flex items-center justify-center relative">
                         <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
@@ -188,6 +199,19 @@
                     </div>
                     <span class="text-[10px] text-gray-400 truncate w-16 text-center">Your story</span>
                 </div>
+
+                <!-- 1.2 Naya LIVE Story Circle (Theek Bagal Me - Direct Tap to Enter Live Room) -->
+                <div id="tray-live-broadcast-box" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0 hidden" onclick="window.enterActiveLiveFromStory()">
+                    <div class="w-16 h-16 rounded-full p-0.5 border-2 border-red-500 bg-red-950/40 flex items-center justify-center relative live-story-ring">
+                        <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
+                            <span class="text-base font-black text-red-500" id="tray-live-avatar">🔴</span>
+                        </div>
+                        <span class="absolute -bottom-1 bg-red-600 text-white font-black text-[8px] px-1.5 py-0.2 rounded-full uppercase tracking-tighter shadow-lg animate-pulse">LIVE</span>
+                    </div>
+                    <span class="text-[10px] text-red-400 font-bold truncate w-16 text-center" id="tray-live-host-name">Live Now</span>
+                </div>
+
+                <!-- 1.3 Other Friends Normal Stories -->
                 <div id="stories-tray-items" class="flex space-x-3"></div>
             </div>
 
@@ -205,9 +229,7 @@
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-xs"></i>
                 <input type="text" id="global-search-input" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-700">
             </div>
-
             <div id="search-users-results" class="space-y-2 hidden"></div>
-
             <div>
                 <p class="text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Explore</p>
                 <div id="explore-grid" class="grid grid-cols-3 gap-1">
@@ -229,11 +251,18 @@
                 <div>
                     <h2 class="text-sm font-bold text-white flex items-center space-x-1.5">
                         <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
-                        <span>IB65 Live</span>
+                        <span>IB65 Live Broadcast</span>
                     </h2>
-                    <p class="text-[10px] text-gray-400">Broadcast video & chat in real time</p>
+                    <p class="text-[10px] text-gray-400">Stream camera & chat with shared hearts</p>
                 </div>
-                <button onclick="window.showToast('Live broadcast ready')" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
+                <button onclick="window.startBroadcast?.()" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Broadcasts</h3>
+                <div id="live-rooms-list" class="space-y-2">
+                    <div class="text-center text-gray-500 py-10 text-xs">No active live streams right now.</div>
+                </div>
             </div>
         </div>
 
@@ -244,7 +273,6 @@
                     <span class="text-base font-extrabold text-white flex items-center space-x-1" id="profile-top-username">
                         <span>@IB65</span>
                     </span>
-                    <span id="profile-top-badge"></span>
                 </div>
                 <button onclick="window.handleLogoutDirect()" class="text-gray-400 text-sm icon-btn p-1" title="Log Out">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -281,155 +309,55 @@
 
     </main>
 
-    <!-- 🔥 INSHOT PRO STUDIO -->
-    <div id="modal-pro-editor" class="fixed inset-0 z-50 bg-[#09090b] flex flex-col justify-between hidden select-none">
-        <div class="p-3.5 flex justify-between items-center z-20 bg-black/90 border-b border-zinc-800">
-            <button onclick="window.closeProEditor?.()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-white icon-btn">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="flex items-center space-x-2 bg-zinc-900/90 px-3.5 py-1.5 rounded-full border border-zinc-700 shadow-lg">
-                <i class="fa-solid fa-wand-magic-sparkles text-red-500 text-xs"></i>
-                <span class="text-xs font-black tracking-wider text-white neon-fire-logo">IB65 Pro Studio</span>
-            </div>
-            <button onclick="window.proceedToPublishFromEditor?.()" class="px-4 py-1.5 rounded-full bg-zinc-900 text-white flex items-center space-x-1 font-bold text-xs icon-btn glow-btn-blue">
-                <span>Next</span>
-                <i class="fa-solid fa-arrow-right text-[10px] ml-1"></i>
-            </button>
-        </div>
-
-        <div class="flex-1 relative flex items-center justify-center overflow-hidden my-auto p-2">
-            <div id="editor-canvas-box" class="relative rounded-2xl overflow-hidden bg-black flex items-center justify-center border border-zinc-800 shadow-2xl transition-all duration-200" style="aspect-ratio: 9/16; max-width: 275px; height: 50vh;">
-                <video id="editor-main-video" crossorigin="anonymous" playsinline loop class="w-full h-full object-cover origin-center transition-transform duration-100"></video>
-                <img id="editor-main-img" class="w-full h-full object-cover origin-center transition-transform duration-100 hidden">
-
-                <div id="pro-text-overlay-box" class="absolute select-none hidden px-3.5 py-1.5 rounded-xl bg-black/75 font-extrabold text-center text-sm shadow-2xl border-2 border-cyan-400 touch-none z-30 cursor-move" style="left: 25px; top: 35px;">
-                    <span id="pro-text-overlay-val">IB65 Studio</span>
+    <!-- 🔴 FULL-SCREEN LIVE STREAM ROOM MODAL (BLACK SCREEN & VOICE FIXED) -->
+    <div id="modal-live-room" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden select-none">
+        <!-- Top Bar -->
+        <div class="flex justify-between items-center z-20">
+            <div class="flex items-center space-x-2">
+                <span class="bg-red-600 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold animate-pulse">IB65 LIVE</span>
+                <span id="live-viewers-tag" class="text-xs font-bold text-white bg-black/50 px-2 py-0.5 rounded-full border border-white/10">👁️ 1</span>
+                <div class="flex items-center space-x-1.5 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-zinc-800">
+                    <div class="w-4 h-4 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-[9px]" id="live-host-avatar">I</div>
+                    <span id="live-host-title" class="text-xs text-white font-bold flex items-center">Host</span>
                 </div>
             </div>
-        </div>
-
-        <!-- InShot Sub Panels -->
-        <div id="inshot-text-panel" class="bg-zinc-900/95 border-t border-zinc-800 p-3 space-y-2.5 hidden z-30 backdrop-blur-md">
-            <div class="flex justify-between items-center">
-                <span class="text-[11px] font-bold text-gray-300">Text & Color</span>
-                <button onclick="document.getElementById('inshot-text-panel').classList.add('hidden')" class="text-gray-400 text-xs"><i class="fa-solid fa-check text-cyan-400"></i> Done</button>
-            </div>
-            <input type="text" id="inshot-text-input" oninput="window.updateInshotText(this.value)" placeholder="Type overlay text here..." class="w-full bg-black border border-zinc-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-            <div class="flex space-x-3 items-center pt-1 overflow-x-auto">
-                <span class="text-[10px] text-gray-400">Color:</span>
-                <button onclick="window.setTextColor('#ffffff')" class="w-6 h-6 rounded-full bg-white border border-gray-400"></button>
-                <button onclick="window.setTextColor('#00f0ff')" class="w-6 h-6 rounded-full bg-[#00f0ff] border border-cyan-300"></button>
-                <button onclick="window.setTextColor('#ff2b2b')" class="w-6 h-6 rounded-full bg-[#ff2b2b] border border-red-400"></button>
-                <button onclick="window.setTextColor('#facc15')" class="w-6 h-6 rounded-full bg-[#facc15] border border-yellow-300"></button>
-                <button onclick="window.setTextColor('#ec4899')" class="w-6 h-6 rounded-full bg-[#ec4899] border border-pink-400"></button>
+            <div class="flex items-center space-x-2">
+                <button id="btn-live-flip-cam" onclick="window.flipLiveCamera()" class="w-8 h-8 rounded-full bg-black/60 border border-white/20 text-white text-xs flex items-center justify-center icon-btn">
+                    <i class="fa-solid fa-camera-rotate"></i>
+                </button>
+                <button id="btn-end-live" onclick="window.exitLiveRoom()" class="text-xs bg-red-600 px-3.5 py-1.5 rounded-xl text-white font-bold icon-btn">End</button>
             </div>
         </div>
 
-        <div id="inshot-ratio-panel" class="bg-zinc-900/95 border-t border-zinc-800 p-3 hidden z-30 backdrop-blur-md">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-[11px] font-bold text-gray-300">Canvas Ratio</span>
-                <button onclick="document.getElementById('inshot-ratio-panel').classList.add('hidden')" class="text-gray-400 text-xs"><i class="fa-solid fa-check text-cyan-400"></i> Done</button>
-            </div>
-            <div class="flex justify-around text-xs">
-                <button onclick="window.applyCanvasRatio('9/16')" class="px-3.5 py-1.5 rounded-xl bg-black border border-zinc-700 hover:border-cyan-400">9:16 Reel</button>
-                <button onclick="window.applyCanvasRatio('1/1')" class="px-3.5 py-1.5 rounded-xl bg-black border border-zinc-700 hover:border-cyan-400">1:1 Square</button>
-                <button onclick="window.applyCanvasRatio('16/9')" class="px-3.5 py-1.5 rounded-xl bg-black border border-zinc-700 hover:border-cyan-400">16:9 Cinema</button>
-            </div>
+        <!-- Video Player Frame -->
+        <div class="absolute inset-0 flex items-center justify-center overflow-hidden bg-zinc-950">
+            <video id="live-room-video" autoplay playsinline webkit-playsinline class="w-full h-full object-cover bg-black"></video>
+            
+            <!-- Tap to Unmute Overlay if Audio Policy Blocks -->
+            <button id="live-unmute-overlay" onclick="window.unlockLiveAudio()" class="absolute top-16 bg-red-600/90 text-white text-xs px-4 py-2 rounded-full font-bold shadow-2xl z-30 hidden animate-bounce flex items-center space-x-2">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>Tap to Unmute Voice 🔊</span>
+            </button>
+
+            <!-- 🎈 SHARED FLOATING HEARTS CONTAINER -->
+            <div id="live-hearts-container" class="absolute right-6 bottom-24 w-20 h-72 pointer-events-none z-30 overflow-hidden"></div>
         </div>
 
-        <div id="inshot-filter-panel" class="bg-zinc-900/95 border-t border-zinc-800 p-3 hidden z-30 backdrop-blur-md">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-[11px] font-bold text-gray-300">Filter Presets</span>
-                <button onclick="document.getElementById('inshot-filter-panel').classList.add('hidden')" class="text-gray-400 text-xs"><i class="fa-solid fa-check text-cyan-400"></i> Done</button>
-            </div>
-            <div class="flex space-x-3 overflow-x-auto py-1">
-                <button onclick="window.applyFilterEffect('none', 'Original')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-600 flex items-center justify-center text-xs">None</div>
-                    <span class="text-[10px] text-gray-400">Original</span>
-                </button>
-                <button onclick="window.applyFilterEffect('saturate(1.5) contrast(1.1)', 'Vibrant')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-orange-600 border border-yellow-400 flex items-center justify-center text-xs font-bold">Vibe</div>
-                    <span class="text-[10px] text-gray-400">Vibrant</span>
-                </button>
-                <button onclick="window.applyFilterEffect('hue-rotate(190deg) contrast(1.2)', 'Cyberpunk')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-cyan-600 border border-purple-400 flex items-center justify-center text-xs font-bold">Cyber</div>
-                    <span class="text-[10px] text-gray-400">Cyberpunk</span>
-                </button>
-                <button onclick="window.applyFilterEffect('sepia(0.35) contrast(1.1)', 'Warm')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-amber-800 border border-amber-500 flex items-center justify-center text-xs font-bold">Warm</div>
-                    <span class="text-[10px] text-gray-400">Warm Film</span>
-                </button>
-                <button onclick="window.applyFilterEffect('grayscale(1) contrast(1.2)', 'Mono')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-zinc-700 border border-white flex items-center justify-center text-xs font-bold">B&W</div>
-                    <span class="text-[10px] text-gray-400">Mono</span>
-                </button>
-                <button onclick="window.applyFilterEffect('contrast(1.4) brightness(1.1) saturate(1.8)', 'Neon')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-fuchsia-700 border border-pink-400 flex items-center justify-center text-xs font-bold">Neon</div>
-                    <span class="text-[10px] text-gray-400">Neon Glow</span>
+        <!-- Bottom Controls & Chat -->
+        <div class="z-20 space-y-3">
+            <div id="live-chat-messages" class="space-y-1.5 max-h-48 overflow-y-auto p-2 text-xs flex flex-col"></div>
+            <div class="flex space-x-2">
+                <input type="text" id="live-input-msg" placeholder="Comment on live..." class="flex-1 bg-black/60 border border-zinc-700 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+                <button onclick="window.sendLiveMsg()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
+                <!-- Shared Floating Heart Trigger -->
+                <button onclick="window.triggerLiveHeartGlobal()" class="bg-red-600 text-white px-4 py-2.5 rounded-xl text-lg icon-btn shadow-[0_0_15px_#ff0033]">
+                    <i class="fa-solid fa-heart"></i>
                 </button>
             </div>
-        </div>
-
-        <!-- Video Scrubber -->
-        <div class="bg-zinc-950 p-2.5 border-t border-zinc-900 space-y-2">
-            <div class="flex justify-between items-center px-2 text-xs">
-                <button onclick="window.toggleEditorPlayback?.()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white glow-btn-red">
-                    <i id="btn-play-pause-icon" class="fa-solid fa-play text-xs"></i>
-                </button>
-                <span id="editor-time-counter" class="text-gray-300 font-bold tracking-widest text-[11px]">0:00 / 0:00</span>
-                <div class="flex items-center space-x-2">
-                    <span class="text-[10px] text-gray-400">Zoom</span>
-                    <input type="range" id="editor-zoom-slider" min="1" max="2.5" step="0.1" value="1" oninput="window.handleZoomSlider?.(this.value)" class="w-16 accent-white h-1 bg-zinc-800 rounded">
-                </div>
-            </div>
-
-            <div id="timeline-frames-track" onclick="window.seekTimeline(event)" class="relative h-11 bg-zinc-900 rounded-xl overflow-hidden flex items-center border border-zinc-800 cursor-pointer">
-                <div class="flex-1 flex overflow-hidden h-full items-center justify-center space-x-1 opacity-60">
-                    <div class="w-full h-full bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800 flex items-center justify-around px-2 text-[10px] text-zinc-400 font-bold tracking-widest uppercase">
-                        <span>• Frame •</span>
-                        <span>• Waveform •</span>
-                        <span>• Audio •</span>
-                    </div>
-                </div>
-                <div id="timeline-playhead-line" class="absolute top-0 bottom-0 left-0 w-1 bg-white z-20 pointer-events-none shadow-[0_0_8px_#ffffff]"></div>
-            </div>
-        </div>
-
-        <!-- Horizontal Tools -->
-        <div class="bg-black border-t border-zinc-800 py-2.5 px-3 flex space-x-5 overflow-x-auto items-center">
-            <button onclick="window.openToolPanel('inshot-ratio-panel')" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-blue"><i class="fa-solid fa-crop text-sm"></i></div>
-                <span class="text-[10px] text-gray-300">Canvas</span>
-            </button>
-
-            <button onclick="window.openToolPanel('inshot-text-panel')" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-red"><i class="fa-solid fa-font text-sm"></i></div>
-                <span class="text-[10px] text-gray-300">Text</span>
-            </button>
-
-            <button onclick="window.openToolPanel('inshot-filter-panel')" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-blue"><i class="fa-solid fa-wand-magic text-sm"></i></div>
-                <span class="text-[10px] text-gray-300">Filters</span>
-            </button>
-
-            <button onclick="window.cycleVideoSpeed()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-red"><i class="fa-solid fa-bolt text-sm"></i></div>
-                <span id="lbl-tool-speed" class="text-[10px] text-gray-300">Speed (1x)</span>
-            </button>
-
-            <button onclick="window.toggleAudioBoost()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-blue"><i id="btn-tool-volume-icon" class="fa-solid fa-volume-high text-sm"></i></div>
-                <span id="lbl-tool-volume" class="text-[10px] text-gray-300">Volume</span>
-            </button>
-
-            <button onclick="window.captureCurrentThumbnailFrame?.()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-red"><i class="fa-solid fa-camera text-sm"></i></div>
-                <span class="text-[10px] text-gray-300">Cover Frame</span>
-            </button>
         </div>
     </div>
 
-    <!-- CREATE MODAL (100% BULLETPROOF UPLOAD POPUP) -->
+    <!-- CREATE MODAL -->
     <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
             <button onclick="window.closeCreateModal()" class="text-white text-base p-1 icon-btn"><i class="fa-solid fa-xmark"></i></button>
@@ -463,7 +391,7 @@
         </div>
     </div>
 
-    <!-- DIRECT INBOX & MESSAGING -->
+    <!-- DIRECT INBOX -->
     <div id="modal-direct-inbox" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-zinc-900 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -482,7 +410,6 @@
         <button onclick="window.switchTab('search')" id="nav-search" class="text-gray-500 text-xl icon-btn">
             <i class="fa-solid fa-magnifying-glass"></i>
         </button>
-        <!-- Center Plus Upload Button -->
         <button onclick="window.openCreateModal('post')" class="w-11 h-11 rounded-full bg-zinc-950 flex items-center justify-center text-white font-extrabold text-xl icon-btn -mt-3 glow-btn-blue shadow-2xl">
             <i class="fa-solid fa-plus"></i>
         </button>
@@ -496,7 +423,7 @@
 
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
-    <!-- DIRECT INLINE GLOBAL CONTROLLER -->
+    <!-- GLOBAL INLINE UI HANDLERS -->
     <script>
         window.showToast = function(msg) {
             var t = document.getElementById('toast');
@@ -541,7 +468,6 @@
             window.showToast("Link copied to clipboard!");
         };
 
-        // 🔊 Bulletproof Audio Toggle
         window.toggleFeedVideoAudio = function(triggerEl) {
             var box = triggerEl.closest('.relative');
             var vid = box ? box.querySelector('video') : null;
@@ -563,7 +489,7 @@
         };
     </script>
 
-    <!-- DIRECT INLINE FIRESTORE & EDITOR MODULE -->
+    <!-- LIVE & FIRESTORE CORE INTEGRATION -->
     <script type="module">
         import { 
             auth, 
@@ -573,48 +499,66 @@
             collection, 
             getDocs, 
             addDoc, 
-            updateDoc, 
-            arrayUnion, 
-            arrayRemove, 
+            onSnapshot, 
             onAuthStateChanged, 
             signOut,
             CLOUDINARY_CONFIG 
         } from './js/config.js';
 
         import { 
-            openProEditorSuite, 
-            closeProEditor, 
-            proceedToPublishFromEditor, 
-            toggleEditorPlayback, 
-            handleZoomSlider, 
-            openToolPanel, 
-            applyCanvasRatio, 
-            cycleVideoSpeed, 
-            toggleAudioBoost, 
-            applyFilterEffect, 
-            updateInshotText, 
-            setTextColor, 
-            captureCurrentThumbnailFrame, 
-            seekTimeline, 
-            customThumbnailBlob 
-        } from './js/editor.js';
+            startBroadcast, 
+            joinBroadcast, 
+            triggerLiveHeartGlobal, 
+            sendLiveMsg, 
+            flipLiveCamera, 
+            unlockLiveAudio, 
+            exitLiveRoom, 
+            loadLiveBroadcasters 
+        } from './js/live.js';
 
-        window.openProEditorSuite = openProEditorSuite;
-        window.closeProEditor = closeProEditor;
-        window.proceedToPublishFromEditor = proceedToPublishFromEditor;
-        window.toggleEditorPlayback = toggleEditorPlayback;
-        window.handleZoomSlider = handleZoomSlider;
-        window.openToolPanel = openToolPanel;
-        window.applyCanvasRatio = applyCanvasRatio;
-        window.cycleVideoSpeed = cycleVideoSpeed;
-        window.toggleAudioBoost = toggleAudioBoost;
-        window.applyFilterEffect = applyFilterEffect;
-        window.updateInshotText = updateInshotText;
-        window.setTextColor = setTextColor;
-        window.captureCurrentThumbnailFrame = captureCurrentThumbnailFrame;
-        window.seekTimeline = seekTimeline;
+        window.startBroadcast = startBroadcast;
+        window.joinBroadcast = joinBroadcast;
+        window.triggerLiveHeartGlobal = triggerLiveHeartGlobal;
+        window.sendLiveMsg = sendLiveMsg;
+        window.flipLiveCamera = flipLiveCamera;
+        window.unlockLiveAudio = unlockLiveAudio;
+        window.exitLiveRoom = exitLiveRoom;
+        window.loadLiveBroadcasters = loadLiveBroadcasters;
 
-        // 1. Feed Loader
+        let activeLiveRoomIdForStory = null;
+
+        // 1. Dual Story Monitor: Check If Anyone Is Live & Show Adjacent Live Story
+        function monitorLiveRoomsForStoryTray() {
+            onSnapshot(collection(db, "live_rooms"), (snap) => {
+                const liveBox = document.getElementById('tray-live-broadcast-box');
+                const liveHostName = document.getElementById('tray-live-host-name');
+                const liveAvatar = document.getElementById('tray-live-avatar');
+                
+                let foundRoom = null;
+                snap.forEach(d => {
+                    const r = d.data();
+                    if (r.status === 'live') foundRoom = { id: d.id, ...r };
+                });
+
+                if (foundRoom) {
+                    activeLiveRoomIdForStory = foundRoom.id;
+                    if (liveBox) liveBox.classList.remove('hidden');
+                    if (liveHostName) liveHostName.innerText = '@' + foundRoom.hostName;
+                    if (liveAvatar) liveAvatar.innerText = foundRoom.hostName[0].toUpperCase();
+                } else {
+                    activeLiveRoomIdForStory = null;
+                    if (liveBox) liveBox.classList.add('hidden');
+                }
+            });
+        }
+
+        window.enterActiveLiveFromStory = function() {
+            if (activeLiveRoomIdForStory) {
+                window.joinBroadcast(activeLiveRoomIdForStory);
+            }
+        };
+
+        // 2. Direct Posts Loader
         window.loadDirectPostsFeed = async function() {
             const container = document.getElementById('posts-stream');
             if (!container) return;
@@ -691,7 +635,7 @@
             }
         };
 
-        // 2. Reels Loader
+        // 3. Direct Reels Loader
         window.loadDirectReels = async function() {
             const container = document.getElementById('reels-container');
             if (!container) return;
@@ -743,7 +687,7 @@
             }
         };
 
-        // 3. Explore Loader
+        // 4. Direct Explore Loader
         window.loadDirectExplore = async function() {
             const grid = document.getElementById('explore-grid');
             if (!grid) return;
@@ -798,7 +742,7 @@
             }
         };
 
-        // 4. Profile Loader
+        // 5. Direct Profile Loader
         window.loadDirectProfile = async function() {
             const user = auth.currentUser;
             if (!user) return;
@@ -898,6 +842,7 @@
             if (tab === 'home') window.loadDirectPostsFeed();
             if (tab === 'search') window.loadDirectExplore();
             if (tab === 'reels') window.loadDirectReels();
+            if (tab === 'live') window.loadLiveBroadcasters();
             if (tab === 'profile') window.loadDirectProfile();
         };
 
@@ -908,32 +853,19 @@
             } catch(e) {}
         };
 
-        // Upload Direct Handlers
+        // Direct File Pick & Upload
         let selectedUploadFile = null;
-        let selectedDataUrl = '';
-
         window.handleFileSelectedDirect = function(e) {
             const f = e.target.files && e.target.files[0];
             if (!f) return;
             selectedUploadFile = f;
-            const isVid = f.type.startsWith('video');
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                selectedDataUrl = evt.target.result;
-                document.getElementById('lbl-picker-text').innerText = "Selected: " + f.name;
-
-                // Launch InShot Pro Studio
-                window.closeCreateModal();
-                openProEditorSuite(selectedDataUrl, isVid ? 'video' : 'image');
-            };
-            reader.readAsDataURL(f);
+            document.getElementById('lbl-picker-text').innerText = "Selected: " + f.name;
         };
 
         window.publishMediaDirect = async function() {
             const user = auth.currentUser;
             if (!user) { window.showToast("Login required!"); return; }
-            if (!selectedUploadFile && !selectedDataUrl) { window.showToast("Select media first!"); return; }
+            if (!selectedUploadFile) { window.showToast("Select media first!"); return; }
 
             const cap = document.getElementById('create-caption-input').value.trim();
             const loc = document.getElementById('create-location-input').value.trim();
@@ -949,21 +881,17 @@
             window.showToast("Uploading to IB65...");
 
             try {
-                let mediaUrl = selectedDataUrl;
+                const fd = new FormData();
+                fd.append("file", selectedUploadFile);
+                fd.append("upload_preset", CLOUDINARY_CONFIG.uploadPreset);
 
-                if (selectedUploadFile) {
-                    const fd = new FormData();
-                    fd.append("file", selectedUploadFile);
-                    fd.append("upload_preset", CLOUDINARY_CONFIG.uploadPreset);
+                const endpoint = selectedUploadFile.type.startsWith('video')
+                    ? `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/video/upload`
+                    : `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
 
-                    const endpoint = selectedUploadFile.type.startsWith('video')
-                        ? `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/video/upload`
-                        : `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
-
-                    const res = await fetch(endpoint, { method: "POST", body: fd });
-                    const cData = await res.json();
-                    if (cData.secure_url) mediaUrl = cData.secure_url;
-                }
+                const res = await fetch(endpoint, { method: "POST", body: fd });
+                const cData = await res.json();
+                const mediaUrl = cData.secure_url;
 
                 const cleanAuthor = (user.displayName || user.email.split('@')[0]).replace(/^@+/, '');
 
@@ -974,13 +902,16 @@
                     caption: cap,
                     location: loc,
                     mediaUrl: mediaUrl,
-                    mediaType: (selectedUploadFile && selectedUploadFile.type.startsWith('video')) ? 'video' : 'image',
+                    mediaType: selectedUploadFile.type.startsWith('video') ? 'video' : 'image',
                     createdAt: Date.now()
                 };
 
                 if (uploadType === 'reel') {
                     await addDoc(collection(db, "reels"), { ...itemData, videoUrl: mediaUrl });
                     window.switchTab('reels');
+                } else if (uploadType === 'story') {
+                    await addDoc(collection(db, "stories"), itemData);
+                    window.switchTab('home');
                 } else {
                     await addDoc(collection(db, "posts"), itemData);
                     window.switchTab('home');
@@ -988,7 +919,6 @@
 
                 window.closeCreateModal();
                 selectedUploadFile = null;
-                selectedDataUrl = '';
                 document.getElementById('create-caption-input').value = '';
                 document.getElementById('lbl-picker-text').innerText = "Select Media From Device";
                 window.showToast("Shared successfully! 🎉");
@@ -999,12 +929,13 @@
             }
         };
 
-        // Auth Monitor
+        // Auth Monitor & Auto Start
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 var savedTab = 'home';
                 try { savedTab = localStorage.getItem('ib65_active_tab') || 'home'; } catch(e) {}
                 window.switchTab(savedTab);
+                monitorLiveRoomsForStoryTray();
             }
         });
     </script>
