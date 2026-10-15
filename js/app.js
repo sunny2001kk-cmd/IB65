@@ -4,65 +4,15 @@ import {
     db, 
     doc, 
     getDoc, 
-    updateDoc, 
     collection, 
-    addDoc, 
     getDocs, 
     arrayUnion, 
     arrayRemove, 
     increment, 
     onAuthStateChanged,
     showToast, 
-    getVerificationBadgeSvg, 
-    CLOUDINARY_CONFIG 
+    getVerificationBadgeSvg 
 } from './config.js';
-
-import { 
-    handleSignup, 
-    handleLogin, 
-    handleLogout, 
-    handleForgotPassword, 
-    checkHandleAvailability, 
-    openAccountSwitcher, 
-    switchActiveSession 
-} from './auth.js';
-
-import { 
-    openProfessionalDashboard, 
-    closeProfessionalDashboard 
-} from './dashboard.js';
-
-import { 
-    openProEditorSuite, 
-    closeProEditor, 
-    captureCurrentThumbnailFrame, 
-    toggleEditorPlayback, 
-    handleZoomSlider, 
-    openAddTextTool, 
-    cycleFilterPresets, 
-    proceedToPublishFromEditor, 
-    resetEditorThumb, 
-    customThumbnailBlob 
-} from './editor.js';
-
-import { 
-    startBroadcast, 
-    joinBroadcast, 
-    resumeLiveStreamPlayback, 
-    sendLiveMsg, 
-    triggerLiveHeartGlobal, 
-    exitLiveRoom, 
-    loadLiveBroadcasters 
-} from './live.js';
-
-import { 
-    openDirectInbox, 
-    closeDirectInbox, 
-    openDirectChatWithUser, 
-    closeDirectChat, 
-    navigateToChatUserProfile, 
-    sendChatMessageDirect 
-} from './direct.js';
 
 import { 
     loadPostsFeed, 
@@ -72,38 +22,29 @@ import {
     openStoryQueueIndex, 
     closeStory, 
     openProfileFromStory, 
-    startWatchTracking, 
-    stopWatchTracking, 
     openComments, 
     closeComments, 
     submitComment,
-    handleSearch,
     openMediaViewer,
     closeMediaViewer,
     toggleCloudLike,
-    triggerDoubleTapLike,
     toggleSavePost,
     deleteMyContent
 } from './feed.js';
 
-let currentTab = 'home';
-let uploadType = 'post';
-let selectedFileBlob = null;
-let selectedFileUrl = '';
-let selectedFileType = 'image';
+import { 
+    openProEditorSuite, 
+    closeProEditor, 
+    captureCurrentThumbnailFrame, 
+    toggleEditorPlayback, 
+    handleZoomSlider, 
+    openAddTextTool, 
+    cycleFilterPresets, 
+    proceedToPublishFromEditor 
+} from './editor.js';
 
 // Bind to Window
-window.handleSignup = handleSignup;
-window.handleLogin = handleLogin;
-window.handleLogout = handleLogout;
-window.handleForgotPassword = handleForgotPassword;
-window.checkHandleAvailability = checkHandleAvailability;
-window.openAccountSwitcher = openAccountSwitcher;
-window.switchActiveSession = switchActiveSession;
-
-window.openProfessionalDashboard = openProfessionalDashboard;
-window.closeProfessionalDashboard = closeProfessionalDashboard;
-
+window.openProEditorSuite = openProEditorSuite;
 window.closeProEditor = closeProEditor;
 window.captureCurrentThumbnailFrame = captureCurrentThumbnailFrame;
 window.toggleEditorPlayback = toggleEditorPlayback;
@@ -112,20 +53,6 @@ window.openAddTextTool = openAddTextTool;
 window.cycleFilterPresets = cycleFilterPresets;
 window.proceedToPublishFromEditor = proceedToPublishFromEditor;
 
-window.startBroadcast = startBroadcast;
-window.joinBroadcast = joinBroadcast;
-window.resumeLiveStreamPlayback = resumeLiveStreamPlayback;
-window.sendLiveMsg = sendLiveMsg;
-window.triggerLiveHeartGlobal = triggerLiveHeartGlobal;
-window.exitLiveRoom = exitLiveRoom;
-
-window.openDirectInbox = openDirectInbox;
-window.closeDirectInbox = closeDirectInbox;
-window.openDirectChatWithUser = openDirectChatWithUser;
-window.closeDirectChat = closeDirectChat;
-window.navigateToChatUserProfile = navigateToChatUserProfile;
-window.sendChatMessageDirect = sendChatMessageDirect;
-
 window.loadPostsFeed = loadPostsFeed;
 window.loadReelsFeed = loadReelsFeed;
 window.loadExploreMedia = loadExploreMedia;
@@ -133,23 +60,17 @@ window.loadStoriesTray = loadStoriesTray;
 window.openStoryQueueIndex = openStoryQueueIndex;
 window.closeStory = closeStory;
 window.openProfileFromStory = openProfileFromStory;
-window.startWatchTracking = startWatchTracking;
-window.stopWatchTracking = stopWatchTracking;
 window.openComments = openComments;
 window.closeComments = closeComments;
 window.submitComment = submitComment;
-
-window.handleSearch = handleSearch;
 window.openMediaViewer = openMediaViewer;
 window.closeMediaViewer = closeMediaViewer;
 window.toggleCloudLike = toggleCloudLike;
-window.triggerDoubleTapLike = triggerDoubleTapLike;
 window.toggleSavePost = toggleSavePost;
 window.deleteMyContent = deleteMyContent;
 
 // Tab Routing System
 window.switchTab = function(tab) {
-    currentTab = tab;
     document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(v => v.pause());
 
     const header = document.getElementById('main-app-header');
@@ -185,11 +106,10 @@ window.switchTab = function(tab) {
     if (tab === 'search') loadExploreMedia();
     if (tab === 'reels') loadReelsFeed();
     if (tab === 'profile') loadMyProfile();
-    if (tab === 'live') loadLiveBroadcasters();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Profile Loading Function
+// Profile Loader
 export async function loadMyProfile() {
     const user = auth.currentUser;
     if (!user) return;
@@ -202,41 +122,16 @@ export async function loadMyProfile() {
             const badgeType = d.badgeType || (cleanHandle.toLowerCase() === 'ib65' ? 'gold_red' : 'none');
             const badgeSvg = getVerificationBadgeSvg(badgeType);
 
-            const topUserEl = document.getElementById('profile-top-username');
-            const topBadgeEl = document.getElementById('profile-top-badge');
-            const nameEl = document.getElementById('my-profile-name');
-            const handleEl = document.getElementById('my-profile-handle');
-            const bioEl = document.getElementById('my-profile-bio');
-
-            if (topUserEl) topUserEl.innerHTML = `@${cleanHandle}`;
-            if (topBadgeEl) topBadgeEl.innerHTML = badgeSvg;
-            if (nameEl) nameEl.innerHTML = `<span>${d.name || user.displayName || 'User'}</span> ${badgeSvg}`;
-            if (handleEl) handleEl.innerText = '@' + cleanHandle;
-            if (bioEl) bioEl.innerText = d.bio || '';
-
-            const avatarImg = document.getElementById('my-profile-avatar-img');
-            const avatarTxt = document.getElementById('my-profile-avatar');
-            if (d.photoUrl) {
-                if (avatarImg) { avatarImg.src = d.photoUrl; avatarImg.classList.remove('hidden'); }
-                if (avatarTxt) avatarTxt.classList.add('hidden');
-            } else {
-                if (avatarImg) avatarImg.classList.add('hidden');
-                if (avatarTxt) { avatarTxt.classList.remove('hidden'); avatarTxt.innerText = (d.name || 'U')[0].toUpperCase(); }
-            }
-
-            const isPro = d.accountType === 'professional';
-            document.getElementById('pro-dashboard-pill')?.classList.toggle('hidden', !isPro);
-
-            const isPriv = !!d.isPrivate;
-            document.getElementById('profile-privacy-badge')?.classList.toggle('hidden', !isPriv);
+            document.getElementById('profile-top-username').innerHTML = `@${cleanHandle} ${badgeSvg}`;
+            document.getElementById('my-profile-name').innerHTML = `<span>${d.name || user.displayName || 'User'}</span> ${badgeSvg}`;
+            document.getElementById('my-profile-handle').innerText = '@' + cleanHandle;
+            document.getElementById('my-profile-bio').innerText = d.bio || '';
 
             const fCount = typeof d.followers === 'number' ? d.followers : (d.followersList ? d.followersList.length : 0);
             const fgCount = typeof d.following === 'number' ? d.following : (d.followingList ? d.followingList.length : 0);
             
-            const followersEl = document.getElementById('my-stat-followers');
-            const followingEl = document.getElementById('my-stat-following');
-            if (followersEl) followersEl.innerText = fCount;
-            if (followingEl) followingEl.innerText = fgCount;
+            document.getElementById('my-stat-followers').innerText = fCount;
+            document.getElementById('my-stat-following').innerText = fgCount;
         }
 
         const [pSnap, rSnap] = await Promise.all([
@@ -247,31 +142,19 @@ export async function loadMyProfile() {
         pSnap.forEach(p => { if (p.data().authorEmail === user.email) myMedia.push({ id: p.id, col: 'posts', ...p.data() }); });
         rSnap.forEach(r => { if (r.data().authorEmail === user.email) myMedia.push({ id: r.id, col: 'reels', mediaType: 'video', mediaUrl: r.data().videoUrl, ...r.data() }); });
 
-        const postsStatEl = document.getElementById('my-stat-posts');
-        if (postsStatEl) postsStatEl.innerText = myMedia.length;
+        document.getElementById('my-stat-posts').innerText = myMedia.length;
 
         const grid = document.getElementById('my-media-grid');
         if (grid) {
-            if (myMedia.length === 0) {
-                grid.innerHTML = '<div class="col-span-3 text-gray-500 py-8 text-xs text-center">No media uploaded yet</div>';
-            } else {
-                grid.innerHTML = myMedia.map(p => {
-                    const media = p.mediaUrl || p.videoUrl || p.url || '';
-                    const isVid = p.mediaType === 'video' || p.col === 'reels';
-                    return `
-                        <div class="relative h-32 bg-zinc-900 rounded-lg overflow-hidden cursor-pointer border border-zinc-800 flex items-center justify-center" onclick='window.openMediaViewer(${JSON.stringify(p)})'>
-                            ${isVid ? `
-                                <video src="${media}#t=0.1" poster="${p.thumbnailUrl || ''}" preload="metadata" muted playsinline class="w-full h-full object-cover pointer-events-none"></video>
-                                <span class="absolute top-1.5 right-1.5 bg-black/60 rounded-full px-1.5 py-0.5 text-[9px] text-white">
-                                    <i class="fa-solid fa-play text-[8px]"></i>
-                                </span>
-                            ` : `
-                                <img src="${media}" loading="lazy" class="w-full h-full object-cover">
-                            `}
-                        </div>
-                    `;
-                }).join('');
-            }
+            grid.innerHTML = myMedia.length === 0 ? '<div class="col-span-3 text-gray-500 py-8 text-xs text-center">No media uploaded yet</div>' : myMedia.map(p => `
+                <div class="relative h-32 bg-zinc-900 rounded-lg overflow-hidden cursor-pointer border border-zinc-800 flex items-center justify-center" onclick='window.openMediaViewer(${JSON.stringify(p)})'>
+                    ${p.mediaType === 'video' ? `
+                        <video src="${p.mediaUrl || p.videoUrl}#t=0.1" preload="metadata" muted playsinline class="w-full h-full object-cover"></video>
+                    ` : `
+                        <img src="${p.mediaUrl}" loading="lazy" class="w-full h-full object-cover">
+                    `}
+                </div>
+            `).join('');
         }
     } catch(e) {}
 }
@@ -292,36 +175,18 @@ window.openPublicProfile = async function(email) {
         const d = uSnap.data();
 
         const cleanHandle = (d.handle || email.split('@')[0]).replace(/^@+/, '');
-        const badgeType = d.badgeType || (cleanHandle.toLowerCase() === 'ib65' ? 'gold_red' : 'none');
-        const badgeSvg = getVerificationBadgeSvg(badgeType);
+        const badgeSvg = getVerificationBadgeSvg(d.badgeType || 'none');
 
-        const topHandle = document.getElementById('pub-top-handle');
-        const nameEl = document.getElementById('pub-name');
-        const handleEl = document.getElementById('pub-handle');
-        const bioEl = document.getElementById('pub-bio');
-
-        if (topHandle) topHandle.innerText = '@' + cleanHandle;
-        if (nameEl) nameEl.innerHTML = `<span>${d.name || 'Creator'}</span> ${badgeSvg}`;
-        if (handleEl) handleEl.innerText = '@' + cleanHandle;
-        if (bioEl) bioEl.innerText = d.bio || '';
-
-        const pubImg = document.getElementById('pub-avatar-img');
-        const pubTxt = document.getElementById('pub-avatar');
-        if (d.photoUrl) {
-            if (pubImg) { pubImg.src = d.photoUrl; pubImg.classList.remove('hidden'); }
-            if (pubTxt) pubTxt.classList.add('hidden');
-        } else {
-            if (pubImg) pubImg.classList.add('hidden');
-            if (pubTxt) { pubTxt.classList.remove('hidden'); pubTxt.innerText = (d.name || 'C')[0].toUpperCase(); }
-        }
+        document.getElementById('pub-top-handle').innerText = '@' + cleanHandle;
+        document.getElementById('pub-name').innerHTML = `<span>${d.name || 'Creator'}</span> ${badgeSvg}`;
+        document.getElementById('pub-handle').innerText = '@' + cleanHandle;
+        document.getElementById('pub-bio').innerText = d.bio || '';
 
         const fCount = typeof d.followers === 'number' ? d.followers : (d.followersList ? d.followersList.length : 0);
         const fgCount = typeof d.following === 'number' ? d.following : (d.followingList ? d.followingList.length : 0);
         
-        const fEl = document.getElementById('pub-stat-followers');
-        const fgEl = document.getElementById('pub-stat-following');
-        if (fEl) fEl.innerText = fCount;
-        if (fgEl) fgEl.innerText = fgCount;
+        document.getElementById('pub-stat-followers').innerText = fCount;
+        document.getElementById('pub-stat-following').innerText = fgCount;
 
         const mySnap = await getDoc(doc(db, "users", user.email));
         const myFollowing = mySnap.exists() ? (mySnap.data().followingList || []) : [];
@@ -337,37 +202,12 @@ window.openPublicProfile = async function(email) {
             };
         }
 
-        const msgBtn = document.getElementById('pub-msg-btn');
-        if (msgBtn) {
-            msgBtn.onclick = () => window.openDirectChatWithUser(email, d.name || cleanHandle, badgeType);
-        }
-
-        const [pSnap, rSnap] = await Promise.all([
-            getDocs(collection(db, "posts")),
-            getDocs(collection(db, "reels"))
-        ]);
-        const mediaItems = [];
-        pSnap.forEach(p => { if (p.data().authorEmail === email) mediaItems.push({ id: p.id, col: 'posts', ...p.data() }); });
-        rSnap.forEach(r => { if (r.data().authorEmail === email) mediaItems.push({ id: r.id, col: 'reels', mediaType: 'video', mediaUrl: r.data().videoUrl, ...r.data() }); });
-
-        const postsEl = document.getElementById('pub-stat-posts');
-        if (postsEl) postsEl.innerText = mediaItems.length;
-
-        const grid = document.getElementById('pub-media-grid');
-        if (grid) {
-            grid.innerHTML = mediaItems.length === 0 ? '<div class="col-span-3 text-center text-gray-500 py-8 text-xs">No posts uploaded yet</div>' : mediaItems.map(p => `
-                <div class="h-28 rounded-lg overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center cursor-pointer" onclick='window.openMediaViewer(${JSON.stringify(p)})'>
-                    ${p.mediaType === 'video' ? `<video src="${p.mediaUrl \vert{}\vert{} p.videoUrl}#t=0.1" poster="${p.thumbnailUrl || ''}" class="w-full h-full object-cover"></video>` : `<img src="${p.mediaUrl}" class="w-full h-full object-cover">`}
-                </div>
-            `).join('');
-        }
-
         ['home', 'search', 'reels', 'live', 'profile'].forEach(t => document.getElementById('view-' + t)?.classList.add('hidden'));
         document.getElementById('view-public-profile')?.classList.remove('hidden');
     } catch(e) {}
 };
 
-// Follow / Unfollow Logic
+// Follow/Unfollow Sync
 window.toggleFollowUser = async function(targetEmail, targetName) {
     const user = auth.currentUser;
     if (!user || user.email === targetEmail) return;
@@ -401,153 +241,7 @@ window.toggleFollowUser = async function(targetEmail, targetName) {
             showToast("Following " + targetName);
         }
         loadPostsFeed();
-        loadReelsFeed();
-    } catch(e) { showToast(e.message); }
-};
-
-// Media Create & Upload Handlers
-window.openCreateModal = function(type) {
-    uploadType = type || 'post';
-    document.getElementById('modal-create')?.classList.remove('hidden');
-};
-
-window.closeCreateModal = function() {
-    document.getElementById('modal-create')?.classList.add('hidden');
-};
-
-window.setUploadType = function(t) {
-    uploadType = t;
-    ['post', 'reel', 'story'].forEach(tp => {
-        const btn = document.getElementById('type-btn-' + tp);
-        if (btn) btn.className = tp === t ? 'font-bold text-white border-b-2 border-white pb-1 px-3' : 'text-gray-500 pb-1 px-3';
-    });
-};
-
-window.handleFileSelected = function(e) {
-    const f = e.target.files && e.target.files[0];
-    if (!f) return;
-
-    showToast("Loading media...");
-    selectedFileBlob = f;
-    resetEditorThumb();
-    selectedFileType = (f.type && f.type.startsWith('video')) ? 'video' : 'image';
-
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        selectedFileUrl = event.target.result;
-        e.target.value = '';
-        window.closeCreateModal();
-        openProEditorSuite(selectedFileUrl, selectedFileType);
-    };
-    reader.readAsDataURL(f);
-};
-
-window.publishMedia = async function() {
-    const user = auth.currentUser;
-    if (!user) { showToast("Login required!"); return; }
-    if (!selectedFileBlob && !selectedFileUrl) { showToast("Select media first!"); return; }
-
-    const captionInput = document.getElementById('create-caption-input');
-    const locationInput = document.getElementById('create-location-input');
-    const caption = captionInput ? captionInput.value.trim() : '';
-    const location = locationInput ? locationInput.value.trim() : '';
-
-    if (!caption && uploadType !== 'story') {
-        showToast("Caption is required!");
-        captionInput?.focus();
-        return;
-    }
-
-    const hashtags = (caption.match(/#[a-z0-9_]+/gi) || []).map(t => t.toLowerCase());
-    const btn = document.getElementById('btn-publish');
-    if (btn) { btn.innerText = "Sharing..."; btn.disabled = true; }
-
-    try {
-        let cloudUrl = selectedFileUrl;
-        let uploadedThumbUrl = '';
-
-        if (selectedFileBlob) {
-            const fd = new FormData();
-            fd.append("file", selectedFileBlob);
-            fd.append("upload_preset", CLOUDINARY_CONFIG.uploadPreset);
-
-            const endpoint = selectedFileType === 'video'
-                ? `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/video/upload`
-                : `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
-
-            const res = await fetch(endpoint, { method: "POST", body: fd });
-            const data = await res.json();
-            if (data.secure_url) cloudUrl = data.secure_url;
-        }
-
-        if (customThumbnailBlob) {
-            const thumbFd = new FormData();
-            thumbFd.append("file", customThumbnailBlob);
-            thumbFd.append("upload_preset", CLOUDINARY_CONFIG.uploadPreset);
-            const thumbRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, { method: "POST", body: thumbFd });
-            const thumbData = await thumbRes.json();
-            if (thumbData.secure_url) uploadedThumbUrl = thumbData.secure_url;
-        }
-
-        const cleanAuthor = (user.displayName || user.email.split('@')[0]).replace(/^@+/, '');
-        const uDoc = await getDoc(doc(db, "users", user.email));
-        const badgeType = uDoc.data()?.badgeType || (cleanAuthor.toLowerCase() === 'ib65' ? 'gold_red' : 'none');
-
-        const payload = {
-            author: cleanAuthor,
-            handle: cleanAuthor,
-            authorEmail: user.email,
-            caption: caption,
-            location: location,
-            tags: hashtags,
-            mediaUrl: cloudUrl,
-            thumbnailUrl: uploadedThumbUrl,
-            badgeType: badgeType,
-            mediaType: selectedFileType,
-            views: 0,
-            viewedUsers: [],
-            shares: 0,
-            watchSeconds: 0,
-            likes: [],
-            comments: [],
-            isArchived: false,
-            createdAt: Date.now()
-        };
-
-        if (uploadType === 'reel') {
-            await addDoc(collection(db, "reels"), { ...payload, videoUrl: cloudUrl });
-            window.switchTab('reels');
-        } else if (uploadType === 'story') {
-            await addDoc(collection(db, "stories"), payload);
-            window.switchTab('home');
-        } else {
-            await addDoc(collection(db, "posts"), payload);
-            window.switchTab('home');
-        }
-
-        window.closeCreateModal();
-        selectedFileBlob = null;
-        selectedFileUrl = '';
-        if (captionInput) captionInput.value = '';
-        if (locationInput) locationInput.value = '';
-        showToast("Published successfully!");
-    } catch(e) {
-        showToast("Upload error: " + e.message);
-    } finally {
-        if (btn) { btn.innerText = "Share"; btn.disabled = false; }
-    }
-};
-
-window.toggleFeedVideoAudio = function(vid) {
-    if (!vid) return;
-    const btn = vid.nextElementSibling;
-    if (vid.muted) {
-        vid.muted = false;
-        if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-    } else {
-        vid.muted = true;
-        if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
-    }
+    } catch(e) {}
 };
 
 window.shareLink = function() {
@@ -555,13 +249,11 @@ window.shareLink = function() {
     showToast("Link copied to clipboard!");
 };
 
-// Auto Firebase Auth Listener
+// Auto Start on Load
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        document.getElementById('modal-auth')?.classList.add('hidden');
         window.loadMyProfile();
-        window.switchTab('home');
-    } else {
-        document.getElementById('modal-auth')?.classList.remove('hidden');
+        window.loadStoriesTray();
+        window.loadPostsFeed();
     }
 });
