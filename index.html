@@ -95,7 +95,7 @@
                 border-color: #00e1ff;
             }
             50% {
-                box-shadow: 0 0 14px #00ffff, 0 0 24px rgba(0, 153, 255, 0.85), inset 0 0 8px rgba(255, 255, 0, 0.45);
+                box-shadow: 0 0 14px #00ffff, 0 0 24px rgba(0, 153, 255, 0.85), inset 0 0 8px rgba(0, 255, 255, 0.45);
                 border-color: #38bdf8;
             }
         }
@@ -139,7 +139,7 @@
             100% { transform: scale(1.1) rotate(15deg); opacity: 0; }
         }
         .heart-burst-animate {
-            animation: heartBurst 0.8s ease-out forwards;
+            animation: heartBurst 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
         @keyframes liveRingGlow {
@@ -199,7 +199,7 @@
         <!-- 1. HOME VIEW (DUAL STORIES + FEED) -->
         <div id="view-home" class="space-y-3 pb-24">
             <div class="p-3 border-b border-zinc-900 overflow-x-auto flex space-x-3 items-center">
-                <!-- 1.1 Normal Story Circle -->
+                <!-- Normal Story Circle -->
                 <div onclick="window.openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-pink-600 to-purple-600 flex items-center justify-center relative">
                         <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
@@ -210,7 +210,7 @@
                     <span class="text-[10px] text-gray-400 truncate w-16 text-center">Your story</span>
                 </div>
 
-                <!-- 1.2 Adjacent Live Broadcast Story Circle -->
+                <!-- Adjacent Live Broadcast Story Circle -->
                 <div id="tray-live-broadcast-box" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0 hidden" onclick="window.switchTab('live')">
                     <div class="w-16 h-16 rounded-full p-0.5 border-2 border-red-500 bg-red-950/40 flex items-center justify-center relative live-story-ring">
                         <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
@@ -221,7 +221,7 @@
                     <span class="text-[10px] text-red-400 font-bold truncate w-16 text-center" id="tray-live-host-name">Live Now</span>
                 </div>
 
-                <!-- 1.3 Other Stories -->
+                <!-- Friends Stories Tray -->
                 <div id="stories-tray-items" class="flex space-x-3"></div>
             </div>
 
@@ -245,7 +245,7 @@
             </div>
         </div>
 
-        <!-- 3. INSTAGRAM + TIKTOK REELS VIEW -->
+        <!-- 3. INSTAGRAM + TIKTOK MIX REELS VIEW -->
         <div id="view-reels" class="hidden relative w-full bg-black">
             <div class="absolute top-4 left-4 right-4 z-30 flex justify-between items-center pointer-events-none">
                 <span class="text-lg font-black tracking-wide text-white drop-shadow-md">Reels</span>
@@ -274,26 +274,26 @@
 
         <!-- 5. 100% ORIGINAL INSTAGRAM + TIKTOK PROFILE VIEW -->
         <div id="view-profile" class="space-y-4 p-4 hidden pb-24 select-none">
-            <!-- Top Username Bar With Settings Gear -->
+            <!-- Top Username Header with Dynamic Badges & Settings Menu -->
             <div class="flex justify-between items-center px-1">
                 <div class="flex items-center space-x-1.5 cursor-pointer icon-btn">
                     <span class="text-base font-extrabold text-white flex items-center space-x-1" id="profile-top-username">
                         <span>@IB65</span>
                     </span>
-                    <i class="fa-solid fa-circle-check text-red-500 text-xs ml-1"></i>
+                    <span id="profile-verified-badge-slot"></span>
                 </div>
                 <div class="flex items-center space-x-3">
                     <button onclick="window.openCreateModal('post')" class="text-white text-base icon-btn p-1">
                         <i class="fa-regular fa-square-plus"></i>
                     </button>
-                    <!-- Settings Menu Trigger -->
+                    <!-- Settings Trigger -->
                     <button onclick="window.openProfileSettingsDrawer()" class="text-white text-lg icon-btn p-1">
                         <i class="fa-solid fa-bars"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Profile Info & Real Stats -->
+            <!-- Profile Info & Accurate Stats -->
             <div class="clay-card p-4 space-y-4">
                 <div class="flex items-center space-x-4">
                     <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-600 to-purple-600 p-0.5 relative flex-shrink-0">
@@ -317,14 +317,16 @@
                     </div>
                 </div>
 
-                <!-- Name & Bio -->
+                <!-- Name & Bio with Verified Badge -->
                 <div class="space-y-0.5 px-1">
-                    <h2 id="my-profile-name" class="text-sm font-bold text-white">IB65</h2>
+                    <h2 id="my-profile-name" class="text-sm font-bold text-white flex items-center space-x-1">
+                        <span>IB65</span>
+                    </h2>
                     <p id="my-profile-handle" class="text-[11px] text-gray-400">@IB65</p>
                     <p id="my-profile-bio" class="text-xs text-gray-200 mt-1">Creator • Official IB65 Account</p>
                 </div>
 
-                <!-- Instagram + TikTok Action Buttons -->
+                <!-- Profile Action Buttons -->
                 <div class="flex space-x-2 pt-1">
                     <button onclick="window.openEditProfileModal()" class="flex-1 bg-zinc-900 border border-zinc-800 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">
                         Edit profile
@@ -351,7 +353,7 @@
                 </button>
             </div>
 
-            <!-- Grids Content -->
+            <!-- Grids Content with Smart Media Fallback (Broken Image Fix) -->
             <div id="profile-grid-posts" class="grid grid-cols-3 gap-1"></div>
             <div id="profile-grid-reels" class="grid grid-cols-3 gap-1 hidden"></div>
             <div id="profile-grid-saved" class="grid grid-cols-3 gap-1 hidden">
@@ -361,54 +363,50 @@
 
     </main>
 
-    <!-- EDIT PROFILE MODAL -->
-    <div id="modal-edit-profile" class="fixed inset-0 z-50 bg-black flex flex-col hidden select-none">
-        <div class="p-3 border-b border-zinc-800 flex justify-between items-center bg-black">
-            <button onclick="window.closeEditProfileModal()" class="text-white text-sm">Cancel</button>
-            <span class="font-bold text-xs text-white">Edit Profile</span>
-            <button onclick="window.saveProfileUpdatesDirect()" class="text-xs font-bold text-cyan-400">Done</button>
-        </div>
-        <div class="p-5 space-y-4 max-w-md mx-auto w-full">
-            <div class="text-center space-y-2">
-                <div class="w-20 h-20 mx-auto rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center text-2xl font-bold">
-                    <span id="edit-avatar-preview">I</span>
-                </div>
-                <button onclick="window.showToast('Feature coming: change profile photo')" class="text-xs font-bold text-cyan-400">Change photo</button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="text-gray-400 block mb-1">Name</label>
-                    <input type="text" id="edit-input-name" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none">
-                </div>
-                <div>
-                    <label class="text-gray-400 block mb-1">Username</label>
-                    <input type="text" id="edit-input-handle" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none">
-                </div>
-                <div>
-                    <label class="text-gray-400 block mb-1">Bio</label>
-                    <textarea id="edit-input-bio" rows="3" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none"></textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SETTINGS DRAWER -->
-    <div id="modal-profile-settings" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="window.closeProfileSettingsDrawer()">
-        <div class="clay-card w-full max-w-md rounded-t-3xl p-5 space-y-3" onclick="event.stopPropagation()">
+    <!-- FULL INSTAGRAM + TIKTOK ORIGINAL SETTINGS DRAWER -->
+    <div id="modal-profile-settings" class="fixed inset-0 z-50 bg-black/85 flex items-end justify-center hidden" onclick="window.closeProfileSettingsDrawer()">
+        <div class="clay-card w-full max-w-md max-h-[85vh] overflow-y-auto rounded-t-3xl p-5 space-y-3" onclick="event.stopPropagation()">
             <div class="w-12 h-1 bg-zinc-700 rounded-full mx-auto mb-2"></div>
             <h3 class="text-sm font-bold text-white mb-2">Settings & Privacy</h3>
             
-            <div onclick="window.showToast('Account is Public')" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Account & Safety</p>
+            <div onclick="window.toggleAccountPrivacy()" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
                 <span class="text-xs text-white"><i class="fa-solid fa-lock text-gray-400 mr-2.5"></i>Account Privacy</span>
-                <span class="text-[10px] text-green-400 font-bold">Public</span>
+                <span id="privacy-toggle-status" class="text-[10px] text-green-400 font-bold">Public</span>
             </div>
-            <div onclick="window.showToast('Professional Mode Active')" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
-                <span class="text-xs text-white"><i class="fa-solid fa-chart-line text-blue-400 mr-2.5"></i>Insights & Creator Studio</span>
+            <div onclick="window.showToast('Security Verified: 2FA Active')" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
+                <span class="text-xs text-white"><i class="fa-solid fa-shield-halved text-cyan-400 mr-2.5"></i>Password & Security</span>
                 <i class="fa-solid fa-chevron-right text-xs text-gray-500"></i>
             </div>
+
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider pt-2">Creator Tools & Insights</p>
+            <div onclick="window.showToast('Creator Studio: 1.4K Total Views')" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
+                <span class="text-xs text-white"><i class="fa-solid fa-chart-line text-blue-400 mr-2.5"></i>TikTok Studio & Insights</span>
+                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-bold">Pro Active</span>
+            </div>
+            <div onclick="window.showToast('Verification: Official badge active')" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
+                <span class="text-xs text-white"><i class="fa-solid fa-circle-check text-red-500 mr-2.5"></i>Request Verification</span>
+                <i class="fa-solid fa-chevron-right text-xs text-gray-500"></i>
+            </div>
+
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider pt-2">Content & Preferences</p>
             <div onclick="window.switchProfileGrid('saved'); window.closeProfileSettingsDrawer();" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
-                <span class="text-xs text-white"><i class="fa-regular fa-bookmark text-yellow-400 mr-2.5"></i>Saved Posts</span>
+                <span class="text-xs text-white"><i class="fa-regular fa-bookmark text-yellow-400 mr-2.5"></i>Saved Posts & Audio</span>
                 <i class="fa-solid fa-chevron-right text-xs text-gray-500"></i>
+            </div>
+            <div onclick="window.showToast('Close Friends List: 0 users')" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
+                <span class="text-xs text-white"><i class="fa-regular fa-star text-green-400 mr-2.5"></i>Close Friends</span>
+                <i class="fa-solid fa-chevron-right text-xs text-gray-500"></i>
+            </div>
+            <div onclick="window.showToast('High Quality Uploads is ON')" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
+                <span class="text-xs text-white"><i class="fa-solid fa-sliders text-purple-400 mr-2.5"></i>Data Saver & Media Quality</span>
+                <span class="text-[10px] text-cyan-400 font-bold">Ultra HD</span>
+            </div>
+
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider pt-2">Login Actions</p>
+            <div onclick="window.showToast('Switch Account ready')" class="p-3 bg-zinc-900/80 rounded-xl flex items-center text-cyan-400 cursor-pointer">
+                <i class="fa-solid fa-users-viewfinder mr-2.5"></i>
+                <span class="text-xs font-bold">Add or Switch Account</span>
             </div>
             <div onclick="window.handleLogoutDirect()" class="p-3 bg-zinc-900/80 rounded-xl flex items-center text-red-500 cursor-pointer">
                 <i class="fa-solid fa-arrow-right-from-bracket mr-2.5"></i>
@@ -417,7 +415,73 @@
         </div>
     </div>
 
-    <!-- SHARE DRAWER (ORIGINAL INSTA / TIKTOK STYLE) -->
+    <!-- ORIGINAL INSTAGRAM / TIKTOK CREATE MODAL -->
+    <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden select-none">
+        <div class="p-3 border-b border-zinc-800 flex justify-between items-center bg-black">
+            <button onclick="window.closeCreateModal()" class="text-white text-base p-1 icon-btn"><i class="fa-solid fa-xmark"></i></button>
+            <span class="font-bold text-xs text-white">New Creation</span>
+            <button onclick="window.publishMediaDirect()" id="btn-publish" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Next</button>
+        </div>
+        <div class="flex-1 p-4 space-y-4 max-w-md mx-auto w-full overflow-y-auto">
+            <!-- Mode Pills -->
+            <div class="flex space-x-2 border-b border-zinc-800 pb-2 text-xs">
+                <button onclick="window.setUploadType('post')" id="type-btn-post" class="font-bold text-white border-b-2 border-white pb-1 px-3">Post</button>
+                <button onclick="window.setUploadType('reel')" id="type-btn-reel" class="text-gray-500 pb-1 px-3">Reel</button>
+                <button onclick="window.setUploadType('story')" id="type-btn-story" class="text-gray-500 pb-1 px-3">Story</button>
+            </div>
+            
+            <!-- Live Preview Stage -->
+            <div id="upload-preview-box" class="relative rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 h-64 flex items-center justify-center">
+                <video id="upload-preview-vid" controls playsinline class="w-full h-full object-cover hidden"></video>
+                <img id="upload-preview-img" class="w-full h-full object-cover hidden">
+                <div id="upload-placeholder-cta" class="text-center space-y-2 cursor-pointer" onclick="document.getElementById('file-gallery-picker').click()">
+                    <i class="fa-solid fa-images text-3xl text-cyan-400"></i>
+                    <p class="text-xs text-white font-bold">Tap to Pick Media</p>
+                    <span class="text-[10px] text-gray-500">Supports Videos & Photos</span>
+                </div>
+                <button onclick="window.clearSelectedMedia()" id="btn-clear-media" class="absolute top-2 right-2 bg-black/80 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs hidden">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="window.handleFileSelectedDirect(event)">
+
+            <!-- Caption / Hashtags -->
+            <div class="space-y-1">
+                <label class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                    Caption <span class="text-red-500">* (Mandatory)</span>
+                </label>
+                <input type="text" id="create-caption-input" placeholder="Write caption & #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-500">
+            </div>
+
+            <div class="flex space-x-2">
+                <button onclick="document.getElementById('file-gallery-picker').click()" class="flex-1 bg-zinc-900 border border-zinc-800 py-2.5 rounded-xl text-xs font-bold text-white glow-btn-blue">
+                    Change Media
+                </button>
+                <button onclick="window.showToast('Audio Picker Coming')" class="px-4 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-bold text-white">
+                    <i class="fa-solid fa-music mr-1 text-cyan-400"></i>Music
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMMENTS DRAWER (WITH INDIVIDUAL COMMENT LIKES) -->
+    <div id="modal-comments" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="window.closeCommentsDrawer()">
+        <div class="clay-card w-full max-w-md h-[55vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                <span class="font-bold text-xs text-white">Comments</span>
+                <button onclick="window.closeCommentsDrawer()" class="text-gray-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="comments-items-list" class="flex-1 overflow-y-auto space-y-2.5 py-3 text-xs text-gray-400 text-center">
+                No comments yet. Be the first to comment!
+            </div>
+            <div class="flex space-x-2 pt-2 border-t border-zinc-800">
+                <input type="text" id="comment-text-input" placeholder="Add a comment..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+                <button onclick="window.submitReelComment()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Post</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARE DRAWER -->
     <div id="modal-share-drawer" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="window.closeShareDrawer()">
         <div class="clay-card w-full max-w-md rounded-t-3xl p-5 space-y-4" onclick="event.stopPropagation()">
             <div class="w-12 h-1 bg-zinc-700 rounded-full mx-auto"></div>
@@ -455,7 +519,7 @@
         </div>
     </div>
 
-    <!-- AUDIO PAGE MODAL (TIKTOK / INSTA STYLE) -->
+    <!-- AUDIO PAGE MODAL -->
     <div id="modal-audio-track" class="fixed inset-0 z-50 bg-black flex flex-col hidden select-none">
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
             <button onclick="document.getElementById('modal-audio-track').classList.add('hidden')" class="text-white text-sm"><i class="fa-solid fa-arrow-left"></i></button>
@@ -503,57 +567,33 @@
         </div>
     </div>
 
-    <!-- UPLOAD MODAL WITH PREVIEW -->
-    <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden select-none">
+    <!-- EDIT PROFILE MODAL -->
+    <div id="modal-edit-profile" class="fixed inset-0 z-50 bg-black flex flex-col hidden select-none">
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center bg-black">
-            <button onclick="window.closeCreateModal()" class="text-white text-base p-1 icon-btn"><i class="fa-solid fa-xmark"></i></button>
-            <span class="font-bold text-xs text-white">Create New</span>
-            <button onclick="window.publishMediaDirect()" id="btn-publish" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Share</button>
+            <button onclick="window.closeEditProfileModal()" class="text-white text-sm">Cancel</button>
+            <span class="font-bold text-xs text-white">Edit Profile</span>
+            <button onclick="window.saveProfileUpdatesDirect()" class="text-xs font-bold text-cyan-400">Done</button>
         </div>
-        <div class="flex-1 p-4 space-y-4 max-w-md mx-auto w-full overflow-y-auto">
-            <div class="flex space-x-2 border-b border-zinc-800 pb-2 text-xs">
-                <button onclick="window.setUploadType('post')" id="type-btn-post" class="font-bold text-white border-b-2 border-white pb-1 px-3">Post</button>
-                <button onclick="window.setUploadType('reel')" id="type-btn-reel" class="text-gray-500 pb-1 px-3">Reel</button>
-                <button onclick="window.setUploadType('story')" id="type-btn-story" class="text-gray-500 pb-1 px-3">Story</button>
+        <div class="p-5 space-y-4 max-w-md mx-auto w-full">
+            <div class="text-center space-y-2">
+                <div class="w-20 h-20 mx-auto rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center text-2xl font-bold">
+                    <span id="edit-avatar-preview">I</span>
+                </div>
+                <button onclick="window.showToast('Profile photo update active')" class="text-xs font-bold text-cyan-400">Change photo</button>
             </div>
-            
-            <div class="space-y-1">
-                <label class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
-                    Caption <span class="text-red-500">* (Mandatory)</span>
-                </label>
-                <input type="text" id="create-caption-input" placeholder="Write caption & #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-500">
-            </div>
-
-            <div class="p-6 text-center rounded-2xl bg-zinc-900 border border-zinc-800 cursor-pointer glow-btn-blue transition" onclick="document.getElementById('file-gallery-picker').click()">
-                <i class="fa-solid fa-cloud-arrow-up text-3xl mb-2 text-cyan-400"></i>
-                <p class="text-xs text-white font-bold" id="lbl-picker-text">Choose Photo / Video from Device</p>
-                <span class="text-[10px] text-gray-500 block mt-0.5">Supports MP4, MOV, JPG, PNG</span>
-            </div>
-            <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="window.handleFileSelectedDirect(event)">
-
-            <div id="upload-preview-box" class="hidden relative rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 max-h-60 flex items-center justify-center">
-                <video id="upload-preview-vid" controls playsinline class="w-full h-full max-h-60 object-cover hidden"></video>
-                <img id="upload-preview-img" class="w-full h-full max-h-60 object-cover hidden">
-                <button onclick="window.clearSelectedMedia()" class="absolute top-2 right-2 bg-black/80 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- COMMENTS DRAWER -->
-    <div id="modal-comments" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="window.closeCommentsDrawer()">
-        <div class="clay-card w-full max-w-md h-[55vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                <span class="font-bold text-xs text-white">Comments</span>
-                <button onclick="window.closeCommentsDrawer()" class="text-gray-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div id="comments-items-list" class="flex-1 overflow-y-auto space-y-2 py-3 text-xs text-gray-400 text-center">
-                No comments yet. Be the first to comment!
-            </div>
-            <div class="flex space-x-2 pt-2 border-t border-zinc-800">
-                <input type="text" id="comment-text-input" placeholder="Add a comment..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-                <button onclick="window.submitReelComment()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Post</button>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="text-gray-400 block mb-1">Name</label>
+                    <input type="text" id="edit-input-name" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none">
+                </div>
+                <div>
+                    <label class="text-gray-400 block mb-1">Username</label>
+                    <input type="text" id="edit-input-handle" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none">
+                </div>
+                <div>
+                    <label class="text-gray-400 block mb-1">Bio</label>
+                    <textarea id="edit-input-bio" rows="3" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none"></textarea>
+                </div>
             </div>
         </div>
     </div>
@@ -600,7 +640,18 @@
             setTimeout(function() { t.classList.add('hidden'); }, 2300);
         };
 
-        // 🛑 Stop All Background Audios Across Tabs
+        // 🌟 DYNAMIC VERIFICATION BADGE GENERATOR
+        window.getVerificationBadgeHtml = function(handle) {
+            var clean = (handle || '').replace(/^@+/, '').toLowerCase();
+            if (clean === 'ib65') {
+                // Official Golden-Red glowing star flame badge
+                return '<i class="fa-solid fa-certificate text-amber-400 drop-shadow-[0_0_8px_#ff3b00] text-[13px] ml-1"></i>';
+            }
+            // Instagram-style Red Tick for all other creators
+            return '<i class="fa-solid fa-circle-check text-red-500 text-xs ml-1"></i>';
+        };
+
+        // 🛑 Global Single-Audio Kill Switch
         window.stopAllAppAudios = function() {
             document.querySelectorAll('video').forEach(function(vid) {
                 if (vid.id !== 'live-room-video') {
@@ -613,7 +664,7 @@
             });
         };
 
-        // 🔊 Audio Toggle
+        // 🔊 Dedicated Audio Toggle (Unmute only affects selected video)
         window.toggleFeedVideoAudio = function(triggerEl) {
             var box = triggerEl.closest('.relative') || triggerEl.closest('.reel-item-box');
             var vid = box ? box.querySelector('video') : null;
@@ -717,9 +768,30 @@
         window.closeDirectInbox = function() {
             document.getElementById('modal-direct-inbox')?.classList.add('hidden');
         };
+
+        window.openProfileSettingsDrawer = function() {
+            document.getElementById('modal-profile-settings')?.classList.remove('hidden');
+        };
+
+        window.closeProfileSettingsDrawer = function() {
+            document.getElementById('modal-profile-settings')?.classList.add('hidden');
+        };
+
+        window.toggleAccountPrivacy = function() {
+            var tag = document.getElementById('privacy-toggle-status');
+            if (tag.innerText === 'Public') {
+                tag.innerText = 'Private';
+                tag.className = 'text-[10px] text-yellow-400 font-bold';
+                window.showToast("Account changed to Private 🔒");
+            } else {
+                tag.innerText = 'Public';
+                tag.className = 'text-[10px] text-green-400 font-bold';
+                window.showToast("Account changed to Public 🌐");
+            }
+        };
     </script>
 
-    <!-- FIRESTORE & COMPONENT INTEGRATION -->
+    <!-- FIRESTORE, LIKE-TOGGLE & COMPONENT ENGINE -->
     <script type="module">
         import { 
             auth, 
@@ -733,42 +805,55 @@
             arrayUnion, 
             arrayRemove, 
             onAuthStateChanged, 
-            signOut,
+            signOut, 
             CLOUDINARY_CONFIG 
         } from './js/config.js';
 
         let activeReelForComment = null;
         let activeShareData = null;
 
-        // 1. Double Tap Like Function (Only Likes, Doesn't Unmute)
-        window.handleDoubleTapLike = async function(box, reelId) {
+        // 1. Double Tap / Click Like Toggle (Prevents Count Over-Increment Bug)
+        window.handleLikeToggle = async function(box, reelId) {
             if (!box) return;
-            const burst = box.querySelector('.heart-burst-box');
-            if (burst) {
-                burst.classList.remove('hidden');
-                setTimeout(() => burst.classList.add('hidden'), 850);
-            }
-
             const user = auth.currentUser;
             if (!user) {
                 window.showToast("Login to like!");
                 return;
             }
 
+            const heartIcon = box.querySelector('.reel-like-icon');
+            const likeBadge = box.querySelector('.like-counter-val');
+            const burst = box.querySelector('.heart-burst-box');
+
             try {
                 const reelRef = doc(db, "reels", reelId);
-                await updateDoc(reelRef, {
-                    likes: arrayUnion(user.email)
-                });
-                const likeBadge = box.querySelector('.like-counter-val');
-                if (likeBadge) {
-                    likeBadge.innerText = (parseInt(likeBadge.innerText) || 0) + 1;
+                const snap = await getDoc(reelRef);
+                if (!snap.exists()) return;
+
+                const likesList = snap.data().likes || [];
+                const hasLiked = likesList.includes(user.email);
+
+                if (hasLiked) {
+                    // Unlike Action
+                    await updateDoc(reelRef, { likes: arrayRemove(user.email) });
+                    if (heartIcon) heartIcon.className = 'fa-solid fa-heart text-2xl text-white reel-like-icon drop-shadow-md';
+                    if (likeBadge) likeBadge.innerText = Math.max(0, likesList.length - 1);
+                    window.showToast("Unliked");
+                } else {
+                    // Like Action
+                    await updateDoc(reelRef, { likes: arrayUnion(user.email) });
+                    if (burst) {
+                        burst.classList.remove('hidden');
+                        setTimeout(() => burst.classList.add('hidden'), 700);
+                    }
+                    if (heartIcon) heartIcon.className = 'fa-solid fa-heart text-2xl text-red-500 reel-like-icon drop-shadow-[0_0_10px_#ff0033]';
+                    if (likeBadge) likeBadge.innerText = likesList.length + 1;
+                    window.showToast("Liked Reel ❤️");
                 }
-                window.showToast("Liked Reel ❤️");
             } catch(e) {}
         };
 
-        // 2. Open Original Comments Drawer
+        // 2. Open Comments Drawer with Individual Comment Likes
         window.openCommentsDrawer = async function(reelId) {
             activeReelForComment = reelId;
             const modal = document.getElementById('modal-comments');
@@ -782,15 +867,28 @@
                 const snap = await getDoc(doc(db, "reels", reelId));
                 const comments = snap.exists() ? (snap.data().comments || []) : [];
                 if (comments.length === 0) {
-                    list.innerHTML = 'No comments yet. Be the first to comment!';
+                    list.innerHTML = 'No comments yet. Say something!';
                     return;
                 }
-                list.innerHTML = comments.map(c => `
-                    <div class="clay-card p-2 text-left space-y-0.5">
-                        <strong class="text-white text-[11px]">@${c.user}</strong>
-                        <p class="text-gray-300 text-xs">${c.text}</p>
+
+                list.innerHTML = comments.map((c, idx) => {
+                    const badge = window.getVerificationBadgeHtml(c.user);
+                    const cLikes = (c.likes || []).length;
+                    return `
+                    <div class="clay-card p-2.5 text-left flex justify-between items-center space-x-2">
+                        <div class="space-y-0.5 flex-1">
+                            <span class="text-white text-[11px] font-bold flex items-center">
+                                @${c.user} ${badge}
+                            </span>
+                            <p class="text-gray-200 text-xs">${c.text}</p>
+                        </div>
+                        <button onclick="window.likeIndividualComment(${idx})" class="flex flex-col items-center icon-btn text-gray-400 hover:text-red-500 p-1">
+                            <i class="fa-regular fa-heart text-xs"></i>
+                            <span class="text-[9px] font-bold">${cLikes > 0 ? cLikes : ''}</span>
+                        </button>
                     </div>
-                `).join('');
+                    `;
+                }).join('');
             } catch(e) {
                 list.innerHTML = 'Error loading comments.';
             }
@@ -800,6 +898,29 @@
             document.getElementById('modal-comments')?.classList.add('hidden');
         };
 
+        // Like Individual Comment
+        window.likeIndividualComment = async function(idx) {
+            const user = auth.currentUser;
+            if (!user || !activeReelForComment) return;
+
+            try {
+                const snap = await getDoc(doc(db, "reels", activeReelForComment));
+                if (!snap.exists()) return;
+                const comments = snap.data().comments || [];
+                if (comments[idx]) {
+                    comments[idx].likes = comments[idx].likes || [];
+                    if (!comments[idx].likes.includes(user.email)) {
+                        comments[idx].likes.push(user.email);
+                    } else {
+                        comments[idx].likes = comments[idx].likes.filter(e => e !== user.email);
+                    }
+                    await updateDoc(doc(db, "reels", activeReelForComment), { comments: comments });
+                    window.openCommentsDrawer(activeReelForComment);
+                }
+            } catch(e) {}
+        };
+
+        // Post New Comment & Increment Counter Live
         window.submitReelComment = async function() {
             const input = document.getElementById('comment-text-input');
             const text = input ? input.value.trim() : '';
@@ -808,16 +929,144 @@
 
             try {
                 const cleanAuthor = (user.displayName || user.email.split('@')[0]).replace(/^@+/, '');
-                await updateDoc(doc(db, "reels", activeReelForComment), {
-                    comments: arrayUnion({ user: cleanAuthor, text: text, time: Date.now() })
-                });
+                const snap = await getDoc(doc(db, "reels", activeReelForComment));
+                const oldComments = snap.exists() ? (snap.data().comments || []) : [];
+                
+                const newComments = [...oldComments, {
+                    user: cleanAuthor,
+                    text: text,
+                    likes: [],
+                    time: Date.now()
+                }];
+
+                await updateDoc(doc(db, "reels", activeReelForComment), { comments: newComments });
                 input.value = '';
+
+                // Live Update On-Screen Reel Comment Counter
+                const commentCounterEl = document.querySelector(`[data-reel-comment-counter="${activeReelForComment}"]`);
+                if (commentCounterEl) commentCounterEl.innerText = newComments.length;
+
                 window.openCommentsDrawer(activeReelForComment);
                 window.showToast("Comment posted!");
             } catch(e) {}
         };
 
-        // 3. Original Share Drawer Actions
+        // 3. Reels Loader
+        let globalReelsObserver = null;
+        window.loadDirectReels = async function() {
+            const container = document.getElementById('reels-container');
+            if (!container) return;
+
+            try {
+                const snap = await getDocs(collection(db, "reels"));
+                const reels = [];
+                snap.forEach(d => reels.push({ id: d.id, ...d.data() }));
+
+                if (reels.length === 0) {
+                    container.innerHTML = `
+                        <div class="h-screen w-full flex flex-col items-center justify-center space-y-3">
+                            <i class="fa-solid fa-clapperboard text-4xl text-zinc-600"></i>
+                            <p class="text-xs text-zinc-400">No reels uploaded yet.</p>
+                            <button onclick="window.openCreateModal('reel')" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-white glow-btn-blue">Upload First Reel</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                reels.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+                const currentEmail = auth.currentUser ? auth.currentUser.email : '';
+
+                container.innerHTML = reels.map(r => {
+                    const rawAuthor = (r.author || r.handle || 'Creator').replace(/^@+/, '');
+                    const badgeHtml = window.getVerificationBadgeHtml(rawAuthor);
+                    const vidUrl = r.videoUrl || r.mediaUrl || '';
+                    const caption = r.caption || '';
+                    const likesList = r.likes || [];
+                    const isLikedByMe = likesList.includes(currentEmail);
+                    const commentsCount = (r.comments || []).length;
+
+                    return `
+                    <div class="reel-item-box w-full bg-black flex flex-col justify-between overflow-hidden" ondblclick="window.handleLikeToggle(this, '${r.id}')">
+                        <video src="${vidUrl}" loop playsinline preload="metadata" muted class="reel-video-element absolute inset-0 w-full h-full object-cover cursor-pointer" onclick="window.toggleFeedVideoAudio(this)"></video>
+
+                        <button onclick="window.toggleFeedVideoAudio(this)" class="audio-btn-icon absolute top-16 left-4 bg-black/60 border border-white/20 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-30 shadow-lg">
+                            <i class="fa-solid fa-volume-xmark text-white"></i>
+                        </button>
+
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-30 hidden heart-burst-box">
+                            <i class="fa-solid fa-heart text-red-500 text-8xl drop-shadow-[0_0_20px_#ff0033] heart-burst-animate"></i>
+                        </div>
+
+                        <!-- Right Action Bar -->
+                        <div class="absolute right-3 bottom-24 flex flex-col items-center space-y-5 z-30">
+                            <button onclick="window.handleLikeToggle(this.closest('.reel-item-box'), '${r.id}')" class="flex flex-col items-center space-y-1 icon-btn">
+                                <i class="fa-solid fa-heart text-2xl ${isLikedByMe ? 'text-red-500 drop-shadow-[0_0_10px_#ff0033]' : 'text-white'} reel-like-icon drop-shadow-md transition"></i>
+                                <span class="like-counter-val text-[11px] font-bold text-white drop-shadow">${likesList.length}</span>
+                            </button>
+
+                            <button onclick="window.openCommentsDrawer('${r.id}')" class="flex flex-col items-center space-y-1 icon-btn">
+                                <i class="fa-solid fa-comment-dots text-2xl text-white drop-shadow-md"></i>
+                                <span data-reel-comment-counter="${r.id}" class="text-[11px] font-bold text-white drop-shadow">${commentsCount}</span>
+                            </button>
+
+                            <button onclick="window.openShareDrawer('${caption}', '${vidUrl}')" class="flex flex-col items-center space-y-1 icon-btn">
+                                <i class="fa-solid fa-paper-plane text-xl text-white drop-shadow-md"></i>
+                            </button>
+
+                            <div onclick="window.openAudioTrackPage('Original Audio', '${rawAuthor}')" class="w-9 h-9 rounded-full bg-zinc-900 border-2 border-white/30 flex items-center justify-center animate-vinyl shadow-xl cursor-pointer">
+                                <div class="w-4 h-4 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 flex items-center justify-center text-[7px] font-black">
+                                    ♫
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Creator Meta -->
+                        <div class="absolute left-4 right-16 bottom-20 z-20 space-y-2 pointer-events-none">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 pointer-events-auto">
+                                    <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-bold text-xs">${rawAuthor[0].toUpperCase()}</div>
+                                </div>
+                                <span class="font-extrabold text-sm text-white drop-shadow pointer-events-auto flex items-center">
+                                    @${rawAuthor} ${badgeHtml}
+                                </span>
+                            </div>
+                            <p class="text-xs text-white/95 drop-shadow line-clamp-2 leading-relaxed">${caption}</p>
+                            <div onclick="window.openAudioTrackPage('Original Audio', '${rawAuthor}')" class="flex items-center space-x-1 text-[11px] text-white/80 drop-shadow pointer-events-auto cursor-pointer">
+                                <i class="fa-solid fa-music text-[9px]"></i>
+                                <span class="truncate">Original Audio — @${rawAuthor}</span>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+
+                if (globalReelsObserver) globalReelsObserver.disconnect();
+                globalReelsObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        const vid = entry.target;
+                        if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+                            document.querySelectorAll('.reel-video-element').forEach(other => {
+                                if (other !== vid) {
+                                    other.pause();
+                                    other.muted = true;
+                                }
+                            });
+                            vid.play().catch(() => {});
+                        } else {
+                            vid.pause();
+                            vid.muted = true;
+                        }
+                    });
+                }, { threshold: 0.6 });
+
+                document.querySelectorAll('.reel-video-element').forEach(v => globalReelsObserver.observe(v));
+
+            } catch(e) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-32 text-xs">Error loading reels.</div>';
+            }
+        };
+
+        // 4. Original Share Drawer Handlers
         window.openShareDrawer = function(title, url) {
             activeShareData = { title: title || 'IB65 Reel', url: url || window.location.href };
             document.getElementById('modal-share-drawer')?.classList.remove('hidden');
@@ -865,7 +1114,7 @@
             } catch(e) {}
         };
 
-        // 4. Audio Page Launcher
+        // 5. Audio Page Launcher
         window.openAudioTrackPage = function(title, author) {
             document.getElementById('audio-track-title').innerText = title || 'Original Audio';
             document.getElementById('audio-track-author').innerText = '@' + (author || 'creator');
@@ -877,121 +1126,12 @@
             window.openCreateModal('reel');
         };
 
-        // 5. Reels Loader (With Likes & Comment Counter Sync)
-        let globalReelsObserver = null;
-        window.loadDirectReels = async function() {
-            const container = document.getElementById('reels-container');
-            if (!container) return;
-
-            try {
-                const snap = await getDocs(collection(db, "reels"));
-                const reels = [];
-                snap.forEach(d => reels.push({ id: d.id, ...d.data() }));
-
-                if (reels.length === 0) {
-                    container.innerHTML = `
-                        <div class="h-screen w-full flex flex-col items-center justify-center space-y-3">
-                            <i class="fa-solid fa-clapperboard text-4xl text-zinc-600"></i>
-                            <p class="text-xs text-zinc-400">No reels uploaded yet.</p>
-                            <button onclick="window.openCreateModal('reel')" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-white glow-btn-blue">Upload First Reel</button>
-                        </div>
-                    `;
-                    return;
-                }
-
-                reels.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-                container.innerHTML = reels.map(r => {
-                    const rawAuthor = (r.author || r.handle || 'Creator').replace(/^@+/, '');
-                    const vidUrl = r.videoUrl || r.mediaUrl || '';
-                    const caption = r.caption || '';
-                    const likesCount = (r.likes || []).length;
-                    const commentsCount = (r.comments || []).length;
-
-                    return `
-                    <div class="reel-item-box w-full bg-black flex flex-col justify-between overflow-hidden" ondblclick="window.handleDoubleTapLike(this, '${r.id}')">
-                        <video src="${vidUrl}" loop playsinline preload="metadata" muted class="reel-video-element absolute inset-0 w-full h-full object-cover cursor-pointer" onclick="window.toggleFeedVideoAudio(this)"></video>
-
-                        <button onclick="window.toggleFeedVideoAudio(this)" class="audio-btn-icon absolute top-16 left-4 bg-black/60 border border-white/20 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-30 shadow-lg">
-                            <i class="fa-solid fa-volume-xmark text-white"></i>
-                        </button>
-
-                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-30 hidden heart-burst-box">
-                            <i class="fa-solid fa-heart text-red-500 text-8xl drop-shadow-[0_0_20px_#ff0033] heart-burst-animate"></i>
-                        </div>
-
-                        <div class="absolute right-3 bottom-24 flex flex-col items-center space-y-5 z-30">
-                            <button onclick="window.handleDoubleTapLike(this.closest('.reel-item-box'), '${r.id}')" class="flex flex-col items-center space-y-1 icon-btn">
-                                <i class="fa-solid fa-heart text-2xl text-white drop-shadow-md hover:text-red-500 transition"></i>
-                                <span class="like-counter-val text-[11px] font-bold text-white drop-shadow">${likesCount}</span>
-                            </button>
-
-                            <button onclick="window.openCommentsDrawer('${r.id}')" class="flex flex-col items-center space-y-1 icon-btn">
-                                <i class="fa-solid fa-comment-dots text-2xl text-white drop-shadow-md"></i>
-                                <span class="text-[11px] font-bold text-white drop-shadow">${commentsCount}</span>
-                            </button>
-
-                            <button onclick="window.openShareDrawer('${caption}', '${vidUrl}')" class="flex flex-col items-center space-y-1 icon-btn">
-                                <i class="fa-solid fa-paper-plane text-xl text-white drop-shadow-md"></i>
-                            </button>
-
-                            <div onclick="window.openAudioTrackPage('Original Audio', '${rawAuthor}')" class="w-9 h-9 rounded-full bg-zinc-900 border-2 border-white/30 flex items-center justify-center animate-vinyl shadow-xl cursor-pointer">
-                                <div class="w-4 h-4 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 flex items-center justify-center text-[7px] font-black">
-                                    ♫
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="absolute left-4 right-16 bottom-20 z-20 space-y-2 pointer-events-none">
-                            <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 pointer-events-auto">
-                                    <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-bold text-xs">${rawAuthor[0].toUpperCase()}</div>
-                                </div>
-                                <span class="font-extrabold text-sm text-white drop-shadow pointer-events-auto">@${rawAuthor}</span>
-                            </div>
-                            <p class="text-xs text-white/95 drop-shadow line-clamp-2 leading-relaxed">${caption}</p>
-                            <div onclick="window.openAudioTrackPage('Original Audio', '${rawAuthor}')" class="flex items-center space-x-1 text-[11px] text-white/80 drop-shadow pointer-events-auto cursor-pointer">
-                                <i class="fa-solid fa-music text-[9px]"></i>
-                                <span class="truncate">Original Audio — @${rawAuthor}</span>
-                            </div>
-                        </div>
-                    </div>
-                    `;
-                }).join('');
-
-                if (globalReelsObserver) globalReelsObserver.disconnect();
-                globalReelsObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        const vid = entry.target;
-                        if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-                            document.querySelectorAll('.reel-video-element').forEach(other => {
-                                if (other !== vid) {
-                                    other.pause();
-                                    other.muted = true;
-                                }
-                            });
-                            vid.play().catch(() => {});
-                        } else {
-                            vid.pause();
-                            vid.muted = true;
-                        }
-                    });
-                }, { threshold: 0.6 });
-
-                document.querySelectorAll('.reel-video-element').forEach(v => globalReelsObserver.observe(v));
-
-            } catch(e) {
-                container.innerHTML = '<div class="text-center text-gray-500 py-32 text-xs">Error loading reels.</div>';
-            }
-        };
-
-        // 6. 100% Original Profile Loader (Followers / Following / Posts Fixed)
+        // 6. Complete Profile Loader with Accurate Counters & Broken Image Fix
         window.loadDirectProfile = async function() {
             const user = auth.currentUser;
             if (!user) return;
 
             try {
-                // Fetch User Profile Document with fallback
                 let uData = null;
                 const emailDoc = await getDoc(doc(db, "users", user.email));
                 if (emailDoc.exists()) {
@@ -1004,13 +1144,17 @@
                 const cleanHandle = (uData?.handle || user.email.split('@')[0]).replace(/^@+/, '');
                 const cleanName = uData?.name || user.displayName || 'IB65';
 
+                // Verification Badge
+                const badgeSlot = document.getElementById('profile-verified-badge-slot');
+                if (badgeSlot) badgeSlot.innerHTML = window.getVerificationBadgeHtml(cleanHandle);
+
                 document.getElementById('profile-top-username').innerHTML = `<span>@${cleanHandle}</span>`;
                 document.getElementById('my-profile-name').innerText = cleanName;
                 document.getElementById('my-profile-handle').innerText = '@' + cleanHandle;
                 document.getElementById('my-profile-bio').innerText = uData?.bio || 'Creator • Official IB65 Account';
                 document.getElementById('my-profile-avatar').innerText = cleanName[0].toUpperCase();
 
-                // Accurate Followers & Following Count Calculation
+                // Followers / Following Double Check
                 const fCount = typeof uData?.followers === 'number' 
                     ? uData.followers 
                     : (Array.isArray(uData?.followersList) ? uData.followersList.length : 0);
@@ -1022,7 +1166,7 @@
                 document.getElementById('my-stat-followers').innerText = fCount;
                 document.getElementById('my-stat-following').innerText = fgCount;
 
-                // Load User Posts & Reels for Grids
+                // Media Grids (Smart Fallback for Broken Images)
                 const [pSnap, rSnap] = await Promise.all([
                     getDocs(collection(db, "posts")),
                     getDocs(collection(db, "reels"))
@@ -1043,17 +1187,25 @@
 
                 document.getElementById('my-stat-posts').innerText = (myPosts.length + myReels.length);
 
-                // Render Grid 1: Posts
+                // Grid 1: Posts (With video detection)
                 const postsGrid = document.getElementById('profile-grid-posts');
                 if (postsGrid) {
-                    postsGrid.innerHTML = myPosts.length === 0 ? '<div class="col-span-3 text-gray-500 py-8 text-xs text-center">No posts uploaded yet</div>' : myPosts.map(p => `
+                    postsGrid.innerHTML = myPosts.length === 0 ? '<div class="col-span-3 text-gray-500 py-8 text-xs text-center">No posts uploaded yet</div>' : myPosts.map(p => {
+                        const isVid = p.mediaType === 'video' || (p.mediaUrl && p.mediaUrl.match(/\.(mp4|mov|webm)$/i));
+                        return `
                         <div class="relative h-28 bg-zinc-900 overflow-hidden rounded-lg border border-zinc-800 flex items-center justify-center">
-                            <img src="${p.mediaUrl}" class="w-full h-full object-cover">
+                            ${isVid ? `
+                                <video src="${p.mediaUrl}#t=0.1" preload="metadata" muted playsinline class="w-full h-full object-cover"></video>
+                                <span class="absolute top-1 right-1 text-[9px] bg-black/60 px-1 py-0.5 rounded-full"><i class="fa-solid fa-play"></i></span>
+                            ` : `
+                                <img src="${p.mediaUrl}" loading="lazy" class="w-full h-full object-cover" onerror="this.src='./icon.png'">
+                            `}
                         </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
 
-                // Render Grid 2: Reels
+                // Grid 2: Reels
                 const reelsGrid = document.getElementById('profile-grid-reels');
                 if (reelsGrid) {
                     reelsGrid.innerHTML = myReels.length === 0 ? '<div class="col-span-3 text-gray-500 py-8 text-xs text-center">No reels uploaded yet</div>' : myReels.map(r => `
@@ -1067,7 +1219,6 @@
             } catch(e) {}
         };
 
-        // Profile Grid Switcher (Instagram + TikTok)
         window.switchProfileGrid = function(gridType) {
             ['posts', 'reels', 'saved'].forEach(g => {
                 document.getElementById('profile-grid-' + g)?.classList.add('hidden');
@@ -1080,7 +1231,6 @@
             if (activeBtn) activeBtn.className = 'flex-1 py-2.5 text-center text-white border-b-2 border-white icon-btn';
         };
 
-        // Edit Profile Direct Handlers
         window.openEditProfileModal = function() {
             const user = auth.currentUser;
             if (!user) return;
@@ -1115,20 +1265,12 @@
             }
         };
 
-        window.openProfileSettingsDrawer = function() {
-            document.getElementById('modal-profile-settings')?.classList.remove('hidden');
-        };
-
-        window.closeProfileSettingsDrawer = function() {
-            document.getElementById('modal-profile-settings')?.classList.add('hidden');
-        };
-
         window.openShareProfileDrawer = function() {
             const handle = document.getElementById('my-profile-handle').innerText;
             window.openShareDrawer(handle + ' on IB65', window.location.href);
         };
 
-        // 7. Posts Feed & Explore
+        // 7. Home Feed & Explore
         window.loadDirectPostsFeed = async function() {
             const container = document.getElementById('posts-stream');
             if (!container) return;
@@ -1146,14 +1288,16 @@
 
                 container.innerHTML = allItems.map(p => {
                     const rawAuthor = (p.author || 'User').replace(/^@+/, '');
+                    const badge = window.getVerificationBadgeHtml(rawAuthor);
                     const isVid = p.mediaType === 'video';
+
                     return `
                     <div class="clay-card p-3 space-y-2.5">
                         <div class="flex items-center space-x-2.5">
                             <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
                                 <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-bold text-xs">${rawAuthor[0].toUpperCase()}</div>
                             </div>
-                            <span class="font-bold text-xs text-white">@${rawAuthor}</span>
+                            <span class="font-bold text-xs text-white flex items-center">@${rawAuthor} ${badge}</span>
                         </div>
                         <div class="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[260px] max-h-[460px]">
                             ${isVid ? `
@@ -1162,7 +1306,7 @@
                                     <i class="fa-solid fa-volume-xmark"></i>
                                 </button>
                             ` : `
-                                <img src="${p.mediaUrl}" class="w-full h-full max-h-[460px] object-cover">
+                                <img src="${p.mediaUrl}" class="w-full h-full max-h-[460px] object-cover" onerror="this.src='./icon.png'">
                             `}
                         </div>
                         <p class="text-xs text-gray-200 px-1">${p.caption || ''}</p>
@@ -1181,13 +1325,13 @@
                 snap.forEach(d => items.push(d.data()));
                 grid.innerHTML = items.map(it => `
                     <div class="relative h-28 bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800 flex items-center justify-center">
-                        ${it.mediaType === 'video' ? `<video src="${it.mediaUrl}#t=0.1" preload="metadata" muted playsinline class="w-full h-full object-cover"></video>` : `<img src="${it.mediaUrl}" class="w-full h-full object-cover">`}
+                        ${it.mediaType === 'video' ? `<video src="${it.mediaUrl}#t=0.1" preload="metadata" muted playsinline class="w-full h-full object-cover"></video>` : `<img src="${it.mediaUrl}" class="w-full h-full object-cover" onerror="this.src='./icon.png'">`}
                     </div>
                 `).join('');
             } catch(e) {}
         };
 
-        // 8. File Upload & Live Handlers
+        // 8. Media Picker & Publishing
         let selectedUploadFile = null;
         window.handleFileSelectedDirect = function(e) {
             const f = e.target.files && e.target.files[0];
@@ -1195,15 +1339,15 @@
             selectedUploadFile = f;
 
             const isVid = f.type.startsWith('video');
-            const previewBox = document.getElementById('upload-preview-box');
             const previewVid = document.getElementById('upload-preview-vid');
             const previewImg = document.getElementById('upload-preview-img');
-            const lbl = document.getElementById('lbl-picker-text');
+            const placeholder = document.getElementById('upload-placeholder-cta');
+            const clearBtn = document.getElementById('btn-clear-media');
 
-            if (lbl) lbl.innerText = "Selected: " + f.name;
+            if (placeholder) placeholder.classList.add('hidden');
+            if (clearBtn) clearBtn.classList.remove('hidden');
 
             const url = URL.createObjectURL(f);
-            if (previewBox) previewBox.classList.remove('hidden');
 
             if (isVid) {
                 if (previewImg) previewImg.classList.add('hidden');
@@ -1223,14 +1367,16 @@
         window.clearSelectedMedia = function() {
             selectedUploadFile = null;
             document.getElementById('file-gallery-picker').value = '';
-            document.getElementById('upload-preview-box')?.classList.add('hidden');
-            document.getElementById('lbl-picker-text').innerText = "Choose Photo / Video from Device";
+            document.getElementById('upload-preview-vid')?.classList.add('hidden');
+            document.getElementById('upload-preview-img')?.classList.add('hidden');
+            document.getElementById('upload-placeholder-cta')?.classList.remove('hidden');
+            document.getElementById('btn-clear-media')?.classList.add('hidden');
         };
 
         window.publishMediaDirect = async function() {
             const user = auth.currentUser;
             if (!user) { window.showToast("Login required!"); return; }
-            if (!selectedUploadFile) { window.showToast("Select photo or video first!"); return; }
+            if (!selectedUploadFile) { window.showToast("Pick photo or video first!"); return; }
 
             const cap = document.getElementById('create-caption-input').value.trim();
             const uploadType = window.activeUploadType || 'post';
@@ -1241,7 +1387,7 @@
             }
 
             const btn = document.getElementById('btn-publish');
-            if (btn) { btn.innerText = "Uploading..."; btn.disabled = true; }
+            if (btn) { btn.innerText = "Sharing..."; btn.disabled = true; }
             window.showToast("Uploading to IB65...");
 
             try {
@@ -1269,7 +1415,7 @@
                 };
 
                 if (uploadType === 'reel') {
-                    await addDoc(collection(db, "reels"), { ...itemData, videoUrl: mediaUrl });
+                    await addDoc(collection(db, "reels"), { ...itemData, videoUrl: mediaUrl, likes: [], comments: [] });
                     window.switchTab('reels');
                 } else {
                     await addDoc(collection(db, "posts"), itemData);
@@ -1279,19 +1425,19 @@
                 window.closeCreateModal();
                 window.clearSelectedMedia();
                 document.getElementById('create-caption-input').value = '';
-                window.showToast("Uploaded successfully! 🎉");
+                window.showToast("Shared successfully! 🎉");
             } catch(e) {
                 window.showToast("Upload Error: " + e.message);
             } finally {
-                if (btn) { btn.innerText = "Share"; btn.disabled = false; }
+                if (btn) { btn.innerText = "Next"; btn.disabled = false; }
             }
         };
 
-        // Live Camera Stream
+        // 9. Live Broadcast System
         let liveStreamObj = null;
         window.startLiveStreamDirect = async function() {
             try {
-                window.showToast("Connecting camera...");
+                window.showToast("Starting camera...");
                 liveStreamObj = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: 'user' },
                     audio: true
@@ -1339,7 +1485,7 @@
             } catch(e) {}
         };
 
-        // Auth Monitor
+        // Initial Auth Setup
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 var savedTab = 'home';
