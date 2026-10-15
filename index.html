@@ -217,7 +217,7 @@
                 <div onclick="window.openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-pink-600 to-purple-600 flex items-center justify-center relative">
                         <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
-                            <span class="text-base font-black text-white">U</span>
+                            <span class="text-base font-black text-white" id="home-tray-avatar">U</span>
                         </div>
                         <span class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] border border-black font-bold">+</span>
                     </div>
@@ -238,7 +238,7 @@
         <div id="view-search" class="space-y-3 p-3 hidden pb-24">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-xs"></i>
-                <input type="text" id="global-search-input" oninput="window.handleSearch(event)" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-700">
+                <input type="text" id="global-search-input" oninput="window.handleSearch?.(event)" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-700">
             </div>
 
             <div id="search-users-results" class="space-y-2 hidden"></div>
@@ -268,7 +268,7 @@
                     </h2>
                     <p class="text-[10px] text-gray-400">Broadcast video & chat in real time</p>
                 </div>
-                <button onclick="window.startBroadcast()" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
+                <button onclick="window.startBroadcast?.()" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
             </div>
             
             <div class="space-y-2">
@@ -282,7 +282,7 @@
         <!-- 5. MY PROFILE VIEW -->
         <div id="view-profile" class="space-y-3 p-4 hidden pb-24">
             <div class="flex justify-between items-center px-1">
-                <div onclick="window.openAccountSwitcher()" class="flex items-center space-x-1.5 cursor-pointer icon-btn">
+                <div onclick="window.openAccountSwitcher?.()" class="flex items-center space-x-1.5 cursor-pointer icon-btn">
                     <span class="text-base font-extrabold text-white flex items-center space-x-1" id="profile-top-username">
                         <span>@IB65</span>
                     </span>
@@ -291,14 +291,14 @@
                 </div>
                 <div class="flex items-center space-x-3">
                     <span id="profile-privacy-badge" class="text-[10px] bg-zinc-800 px-2 py-0.5 rounded-full text-yellow-400 font-semibold hidden"><i class="fa-solid fa-lock text-[9px] mr-1"></i>Private</span>
-                    <button onclick="window.handleLogout()" class="text-gray-400 text-sm icon-btn p-1" title="Log Out">
+                    <button onclick="window.handleLogoutDirect()" class="text-gray-400 text-sm icon-btn p-1" title="Log Out">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Professional Dashboard Pill -->
-            <div id="pro-dashboard-pill" onclick="window.openProfessionalDashboard()" class="clay-card p-3 flex justify-between items-center cursor-pointer hover:border-zinc-600 transition hidden">
+            <div id="pro-dashboard-pill" onclick="window.openProfessionalDashboard?.()" class="clay-card p-3 flex justify-between items-center cursor-pointer hover:border-zinc-600 transition hidden">
                 <div>
                     <p class="text-xs font-bold text-white flex items-center space-x-1.5">
                         <i class="fa-solid fa-chart-simple text-blue-500"></i>
@@ -330,7 +330,7 @@
                 </div>
                 <div class="flex space-x-2 pt-2">
                     <!-- Blue Neon Fire Share Button -->
-                    <button onclick="window.shareLink()" class="flex-1 bg-zinc-900 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">
+                    <button onclick="window.shareLink?.()" class="flex-1 bg-zinc-900 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">
                         Share profile
                     </button>
                 </div>
@@ -365,9 +365,7 @@
                     <div><span id="pub-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
                 <div class="flex space-x-2 pt-1">
-                    <!-- Red Neon Fire Follow Button -->
                     <button id="pub-follow-btn" class="flex-1 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Follow</button>
-                    <!-- Blue Neon Fire Message Button -->
                     <button id="pub-msg-btn" class="flex-1 bg-zinc-900 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">Message</button>
                 </div>
             </div>
@@ -399,7 +397,7 @@
     <div id="modal-pro-dashboard" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center bg-black">
             <div class="flex items-center space-x-3">
-                <button onclick="window.closeProfessionalDashboard()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
+                <button onclick="window.closeProfessionalDashboard?.()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
                 <span class="text-sm font-bold text-white">Professional Dashboard</span>
             </div>
         </div>
@@ -467,14 +465,14 @@
     <!-- PRO REEL EDITOR SUITE -->
     <div id="modal-pro-editor" class="fixed inset-0 z-50 bg-black flex flex-col justify-between hidden">
         <div class="p-3.5 flex justify-between items-center z-20 bg-black/80 border-b border-zinc-900">
-            <button onclick="window.closeProEditor()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-white icon-btn">
+            <button onclick="window.closeProEditor?.()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-white icon-btn">
                 <i class="fa-solid fa-chevron-down"></i>
             </button>
             <div class="flex items-center space-x-2 bg-zinc-900 px-3 py-1.5 rounded-full border border-zinc-800">
                 <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-xs"></i>
                 <span class="text-xs font-bold text-white tracking-wider">Pro Editor Studio</span>
             </div>
-            <button onclick="window.proceedToPublishFromEditor()" class="w-9 h-9 rounded-full bg-zinc-900 text-white flex items-center justify-center font-bold text-sm icon-btn glow-btn-blue">
+            <button onclick="window.proceedToPublishFromEditor?.()" class="w-9 h-9 rounded-full bg-zinc-900 text-white flex items-center justify-center font-bold text-sm icon-btn glow-btn-blue">
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
@@ -492,12 +490,12 @@
 
         <div class="px-6 py-1 flex items-center space-x-3 bg-zinc-950/70 border-t border-zinc-900 text-xs">
             <span class="text-[10px] text-gray-400 font-semibold">Scale</span>
-            <input type="range" id="editor-zoom-slider" min="1" max="2.5" step="0.1" value="1" oninput="window.handleZoomSlider(this.value)" class="flex-1 accent-white h-1 bg-zinc-800 rounded">
+            <input type="range" id="editor-zoom-slider" min="1" max="2.5" step="0.1" value="1" oninput="window.handleZoomSlider?.(this.value)" class="flex-1 accent-white h-1 bg-zinc-800 rounded">
             <span id="lbl-zoom-val" class="text-[10px] font-bold text-white">1.0x</span>
         </div>
 
         <div class="px-5 py-1.5 flex justify-between items-center text-xs">
-            <button onclick="window.toggleEditorPlayback()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white glow-btn-red">
+            <button onclick="window.toggleEditorPlayback?.()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white glow-btn-red">
                 <i id="btn-play-pause-icon" class="fa-solid fa-play"></i>
             </button>
             <span id="editor-time-counter" class="text-gray-300 font-bold tracking-widest text-[11px]">0:00 / 0:00</span>
@@ -513,11 +511,11 @@
             </div>
 
             <div class="flex space-x-2">
-                <button onclick="window.captureCurrentThumbnailFrame()" class="flex-1 h-8 bg-zinc-900 rounded-lg text-[11px] font-bold text-white flex items-center justify-center space-x-1.5 glow-btn-blue">
+                <button onclick="window.captureCurrentThumbnailFrame?.()" class="flex-1 h-8 bg-zinc-900 rounded-lg text-[11px] font-bold text-white flex items-center justify-center space-x-1.5 glow-btn-blue">
                     <i class="fa-solid fa-camera text-blue-400 text-xs"></i>
                     <span>Capture Cover Frame</span>
                 </button>
-                <div onclick="window.openAddTextTool()" class="flex-1 h-8 bg-zinc-900 rounded-lg flex items-center justify-center px-3 space-x-1.5 cursor-pointer text-gray-200 glow-btn-red">
+                <div onclick="window.openAddTextTool?.()" class="flex-1 h-8 bg-zinc-900 rounded-lg flex items-center justify-center px-3 space-x-1.5 cursor-pointer text-gray-200 glow-btn-red">
                     <i class="fa-solid fa-plus text-[10px]"></i>
                     <span class="text-[11px] font-medium">Add text</span>
                 </div>
@@ -525,7 +523,7 @@
         </div>
 
         <div class="bg-black border-t border-zinc-900 py-2.5 px-4 flex space-x-4 overflow-x-auto items-center">
-            <button onclick="window.cycleFilterPresets()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
+            <button onclick="window.cycleFilterPresets?.()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
                 <div class="w-10 h-10 rounded-2xl bg-zinc-900 flex items-center justify-center text-white glow-btn-blue"><i class="fa-solid fa-circle-half-stroke text-sm"></i></div>
                 <span class="text-[10px] text-gray-300">Filters</span>
             </button>
@@ -537,13 +535,13 @@
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
             <button onclick="window.closeCreateModal()" class="text-white text-base"><i class="fa-solid fa-xmark"></i></button>
             <span class="font-bold text-xs">Create New</span>
-            <button onclick="window.publishMedia()" id="btn-publish" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Share</button>
+            <button onclick="window.publishMedia?.()" id="btn-publish" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Share</button>
         </div>
         <div class="flex-1 p-4 space-y-3 max-w-md mx-auto w-full overflow-y-auto">
             <div class="flex space-x-2 border-b border-zinc-800 pb-2 text-xs">
-                <button onclick="window.setUploadType('post')" id="type-btn-post" class="font-bold text-white border-b-2 border-white pb-1 px-3">Post</button>
-                <button onclick="window.setUploadType('reel')" id="type-btn-reel" class="text-gray-500 pb-1 px-3">Reel</button>
-                <button onclick="window.setUploadType('story')" id="type-btn-story" class="text-gray-500 pb-1 px-3">Story</button>
+                <button onclick="window.setUploadType?.('post')" id="type-btn-post" class="font-bold text-white border-b-2 border-white pb-1 px-3">Post</button>
+                <button onclick="window.setUploadType?.('reel')" id="type-btn-reel" class="text-gray-500 pb-1 px-3">Reel</button>
+                <button onclick="window.setUploadType?.('story')" id="type-btn-story" class="text-gray-500 pb-1 px-3">Story</button>
             </div>
             
             <div class="space-y-1 relative">
@@ -562,21 +560,21 @@
                 <i class="fa-solid fa-images text-3xl mb-2 text-white"></i>
                 <p class="text-xs text-gray-300 font-bold">Select Media From Device</p>
             </div>
-            <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="window.handleFileSelected(event)">
+            <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="window.handleFileSelected?.(event)">
         </div>
     </div>
 
     <!-- COMMENTS MODAL -->
-    <div id="modal-comments" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="window.closeComments()">
+    <div id="modal-comments" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="window.closeComments?.()">
         <div class="clay-card w-full max-w-md h-[60vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
                 <span class="font-bold text-xs text-white">Comments</span>
-                <button onclick="window.closeComments()" class="text-gray-400 text-base"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="window.closeComments?.()" class="text-gray-400 text-base"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="comments-items-list" class="flex-1 overflow-y-auto space-y-2 py-3 text-xs"></div>
             <div class="flex space-x-2 pt-2 border-t border-zinc-800">
                 <input type="text" id="comment-text-input" placeholder="Add a comment..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-                <button onclick="window.submitComment()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Post</button>
+                <button onclick="window.submitComment?.()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Post</button>
             </div>
         </div>
     </div>
@@ -591,13 +589,13 @@
             </div>
 
             <div class="flex justify-between items-center z-30 pt-2">
-                <div class="flex items-center space-x-2.5 cursor-pointer bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full" onclick="window.openProfileFromStory()">
+                <div class="flex items-center space-x-2.5 cursor-pointer bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full" onclick="window.openProfileFromStory?.()">
                     <div class="w-8 h-8 rounded-full bg-zinc-800 text-white font-extrabold flex items-center justify-center text-xs overflow-hidden" id="story-top-avatar-box">
                         <span id="story-top-avatar">U</span>
                     </div>
                     <span class="text-xs font-bold text-white hover:underline flex items-center" id="story-top-author">Creator</span>
                 </div>
-                <button onclick="window.closeStory()" class="text-white text-lg p-2 icon-btn"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="window.closeStory?.()" class="text-white text-lg p-2 icon-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
@@ -623,10 +621,10 @@
                     <span id="live-host-title" class="text-xs text-white font-bold flex items-center">Host</span>
                 </div>
             </div>
-            <button onclick="window.exitLiveRoom()" class="text-xs bg-red-600 px-3.5 py-1.5 rounded-xl text-white font-bold">End</button>
+            <button onclick="window.exitLiveRoom?.()" class="text-xs bg-red-600 px-3.5 py-1.5 rounded-xl text-white font-bold">End</button>
         </div>
 
-        <div class="absolute inset-0 flex items-center justify-center overflow-hidden bg-black" onclick="window.resumeLiveStreamPlayback()">
+        <div class="absolute inset-0 flex items-center justify-center overflow-hidden bg-black" onclick="window.resumeLiveStreamPlayback?.()">
             <video id="live-room-video" autoplay playsinline webkit-playsinline class="w-full h-full object-cover bg-black"></video>
             <div id="live-hearts-container" class="absolute right-6 bottom-28 pointer-events-none z-30"></div>
         </div>
@@ -635,8 +633,8 @@
             <div id="live-chat-messages" class="space-y-1.5 max-h-48 overflow-y-auto p-2 text-xs"></div>
             <div class="flex space-x-2">
                 <input type="text" id="live-input-msg" placeholder="Comment on live..." class="flex-1 bg-black/60 border border-zinc-700 rounded-xl p-2.5 text-xs text-white focus:outline-none">
-                <button onclick="window.sendLiveMsg()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
-                <button onclick="window.triggerLiveHeartGlobal()" class="bg-red-600 text-white px-3.5 py-2 rounded-xl text-base icon-btn shadow-lg"><i class="fa-solid fa-heart"></i></button>
+                <button onclick="window.sendLiveMsg?.()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
+                <button onclick="window.triggerLiveHeartGlobal?.()" class="bg-red-600 text-white px-3.5 py-2 rounded-xl text-base icon-btn shadow-lg"><i class="fa-solid fa-heart"></i></button>
             </div>
         </div>
     </div>
@@ -655,9 +653,9 @@
     <div id="modal-direct-chat" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-3 border-b border-zinc-900 flex justify-between items-center bg-black/95">
             <div class="flex items-center space-x-3">
-                <button onclick="window.closeDirectChat()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
+                <button onclick="window.closeDirectChat?.()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
                 
-                <div class="flex items-center space-x-2.5 cursor-pointer icon-btn" onclick="window.navigateToChatUserProfile()">
+                <div class="flex items-center space-x-2.5 cursor-pointer icon-btn" onclick="window.navigateToChatUserProfile?.()">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 overflow-hidden">
                         <div class="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center text-xs font-bold" id="chat-user-avatar">U</div>
                     </div>
@@ -671,29 +669,30 @@
         <div id="chat-messages-scroll" class="flex-1 overflow-y-auto p-4 space-y-2.5 text-xs"></div>
         <div class="p-3 border-t border-zinc-900 flex items-center space-x-2 bg-black">
             <input type="text" id="chat-input-field" placeholder="Message..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
-            <button onclick="window.sendChatMessageDirect()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
+            <button onclick="window.sendChatMessageDirect?.()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
         </div>
     </div>
 
     <!-- MEDIA VIEWER MODAL -->
     <div id="modal-media-viewer" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-3 hidden">
         <div class="flex justify-between items-center pt-2">
-            <button onclick="window.closeMediaViewer()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <button onclick="window.closeMediaViewer?.()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i> Back</button>
             <span class="text-xs font-bold text-gray-400">IB65 View</span>
         </div>
         <div class="flex-1 flex items-center justify-center overflow-hidden my-3" id="media-viewer-content"></div>
     </div>
 
-    <!-- AUTH MODAL -->
+    <!-- AUTH MODAL (DIRECT ENGINE INTEGRATED) -->
     <div id="modal-auth" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
         <div class="clay-card p-6 w-full max-w-sm space-y-3">
             <h2 class="text-3xl font-black text-center neon-fire-logo">IB65</h2>
             <p class="text-xs text-center text-gray-400">Social Universe</p>
-            <input type="text" id="auth-input-name" placeholder="Full Name" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
+            
+            <input type="text" id="auth-input-name" placeholder="Full Name (for new signups)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
             
             <div>
                 <div class="relative">
-                    <input type="text" id="auth-input-handle" oninput="window.checkHandleAvailability(this.value, 'signup')" placeholder="Unique Username (@handle)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white pr-9">
+                    <input type="text" id="auth-input-handle" placeholder="Unique Username (@handle)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white pr-9">
                     <span id="signup-handle-status-icon" class="absolute right-3.5 top-3.5 text-xs"></span>
                 </div>
                 <p id="signup-handle-helper" class="text-[10px] text-gray-500 mt-1 pl-1"></p>
@@ -703,12 +702,14 @@
             <input type="password" id="auth-input-pass" placeholder="Password (6+ chars)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
             
             <div class="flex justify-end">
-                <button type="button" onclick="window.handleForgotPassword()" class="text-[11px] text-blue-400 font-semibold hover:underline">Forgot password?</button>
+                <button type="button" onclick="window.handleForgotPasswordDirect()" class="text-[11px] text-blue-400 font-semibold hover:underline">Forgot password?</button>
             </div>
 
             <div class="flex space-x-2 pt-1">
-                <button onclick="window.handleLogin()" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-blue">Login</button>
-                <button onclick="window.handleSignup()" id="btn-auth-signup" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-red">Sign Up</button>
+                <!-- Direct Bulletproof Login Button -->
+                <button type="button" id="btn-main-login" onclick="window.handleLoginDirect()" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-blue">Login</button>
+                <!-- Direct Bulletproof Sign Up Button -->
+                <button type="button" id="btn-main-signup" onclick="window.handleSignupDirect()" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-red">Sign Up</button>
             </div>
         </div>
     </div>
@@ -741,6 +742,14 @@
 
     <!-- INLINE SAFEGUARD FALLBACK (Instant Response on Button Tap) -->
     <script>
+        window.showToast = function(msg) {
+            var t = document.getElementById('toast');
+            if (!t) return;
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(function() { t.classList.add('hidden'); }, 2300);
+        };
+
         window.switchTab = window.switchTab || function(tab) {
             ['home', 'search', 'reels', 'live', 'profile', 'public-profile'].forEach(function(t) {
                 var el = document.getElementById('view-' + t);
@@ -784,18 +793,171 @@
             var m = document.getElementById('modal-account-switcher');
             if (m) m.classList.remove('hidden');
         };
-
-        // Connecting feed auto-timeout safeguard
-        setTimeout(function() {
-            var stream = document.getElementById('posts-stream');
-            var spinner = document.getElementById('feed-loading-spinner');
-            if (spinner && stream && stream.children.length <= 1) {
-                spinner.innerHTML = '<div class="text-zinc-500 py-10 space-y-2"><p>No posts yet or slow connection.</p><button onclick="window.openCreateModal(\'post\')" class="px-3.5 py-1.5 rounded-xl bg-zinc-900 text-white text-xs glow-btn-blue">Upload First Post</button></div>';
-            }
-        }, 4000);
     </script>
 
-    <!-- MODULAR SCRIPT ENTRY POINT WITH CACHE-BUSTER -->
-    <script type="module" src="./js/app.js?v=4"></script>
+    <!-- DIRECT FIREBASE AUTH ENGINE (FAIL-SAFE DIRECT INTEGRATION) -->
+    <script type="module">
+        import { 
+            auth, 
+            db, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            sendPasswordResetEmail, 
+            signOut, 
+            onAuthStateChanged, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            collection, 
+            getDocs, 
+            query, 
+            where 
+        } from './js/config.js';
+
+        // Direct Login
+        window.handleLoginDirect = async function() {
+            const emailOrHandle = document.getElementById('auth-input-email').value.trim();
+            const pass = document.getElementById('auth-input-pass').value.trim();
+            const btn = document.getElementById('btn-main-login');
+
+            if (!emailOrHandle || !pass) {
+                window.showToast("Email aur Password daalein!");
+                return;
+            }
+
+            if (btn) { btn.innerText = "Checking..."; btn.disabled = true; }
+            window.showToast("Connecting to IB65 account...");
+
+            try {
+                let finalEmail = emailOrHandle;
+                if (!emailOrHandle.includes('@')) {
+                    const clean = emailOrHandle.replace(/^@+/, '').toLowerCase();
+                    const q = query(collection(db, "users"), where("handle", "==", clean));
+                    const snap = await getDocs(q);
+                    if (!snap.empty) {
+                        finalEmail = snap.docs[0].id;
+                    } else {
+                        finalEmail = clean + '@ib65.app';
+                    }
+                }
+
+                const cred = await signInWithEmailAndPassword(auth, finalEmail, pass);
+                window.showToast("Welcome back!");
+                document.getElementById('modal-auth').classList.add('hidden');
+
+                if (window.loadMyProfile) window.loadMyProfile();
+                if (window.loadPostsFeed) window.loadPostsFeed();
+                window.switchTab('home');
+            } catch(e) {
+                window.showToast("Login Failed: " + e.message);
+            } finally {
+                if (btn) { btn.innerText = "Login"; btn.disabled = false; }
+            }
+        };
+
+        // Direct Signup
+        window.handleSignupDirect = async function() {
+            const name = document.getElementById('auth-input-name').value.trim();
+            const rawHandle = document.getElementById('auth-input-handle').value.trim();
+            let email = document.getElementById('auth-input-email').value.trim();
+            const pass = document.getElementById('auth-input-pass').value.trim();
+            const btn = document.getElementById('btn-main-signup');
+
+            if (!pass || !rawHandle) {
+                window.showToast("Full details fill karein!");
+                return;
+            }
+
+            if (!email.includes('@')) {
+                email = rawHandle.replace(/^@+/, '') + '@ib65.app';
+            }
+
+            const cleanHandle = rawHandle.replace(/^@+/, '').toLowerCase();
+            if (btn) { btn.innerText = "Creating..."; btn.disabled = true; }
+
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                const badgeType = cleanHandle === 'ib65' ? 'gold_red' : 'none';
+
+                await setDoc(doc(db, "users", email), {
+                    name: name || 'User',
+                    handle: cleanHandle,
+                    email: email,
+                    bio: "Welcome to my IB65 profile!",
+                    badgeType: badgeType,
+                    followers: 0,
+                    following: 0,
+                    followersList: [],
+                    followingList: [],
+                    savedPosts: [],
+                    accountType: "creator",
+                    createdAt: Date.now()
+                }, { merge: true });
+
+                window.showToast("Account created successfully!");
+                document.getElementById('modal-auth').classList.add('hidden');
+
+                if (window.loadMyProfile) window.loadMyProfile();
+                if (window.loadPostsFeed) window.loadPostsFeed();
+                window.switchTab('home');
+            } catch(e) {
+                window.showToast(e.message);
+            } finally {
+                if (btn) { btn.innerText = "Sign Up"; btn.disabled = false; }
+            }
+        };
+
+        // Direct Forgot Password
+        window.handleForgotPasswordDirect = async function() {
+            const email = document.getElementById('auth-input-email').value.trim();
+            if (!email || !email.includes('@')) {
+                window.showToast("Enter valid registered email!");
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                window.showToast("Password reset link sent to " + email);
+            } catch(e) {
+                window.showToast(e.message);
+            }
+        };
+
+        // Direct Logout
+        window.handleLogoutDirect = async function() {
+            try {
+                await signOut(auth);
+                window.showToast("Logged out successfully");
+                document.getElementById('modal-auth').classList.remove('hidden');
+            } catch(e) {
+                window.showToast(e.message);
+            }
+        };
+
+        // Direct Auto-Login Detection
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                document.getElementById('modal-auth').classList.add('hidden');
+                try {
+                    const uDoc = await getDoc(doc(db, "users", user.email));
+                    if (uDoc.exists()) {
+                        const d = uDoc.data();
+                        const handle = d.handle || user.email.split('@')[0];
+                        document.getElementById('profile-top-username').innerText = '@' + handle;
+                        document.getElementById('my-profile-name').innerText = d.name || 'User';
+                        document.getElementById('my-profile-handle').innerText = '@' + handle;
+                        document.getElementById('my-profile-avatar').innerText = (d.name || 'U')[0].toUpperCase();
+                        document.getElementById('home-tray-avatar').innerText = (d.name || 'U')[0].toUpperCase();
+                    }
+                } catch(e) {}
+                if (window.loadMyProfile) window.loadMyProfile();
+                if (window.loadPostsFeed) window.loadPostsFeed();
+            } else {
+                document.getElementById('modal-auth').classList.remove('hidden');
+            }
+        });
+    </script>
+
+    <!-- MODULAR SCRIPT ENTRY POINT -->
+    <script type="module" src="./js/app.js?v=5"></script>
 </body>
 </html>
