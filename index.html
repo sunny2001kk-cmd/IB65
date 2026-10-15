@@ -109,10 +109,11 @@
         .icon-btn:active { transform: scale(0.85); transition: transform 0.1s ease; }
         ::-webkit-scrollbar { display: none; }
 
+        /* 📱 TIKTOK + INSTA REEL CONTAINER */
         .reels-scroll-container {
             scroll-snap-type: y mandatory;
             overflow-y: scroll;
-            height: calc(100vh - 65px);
+            height: 100vh;
             scroll-behavior: smooth;
             overscroll-behavior-y: contain;
             -webkit-overflow-scrolling: touch;
@@ -120,24 +121,27 @@
         .reel-item-box {
             scroll-snap-align: start;
             scroll-snap-stop: always;
-            height: calc(100vh - 65px);
+            height: 100vh;
+            position: relative;
         }
 
-        /* 🎈 SHARED FLOATING HEART ANIMATION */
-        @keyframes flyHeartFloat {
-            0% { transform: translateY(0) scale(0.7) rotate(0deg); opacity: 1; }
-            50% { transform: translateY(-110px) scale(1.3) rotate(-15deg); opacity: 0.9; }
-            100% { transform: translateY(-240px) scale(1.5) rotate(15deg); opacity: 0; }
+        /* Rotating Audio Vinyl Record (TikTok Style) */
+        @keyframes spinVinyl {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
-        .live-heart-fly { animation: flyHeartFloat 1.5s ease-out forwards; }
+        .animate-vinyl {
+            animation: spinVinyl 5s linear infinite;
+        }
 
-        /* 🔥 LIVE RING GLOW ANIMATION */
-        @keyframes liveRingGlow {
-            0%, 100% { box-shadow: 0 0 6px #ff0000, 0 0 14px #ff3300; }
-            50% { box-shadow: 0 0 16px #ff0000, 0 0 28px #ff5500; }
+        /* Heart Double-Tap Animation */
+        @keyframes heartBurst {
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+            50% { transform: scale(1.4) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1.1) rotate(15deg); opacity: 0; }
         }
-        .live-story-ring {
-            animation: liveRingGlow 1.8s infinite ease-in-out;
+        .heart-burst-animate {
+            animation: heartBurst 0.8s ease-out forwards;
         }
     </style>
 </head>
@@ -186,10 +190,9 @@
     <!-- Main Container -->
     <main class="max-w-md mx-auto">
 
-        <!-- 1. HOME VIEW (WITH DUAL STORY TRAY: OLD STORY + ADJACENT LIVE CIRCLE) -->
+        <!-- 1. HOME VIEW -->
         <div id="view-home" class="space-y-3 pb-24">
             <div class="p-3 border-b border-zinc-900 overflow-x-auto flex space-x-3 items-center">
-                <!-- 1.1 Purana Normal Story Circle -->
                 <div onclick="window.openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-pink-600 to-purple-600 flex items-center justify-center relative">
                         <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
@@ -199,19 +202,6 @@
                     </div>
                     <span class="text-[10px] text-gray-400 truncate w-16 text-center">Your story</span>
                 </div>
-
-                <!-- 1.2 Naya LIVE Story Circle (Theek Bagal Me - Direct Tap to Enter Live Room) -->
-                <div id="tray-live-broadcast-box" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0 hidden" onclick="window.enterActiveLiveFromStory()">
-                    <div class="w-16 h-16 rounded-full p-0.5 border-2 border-red-500 bg-red-950/40 flex items-center justify-center relative live-story-ring">
-                        <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
-                            <span class="text-base font-black text-red-500" id="tray-live-avatar">🔴</span>
-                        </div>
-                        <span class="absolute -bottom-1 bg-red-600 text-white font-black text-[8px] px-1.5 py-0.2 rounded-full uppercase tracking-tighter shadow-lg animate-pulse">LIVE</span>
-                    </div>
-                    <span class="text-[10px] text-red-400 font-bold truncate w-16 text-center" id="tray-live-host-name">Live Now</span>
-                </div>
-
-                <!-- 1.3 Other Friends Normal Stories -->
                 <div id="stories-tray-items" class="flex space-x-3"></div>
             </div>
 
@@ -229,19 +219,25 @@
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-xs"></i>
                 <input type="text" id="global-search-input" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-700">
             </div>
-            <div id="search-users-results" class="space-y-2 hidden"></div>
             <div>
                 <p class="text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Explore</p>
-                <div id="explore-grid" class="grid grid-cols-3 gap-1">
-                    <div class="col-span-3 text-center text-gray-500 py-12 text-xs">Loading explore feed...</div>
-                </div>
+                <div id="explore-grid" class="grid grid-cols-3 gap-1"></div>
             </div>
         </div>
 
-        <!-- 3. REELS VIEW -->
-        <div id="view-reels" class="hidden">
+        <!-- 3. INSTA + TIKTOK REELS VIEW -->
+        <div id="view-reels" class="hidden relative h-screen w-full bg-black">
+            <!-- Top Controls (Instagram Style) -->
+            <div class="absolute top-4 left-4 right-4 z-30 flex justify-between items-center pointer-events-none">
+                <span class="text-lg font-black tracking-wide text-white drop-shadow-md">Reels</span>
+                <button onclick="window.openCreateModal('reel')" class="text-white text-lg p-2 pointer-events-auto icon-btn drop-shadow-md">
+                    <i class="fa-solid fa-camera"></i>
+                </button>
+            </div>
+
+            <!-- Vertical Scroll Reels Stream -->
             <div id="reels-container" class="reels-scroll-container">
-                <div class="text-center text-gray-500 py-24 text-xs">Loading Reels...</div>
+                <div class="text-center text-gray-500 py-32 text-xs">Loading Reels...</div>
             </div>
         </div>
 
@@ -255,14 +251,7 @@
                     </h2>
                     <p class="text-[10px] text-gray-400">Stream camera & chat with shared hearts</p>
                 </div>
-                <button onclick="window.startBroadcast?.()" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
-            </div>
-
-            <div class="space-y-2">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Broadcasts</h3>
-                <div id="live-rooms-list" class="space-y-2">
-                    <div class="text-center text-gray-500 py-10 text-xs">No active live streams right now.</div>
-                </div>
+                <button onclick="window.startLiveStreamDirect()" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
             </div>
         </div>
 
@@ -290,17 +279,11 @@
                         <span>IB65</span>
                     </h2>
                     <p id="my-profile-handle" class="text-xs text-gray-400">@IB65</p>
-                    <p id="my-profile-bio" class="text-xs text-gray-300 mt-1 max-w-xs mx-auto"></p>
                 </div>
                 <div class="flex justify-around py-2 border-y border-zinc-800 text-xs">
                     <div><span id="my-stat-posts" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Posts</span></div>
                     <div><span id="my-stat-followers" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
                     <div><span id="my-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
-                </div>
-                <div class="flex space-x-2 pt-2">
-                    <button onclick="window.shareLink?.()" class="flex-1 bg-zinc-900 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">
-                        Share profile
-                    </button>
                 </div>
             </div>
 
@@ -309,97 +292,85 @@
 
     </main>
 
-    <!-- 🔴 FULL-SCREEN LIVE STREAM ROOM MODAL (BLACK SCREEN & VOICE FIXED) -->
+    <!-- LIVE STREAM ROOM MODAL -->
     <div id="modal-live-room" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden select-none">
-        <!-- Top Bar -->
         <div class="flex justify-between items-center z-20">
             <div class="flex items-center space-x-2">
                 <span class="bg-red-600 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold animate-pulse">IB65 LIVE</span>
-                <span id="live-viewers-tag" class="text-xs font-bold text-white bg-black/50 px-2 py-0.5 rounded-full border border-white/10">👁️ 1</span>
-                <div class="flex items-center space-x-1.5 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-zinc-800">
-                    <div class="w-4 h-4 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-[9px]" id="live-host-avatar">I</div>
-                    <span id="live-host-title" class="text-xs text-white font-bold flex items-center">Host</span>
-                </div>
+                <span class="text-xs font-bold text-white bg-black/50 px-2 py-0.5 rounded-full">👁️ 1</span>
             </div>
-            <div class="flex items-center space-x-2">
-                <button id="btn-live-flip-cam" onclick="window.flipLiveCamera()" class="w-8 h-8 rounded-full bg-black/60 border border-white/20 text-white text-xs flex items-center justify-center icon-btn">
-                    <i class="fa-solid fa-camera-rotate"></i>
-                </button>
-                <button id="btn-end-live" onclick="window.exitLiveRoom()" class="text-xs bg-red-600 px-3.5 py-1.5 rounded-xl text-white font-bold icon-btn">End</button>
-            </div>
+            <button onclick="window.exitLiveStreamDirect()" class="text-xs bg-red-600 px-3.5 py-1.5 rounded-xl text-white font-bold icon-btn">End</button>
         </div>
 
-        <!-- Video Player Frame -->
-        <div class="absolute inset-0 flex items-center justify-center overflow-hidden bg-zinc-950">
+        <div class="absolute inset-0 flex items-center justify-center overflow-hidden bg-black">
             <video id="live-room-video" autoplay playsinline webkit-playsinline class="w-full h-full object-cover bg-black"></video>
-            
-            <!-- Tap to Unmute Overlay if Audio Policy Blocks -->
-            <button id="live-unmute-overlay" onclick="window.unlockLiveAudio()" class="absolute top-16 bg-red-600/90 text-white text-xs px-4 py-2 rounded-full font-bold shadow-2xl z-30 hidden animate-bounce flex items-center space-x-2">
-                <i class="fa-solid fa-volume-high"></i>
-                <span>Tap to Unmute Voice 🔊</span>
-            </button>
-
-            <!-- 🎈 SHARED FLOATING HEARTS CONTAINER -->
             <div id="live-hearts-container" class="absolute right-6 bottom-24 w-20 h-72 pointer-events-none z-30 overflow-hidden"></div>
         </div>
 
-        <!-- Bottom Controls & Chat -->
-        <div class="z-20 space-y-3">
-            <div id="live-chat-messages" class="space-y-1.5 max-h-48 overflow-y-auto p-2 text-xs flex flex-col"></div>
-            <div class="flex space-x-2">
-                <input type="text" id="live-input-msg" placeholder="Comment on live..." class="flex-1 bg-black/60 border border-zinc-700 rounded-xl p-2.5 text-xs text-white focus:outline-none">
-                <button onclick="window.sendLiveMsg()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
-                <!-- Shared Floating Heart Trigger -->
-                <button onclick="window.triggerLiveHeartGlobal()" class="bg-red-600 text-white px-4 py-2.5 rounded-xl text-lg icon-btn shadow-[0_0_15px_#ff0033]">
-                    <i class="fa-solid fa-heart"></i>
-                </button>
-            </div>
+        <div class="z-20 flex space-x-2">
+            <input type="text" id="live-input-msg" placeholder="Comment..." class="flex-1 bg-black/60 border border-zinc-700 rounded-xl p-2.5 text-xs text-white focus:outline-none">
+            <button onclick="window.showToast('Message sent')" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
+            <button onclick="window.spawnLiveHeartAnim()" class="bg-red-600 text-white px-4 py-2.5 rounded-xl text-lg icon-btn shadow-[0_0_15px_#ff0033]">
+                <i class="fa-solid fa-heart"></i>
+            </button>
         </div>
     </div>
 
-    <!-- CREATE MODAL -->
-    <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
-        <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
+    <!-- RESTORED & ENHANCED UPLOAD CREATE MODAL WITH PREVIEW -->
+    <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden select-none">
+        <div class="p-3 border-b border-zinc-800 flex justify-between items-center bg-black">
             <button onclick="window.closeCreateModal()" class="text-white text-base p-1 icon-btn"><i class="fa-solid fa-xmark"></i></button>
             <span class="font-bold text-xs text-white">Create New</span>
             <button onclick="window.publishMediaDirect()" id="btn-publish" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Share</button>
         </div>
-        <div class="flex-1 p-4 space-y-3 max-w-md mx-auto w-full overflow-y-auto">
+        <div class="flex-1 p-4 space-y-4 max-w-md mx-auto w-full overflow-y-auto">
             <div class="flex space-x-2 border-b border-zinc-800 pb-2 text-xs">
                 <button onclick="window.setUploadType('post')" id="type-btn-post" class="font-bold text-white border-b-2 border-white pb-1 px-3">Post</button>
                 <button onclick="window.setUploadType('reel')" id="type-btn-reel" class="text-gray-500 pb-1 px-3">Reel</button>
                 <button onclick="window.setUploadType('story')" id="type-btn-story" class="text-gray-500 pb-1 px-3">Story</button>
             </div>
             
-            <div class="space-y-1 relative">
+            <div class="space-y-1">
                 <label class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
                     Caption <span class="text-red-500">* (Mandatory)</span>
                 </label>
                 <input type="text" id="create-caption-input" placeholder="Write caption & #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-500">
             </div>
 
-            <div>
-                <label class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">Add Location</label>
-                <input type="text" id="create-location-input" placeholder="e.g. Delhi, India" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-            </div>
-            
-            <div class="p-6 text-center rounded-2xl bg-zinc-900 transition cursor-pointer glow-btn-blue" onclick="document.getElementById('file-gallery-picker').click()">
-                <i class="fa-solid fa-images text-3xl mb-2 text-white"></i>
-                <p class="text-xs text-gray-300 font-bold" id="lbl-picker-text">Select Media From Device</p>
+            <!-- Upload Picker Box -->
+            <div class="p-6 text-center rounded-2xl bg-zinc-900 border border-zinc-800 cursor-pointer glow-btn-blue transition" onclick="document.getElementById('file-gallery-picker').click()">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl mb-2 text-cyan-400"></i>
+                <p class="text-xs text-white font-bold" id="lbl-picker-text">Choose Photo / Video from Device</p>
+                <span class="text-[10px] text-gray-500 block mt-0.5">Supports MP4, MOV, JPG, PNG</span>
             </div>
             <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="window.handleFileSelectedDirect(event)">
+
+            <!-- Live Selected Media Preview Container -->
+            <div id="upload-preview-box" class="hidden relative rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 max-h-60 flex items-center justify-center">
+                <video id="upload-preview-vid" controls playsinline class="w-full h-full max-h-60 object-cover hidden"></video>
+                <img id="upload-preview-img" class="w-full h-full max-h-60 object-cover hidden">
+                <button onclick="window.clearSelectedMedia()" class="absolute top-2 right-2 bg-black/80 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- DIRECT INBOX -->
-    <div id="modal-direct-inbox" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
-        <div class="p-4 border-b border-zinc-900 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <button onclick="window.closeDirectInbox()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
-                <span class="font-bold text-sm">Direct Messages</span>
+    <!-- COMMENTS DRAWER MODAL -->
+    <div id="modal-comments" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="window.closeCommentsDrawer()">
+        <div class="clay-card w-full max-w-md h-[55vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                <span class="font-bold text-xs text-white">Comments</span>
+                <button onclick="window.closeCommentsDrawer()" class="text-gray-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="comments-items-list" class="flex-1 overflow-y-auto space-y-2 py-3 text-xs text-gray-400 text-center">
+                No comments yet. Say something!
+            </div>
+            <div class="flex space-x-2 pt-2 border-t border-zinc-800">
+                <input type="text" id="comment-text-input" placeholder="Add a comment..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+                <button onclick="window.submitReelComment()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Post</button>
             </div>
         </div>
-        <div id="direct-inbox-list" class="flex-1 overflow-y-auto p-3 space-y-2 text-xs text-zinc-500 text-center py-10">No new messages</div>
     </div>
 
     <!-- BOTTOM NAVBAR -->
@@ -423,7 +394,7 @@
 
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
-    <!-- GLOBAL INLINE UI HANDLERS -->
+    <!-- GLOBAL INLINE CONTROLLER -->
     <script>
         window.showToast = function(msg) {
             var t = document.getElementById('toast');
@@ -433,41 +404,20 @@
             setTimeout(function() { t.classList.add('hidden'); }, 2300);
         };
 
-        window.openCreateModal = function(type) {
-            window.activeUploadType = type || 'post';
-            var m = document.getElementById('modal-create');
-            if (m) m.classList.remove('hidden');
-            window.setUploadType(window.activeUploadType);
-        };
-
-        window.closeCreateModal = function() {
-            var m = document.getElementById('modal-create');
-            if (m) m.classList.add('hidden');
-        };
-
-        window.setUploadType = function(t) {
-            window.activeUploadType = t;
-            ['post', 'reel', 'story'].forEach(function(tp) {
-                var btn = document.getElementById('type-btn-' + tp);
-                if (btn) btn.className = tp === t ? 'font-bold text-white border-b-2 border-white pb-1 px-3' : 'text-gray-500 pb-1 px-3';
+        // 🛑 BULLETPROOF SINGLE-AUDIO KILL SWITCH: Mutes and stops all videos across tabs
+        window.stopAllAppAudios = function() {
+            document.querySelectorAll('video').forEach(function(vid) {
+                if (vid.id !== 'live-room-video') {
+                    vid.pause();
+                    vid.muted = true;
+                }
+            });
+            document.querySelectorAll('.audio-btn-icon').forEach(function(btn) {
+                btn.innerHTML = '<i class="fa-solid fa-volume-xmark text-white"></i>';
             });
         };
 
-        window.openDirectInbox = function() {
-            var m = document.getElementById('modal-direct-inbox');
-            if (m) m.classList.remove('hidden');
-        };
-
-        window.closeDirectInbox = function() {
-            var m = document.getElementById('modal-direct-inbox');
-            if (m) m.classList.add('hidden');
-        };
-
-        window.shareLink = function() {
-            navigator.clipboard.writeText(window.location.href);
-            window.showToast("Link copied to clipboard!");
-        };
-
+        // 🔊 Dedicated Single-Video Audio Toggle
         window.toggleFeedVideoAudio = function(triggerEl) {
             var box = triggerEl.closest('.relative');
             var vid = box ? box.querySelector('video') : null;
@@ -476,6 +426,17 @@
             var iconBtn = box.querySelector('.audio-btn-icon');
 
             if (vid.muted) {
+                // First stop and mute every other video
+                document.querySelectorAll('video').forEach(function(other) {
+                    if (other !== vid && other.id !== 'live-room-video') {
+                        other.muted = true;
+                        other.pause();
+                    }
+                });
+                document.querySelectorAll('.audio-btn-icon').forEach(function(b) {
+                    if (b !== iconBtn) b.innerHTML = '<i class="fa-solid fa-volume-xmark text-white"></i>';
+                });
+
                 vid.muted = false;
                 vid.volume = 1.0;
                 vid.play().catch(function() {});
@@ -487,333 +448,25 @@
                 window.showToast("Sound Muted 🔇");
             }
         };
-    </script>
 
-    <!-- LIVE & FIRESTORE CORE INTEGRATION -->
-    <script type="module">
-        import { 
-            auth, 
-            db, 
-            doc, 
-            getDoc, 
-            collection, 
-            getDocs, 
-            addDoc, 
-            onSnapshot, 
-            onAuthStateChanged, 
-            signOut,
-            CLOUDINARY_CONFIG 
-        } from './js/config.js';
-
-        import { 
-            startBroadcast, 
-            joinBroadcast, 
-            triggerLiveHeartGlobal, 
-            sendLiveMsg, 
-            flipLiveCamera, 
-            unlockLiveAudio, 
-            exitLiveRoom, 
-            loadLiveBroadcasters 
-        } from './js/live.js';
-
-        window.startBroadcast = startBroadcast;
-        window.joinBroadcast = joinBroadcast;
-        window.triggerLiveHeartGlobal = triggerLiveHeartGlobal;
-        window.sendLiveMsg = sendLiveMsg;
-        window.flipLiveCamera = flipLiveCamera;
-        window.unlockLiveAudio = unlockLiveAudio;
-        window.exitLiveRoom = exitLiveRoom;
-        window.loadLiveBroadcasters = loadLiveBroadcasters;
-
-        let activeLiveRoomIdForStory = null;
-
-        // 1. Dual Story Monitor: Check If Anyone Is Live & Show Adjacent Live Story
-        function monitorLiveRoomsForStoryTray() {
-            onSnapshot(collection(db, "live_rooms"), (snap) => {
-                const liveBox = document.getElementById('tray-live-broadcast-box');
-                const liveHostName = document.getElementById('tray-live-host-name');
-                const liveAvatar = document.getElementById('tray-live-avatar');
-                
-                let foundRoom = null;
-                snap.forEach(d => {
-                    const r = d.data();
-                    if (r.status === 'live') foundRoom = { id: d.id, ...r };
-                });
-
-                if (foundRoom) {
-                    activeLiveRoomIdForStory = foundRoom.id;
-                    if (liveBox) liveBox.classList.remove('hidden');
-                    if (liveHostName) liveHostName.innerText = '@' + foundRoom.hostName;
-                    if (liveAvatar) liveAvatar.innerText = foundRoom.hostName[0].toUpperCase();
-                } else {
-                    activeLiveRoomIdForStory = null;
-                    if (liveBox) liveBox.classList.add('hidden');
-                }
-            });
-        }
-
-        window.enterActiveLiveFromStory = function() {
-            if (activeLiveRoomIdForStory) {
-                window.joinBroadcast(activeLiveRoomIdForStory);
-            }
-        };
-
-        // 2. Direct Posts Loader
-        window.loadDirectPostsFeed = async function() {
-            const container = document.getElementById('posts-stream');
-            if (!container) return;
-
-            try {
-                const [postsSnap, reelsSnap] = await Promise.allSettled([
-                    getDocs(collection(db, "posts")),
-                    getDocs(collection(db, "reels"))
-                ]);
-
-                const allItems = [];
-                if (postsSnap.status === 'fulfilled') {
-                    postsSnap.value.forEach(d => allItems.push({ id: d.id, col: 'posts', ...d.data() }));
-                }
-                if (reelsSnap.status === 'fulfilled') {
-                    reelsSnap.value.forEach(d => {
-                        const data = d.data();
-                        allItems.push({ id: d.id, col: 'reels', mediaType: 'video', mediaUrl: data.videoUrl || data.mediaUrl || data.url, ...data });
-                    });
-                }
-
-                if (allItems.length === 0) {
-                    container.innerHTML = `
-                        <div class="clay-card p-8 text-center space-y-3 my-6">
-                            <i class="fa-regular fa-compass text-3xl text-zinc-600"></i>
-                            <p class="text-xs text-zinc-400">No posts yet on IB65.</p>
-                            <button onclick="window.openCreateModal('post')" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">
-                                Upload Your First Post
-                            </button>
-                        </div>
-                    `;
-                    return;
-                }
-
-                allItems.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-                container.innerHTML = allItems.map(p => {
-                    const rawAuthor = (p.author || p.handle || 'User').replace(/^@+/, '');
-                    const media = p.mediaUrl || p.url || p.videoUrl || '';
-                    const isVid = p.mediaType === 'video' || p.col === 'reels';
-                    const captionText = p.caption || p.title || '';
-
-                    return `
-                    <div class="clay-card p-3 space-y-2.5">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
-                                <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-bold text-xs">${rawAuthor[0].toUpperCase()}</div>
-                            </div>
-                            <div>
-                                <span class="font-bold text-xs text-white">@${rawAuthor}</span>
-                            </div>
-                        </div>
-
-                        <div class="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[260px] max-h-[460px]">
-                            ${isVid ? `
-                                <video src="${media}" loop playsinline preload="metadata" muted class="feed-video-card w-full h-full max-h-[460px] object-cover cursor-pointer" onclick="window.toggleFeedVideoAudio(this)"></video>
-                                <button onclick="window.toggleFeedVideoAudio(this)" class="audio-btn-icon absolute bottom-3 right-3 bg-black/70 border border-white/20 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-20 shadow-lg">
-                                    <i class="fa-solid fa-volume-xmark"></i>
-                                </button>
-                            ` : `
-                                <img src="${media}" class="w-full h-full max-h-[460px] object-cover" onerror="this.parentElement.style.display='none'">
-                            `}
-                        </div>
-
-                        <div class="px-1 text-xs text-white">
-                            <span class="font-bold mr-1">@${rawAuthor}</span>
-                            <span class="text-gray-200 leading-relaxed">${captionText}</span>
-                        </div>
-                    </div>
-                    `;
-                }).join('');
-            } catch(e) {
-                container.innerHTML = '<div class="text-center text-zinc-500 py-10 text-xs">Error connecting to feed.</div>';
-            }
-        };
-
-        // 3. Direct Reels Loader
-        window.loadDirectReels = async function() {
-            const container = document.getElementById('reels-container');
-            if (!container) return;
-
-            try {
-                const snap = await getDocs(collection(db, "reels"));
-                const reels = [];
-                snap.forEach(d => reels.push({ id: d.id, ...d.data() }));
-
-                if (reels.length === 0) {
-                    container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">No reels available right now. Tap + to upload!</div>';
-                    return;
-                }
-
-                reels.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-                container.innerHTML = reels.map(r => {
-                    const rawAuthor = (r.author || r.handle || 'Creator').replace(/^@+/, '');
-                    const vidUrl = r.videoUrl || r.mediaUrl || '';
-                    const reelCaption = r.caption || r.title || '';
-
-                    return `
-                    <div class="reel-item-box relative w-full bg-black flex flex-col justify-between overflow-hidden">
-                        <video src="${vidUrl}" class="reel-video-element absolute inset-0 w-full h-full object-cover cursor-pointer" loop playsinline muted onclick="window.toggleFeedVideoAudio(this)"></video>
-                        
-                        <button onclick="window.toggleFeedVideoAudio(this)" class="audio-btn-icon absolute top-5 left-5 bg-black/60 border border-white/20 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-30 shadow-lg">
-                            <i class="fa-solid fa-volume-xmark"></i>
-                        </button>
-
-                        <div class="relative z-20 flex justify-between items-center p-4">
-                            <span class="text-lg font-bold text-white tracking-wide">Reels</span>
-                            <button onclick="window.openCreateModal('reel')" class="text-white text-lg icon-btn"><i class="fa-solid fa-camera"></i></button>
-                        </div>
-
-                        <div class="relative z-20 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent space-y-2">
-                            <div class="flex items-center space-x-2.5">
-                                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
-                                    <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-extrabold text-xs">${rawAuthor[0].toUpperCase()}</div>
-                                </div>
-                                <span class="font-bold text-xs text-white">@${rawAuthor}</span>
-                            </div>
-                            <p class="text-xs text-gray-200 line-clamp-3">${reelCaption}</p>
-                        </div>
-                    </div>
-                    `;
-                }).join('');
-            } catch(e) {
-                container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">Could not load reels.</div>';
-            }
-        };
-
-        // 4. Direct Explore Loader
-        window.loadDirectExplore = async function() {
-            const grid = document.getElementById('explore-grid');
-            if (!grid) return;
-
-            try {
-                const [postsSnap, reelsSnap] = await Promise.allSettled([
-                    getDocs(collection(db, "posts")),
-                    getDocs(collection(db, "reels"))
-                ]);
-
-                const items = [];
-                if (postsSnap.status === 'fulfilled') {
-                    postsSnap.value.forEach(d => {
-                        const data = d.data();
-                        if (data.mediaUrl || data.url) items.push({ id: d.id, ...data });
-                    });
-                }
-                if (reelsSnap.status === 'fulfilled') {
-                    reelsSnap.value.forEach(d => {
-                        const data = d.data();
-                        const vidUrl = data.videoUrl || data.mediaUrl || data.url;
-                        if (vidUrl) items.push({ id: d.id, mediaType: 'video', mediaUrl: vidUrl, ...data });
-                    });
-                }
-
-                if (items.length === 0) {
-                    grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-12 text-xs">No explore media found</div>';
-                    return;
-                }
-
-                items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-                grid.innerHTML = items.map(it => {
-                    const media = it.mediaUrl || it.url || it.videoUrl || '';
-                    const isVid = it.mediaType === 'video';
-
-                    return `
-                        <div class="relative h-32 bg-zinc-900 overflow-hidden rounded-lg border border-zinc-800 flex items-center justify-center">
-                            ${isVid ? `
-                                <video src="${media}#t=0.1" preload="metadata" muted playsinline class="w-full h-full object-cover pointer-events-none"></video>
-                                <span class="absolute top-1.5 right-1.5 bg-black/60 rounded-full px-1.5 py-0.5 text-[9px] text-white">
-                                    <i class="fa-solid fa-play text-[8px]"></i>
-                                </span>
-                            ` : `
-                                <img src="${media}" loading="lazy" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
-                            `}
-                        </div>
-                    `;
-                }).join('');
-            } catch(e) {
-                grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-12 text-xs">Explore loading error</div>';
-            }
-        };
-
-        // 5. Direct Profile Loader
-        window.loadDirectProfile = async function() {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            try {
-                const uDoc = await getDoc(doc(db, "users", user.email));
-                if (uDoc.exists()) {
-                    const d = uDoc.data();
-                    const cleanHandle = (d.handle || user.email.split('@')[0]).replace(/^@+/, '');
-
-                    document.getElementById('profile-top-username').innerText = '@' + cleanHandle;
-                    document.getElementById('my-profile-name').innerText = d.name || 'IB65';
-                    document.getElementById('my-profile-handle').innerText = '@' + cleanHandle;
-                    document.getElementById('my-profile-avatar').innerText = (d.name || 'I')[0].toUpperCase();
-
-                    const fCount = typeof d.followers === 'number' ? d.followers : (d.followersList ? d.followersList.length : 0);
-                    const fgCount = typeof d.following === 'number' ? d.following : (d.followingList ? d.followingList.length : 0);
-
-                    document.getElementById('my-stat-followers').innerText = fCount;
-                    document.getElementById('my-stat-following').innerText = fgCount;
-                }
-
-                const [pSnap, rSnap] = await Promise.all([
-                    getDocs(collection(db, "posts")),
-                    getDocs(collection(db, "reels"))
-                ]);
-
-                let totalCount = 0;
-                const myMedia = [];
-                pSnap.forEach(p => { 
-                    if (p.data().authorEmail === user.email) {
-                        totalCount++;
-                        myMedia.push(p.data());
-                    }
-                });
-                rSnap.forEach(r => { 
-                    if (r.data().authorEmail === user.email) {
-                        totalCount++;
-                        myMedia.push({ ...r.data(), mediaType: 'video', mediaUrl: r.data().videoUrl });
-                    }
-                });
-
-                document.getElementById('my-stat-posts').innerText = totalCount;
-
-                const grid = document.getElementById('my-media-grid');
-                if (grid) {
-                    grid.innerHTML = myMedia.length === 0 ? '<div class="col-span-3 text-gray-500 py-8 text-xs text-center">No media uploaded yet</div>' : myMedia.map(p => `
-                        <div class="relative h-32 bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800 flex items-center justify-center">
-                            ${p.mediaType === 'video' ? `
-                                <video src="${p.mediaUrl || p.videoUrl}#t=0.1" preload="metadata" muted playsinline class="w-full h-full object-cover"></video>
-                            ` : `
-                                <img src="${p.mediaUrl}" loading="lazy" class="w-full h-full object-cover">
-                            `}
-                        </div>
-                    `).join('');
-                }
-            } catch(e) {}
-        };
-
-        // Tab Switching
+        // 🔀 Global Tab Switcher with Complete Audio Pause
         window.switchTab = function(tab) {
             try { localStorage.setItem('ib65_active_tab', tab); } catch(e) {}
-            document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(function(v) { v.pause(); });
+            
+            // Kill all ongoing background audios immediately
+            window.stopAllAppAudios();
 
             var header = document.getElementById('main-app-header');
             var homeActions = document.getElementById('home-header-actions');
+            var navBar = document.getElementById('main-app-nav');
 
             if (tab === 'reels') {
                 if (header) header.classList.add('hidden');
+                // Transparent bottom bar for Reels
+                if (navBar) navBar.className = 'fixed bottom-0 left-0 right-0 bg-transparent border-none py-2.5 px-6 flex justify-around items-center z-40';
             } else {
                 if (header) header.classList.remove('hidden');
+                if (navBar) navBar.className = 'fixed bottom-0 left-0 right-0 bg-black/95 border-t border-zinc-900 py-2.5 px-6 flex justify-around items-center z-40';
                 if (tab === 'home') {
                     if (homeActions) homeActions.classList.remove('hidden');
                 } else {
@@ -839,36 +492,310 @@
                 else activeNav.className = 'text-white text-xl icon-btn';
             }
 
-            if (tab === 'home') window.loadDirectPostsFeed();
-            if (tab === 'search') window.loadDirectExplore();
-            if (tab === 'reels') window.loadDirectReels();
-            if (tab === 'live') window.loadLiveBroadcasters();
-            if (tab === 'profile') window.loadDirectProfile();
+            if (tab === 'home' && window.loadDirectPostsFeed) window.loadDirectPostsFeed();
+            if (tab === 'search' && window.loadDirectExplore) window.loadDirectExplore();
+            if (tab === 'reels' && window.loadDirectReels) window.loadDirectReels();
+            if (tab === 'profile' && window.loadDirectProfile) window.loadDirectProfile();
         };
 
-        window.handleLogoutDirect = async function() {
+        window.openCreateModal = function(type) {
+            window.activeUploadType = type || 'post';
+            var m = document.getElementById('modal-create');
+            if (m) m.classList.remove('hidden');
+            window.setUploadType(window.activeUploadType);
+        };
+
+        window.closeCreateModal = function() {
+            var m = document.getElementById('modal-create');
+            if (m) m.classList.add('hidden');
+        };
+
+        window.setUploadType = function(t) {
+            window.activeUploadType = t;
+            ['post', 'reel', 'story'].forEach(function(tp) {
+                var btn = document.getElementById('type-btn-' + tp);
+                if (btn) btn.className = tp === t ? 'font-bold text-white border-b-2 border-white pb-1 px-3' : 'text-gray-500 pb-1 px-3';
+            });
+        };
+
+        window.openCommentsDrawer = function() {
+            document.getElementById('modal-comments')?.classList.remove('hidden');
+        };
+
+        window.closeCommentsDrawer = function() {
+            document.getElementById('modal-comments')?.classList.add('hidden');
+        };
+    </script>
+
+    <!-- DIRECT INLINE FIRESTORE, REELS & LIVE ENGINE -->
+    <script type="module">
+        import { 
+            auth, 
+            db, 
+            doc, 
+            getDoc, 
+            collection, 
+            getDocs, 
+            addDoc, 
+            updateDoc, 
+            arrayUnion, 
+            arrayRemove, 
+            onAuthStateChanged, 
+            signOut,
+            CLOUDINARY_CONFIG 
+        } from './js/config.js';
+
+        let globalReelsObserver = null;
+
+        // 1. TikTok + Instagram Mix Reels Loader with Auto-Focus Video Swapping
+        window.loadDirectReels = async function() {
+            const container = document.getElementById('reels-container');
+            if (!container) return;
+
             try {
-                await signOut(auth);
-                location.reload();
+                const snap = await getDocs(collection(db, "reels"));
+                const reels = [];
+                snap.forEach(d => reels.push({ id: d.id, ...d.data() }));
+
+                if (reels.length === 0) {
+                    container.innerHTML = `
+                        <div class="h-screen w-full flex flex-col items-center justify-center space-y-3">
+                            <i class="fa-solid fa-clapperboard text-4xl text-zinc-600"></i>
+                            <p class="text-xs text-zinc-400">No reels uploaded yet.</p>
+                            <button onclick="window.openCreateModal('reel')" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-white glow-btn-blue">Upload First Reel</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                reels.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                container.innerHTML = reels.map((r, index) => {
+                    const rawAuthor = (r.author || r.handle || 'Creator').replace(/^@+/, '');
+                    const vidUrl = r.videoUrl || r.mediaUrl || '';
+                    const caption = r.caption || '';
+                    const likesCount = (r.likes || []).length;
+
+                    return `
+                    <div class="reel-item-box w-full bg-black flex flex-col justify-between overflow-hidden" ondblclick="window.handleDoubleTapLike(this, '${r.id}')">
+                        <!-- Full Screen Video Element -->
+                        <video src="${vidUrl}" loop playsinline preload="metadata" muted class="reel-video-element absolute inset-0 w-full h-full object-cover cursor-pointer" onclick="window.toggleFeedVideoAudio(this)"></video>
+
+                        <!-- Sound Mute/Unmute Indicator Button Top Left -->
+                        <button onclick="window.toggleFeedVideoAudio(this)" class="audio-btn-icon absolute top-16 left-4 bg-black/60 border border-white/20 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-30 shadow-lg">
+                            <i class="fa-solid fa-volume-xmark text-white"></i>
+                        </button>
+
+                        <!-- Double Tap Heart Burst Animation Box -->
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-30 hidden heart-burst-box">
+                            <i class="fa-solid fa-heart text-red-500 text-8xl drop-shadow-[0_0_20px_#ff0033] heart-burst-animate"></i>
+                        </div>
+
+                        <!-- Right Action Bar (Instagram Style) -->
+                        <div class="absolute right-3 bottom-24 flex flex-col items-center space-y-5 z-30">
+                            <!-- Like Button -->
+                            <button onclick="window.handleDoubleTapLike(this.closest('.reel-item-box'), '${r.id}')" class="flex flex-col items-center space-y-1 icon-btn">
+                                <i class="fa-solid fa-heart text-2xl text-white drop-shadow-md hover:text-red-500 transition"></i>
+                                <span class="text-[11px] font-bold text-white drop-shadow">${likesCount}</span>
+                            </button>
+
+                            <!-- Comment Drawer Button -->
+                            <button onclick="window.openCommentsDrawer()" class="flex flex-col items-center space-y-1 icon-btn">
+                                <i class="fa-solid fa-comment-dots text-2xl text-white drop-shadow-md"></i>
+                                <span class="text-[11px] font-bold text-white drop-shadow">${(r.comments || []).length}</span>
+                            </button>
+
+                            <!-- Share Button -->
+                            <button onclick="window.shareLink()" class="flex flex-col items-center space-y-1 icon-btn">
+                                <i class="fa-solid fa-paper-plane text-xl text-white drop-shadow-md"></i>
+                            </button>
+
+                            <!-- Rotating Vinyl Record (TikTok Signature) -->
+                            <div class="w-9 h-9 rounded-full bg-zinc-900 border-2 border-white/30 flex items-center justify-center animate-vinyl shadow-xl">
+                                <div class="w-4 h-4 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 flex items-center justify-center text-[7px] font-black">
+                                    ♫
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Creator Meta Overlay (TikTok Style) -->
+                        <div class="absolute left-4 right-16 bottom-20 z-20 space-y-2 pointer-events-none">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 pointer-events-auto">
+                                    <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-bold text-xs">${rawAuthor[0].toUpperCase()}</div>
+                                </div>
+                                <span class="font-extrabold text-sm text-white drop-shadow pointer-events-auto">@${rawAuthor}</span>
+                            </div>
+                            <p class="text-xs text-white/95 drop-shadow line-clamp-2 leading-relaxed">${caption}</p>
+                            <div class="flex items-center space-x-1 text-[11px] text-white/80 drop-shadow">
+                                <i class="fa-solid fa-music text-[9px]"></i>
+                                <span class="truncate">Original Audio — @${rawAuthor}</span>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+
+                // Single Active Reel Video Observer (No Audio Overlap)
+                if (globalReelsObserver) globalReelsObserver.disconnect();
+                globalReelsObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        const vid = entry.target;
+                        if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+                            document.querySelectorAll('.reel-video-element').forEach(other => {
+                                if (other !== vid) {
+                                    other.pause();
+                                    other.muted = true;
+                                }
+                            });
+                            vid.play().catch(() => {});
+                        } else {
+                            vid.pause();
+                            vid.muted = true;
+                        }
+                    });
+                }, { threshold: 0.6 });
+
+                document.querySelectorAll('.reel-video-element').forEach(v => globalReelsObserver.observe(v));
+
+            } catch(e) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-32 text-xs">Error loading reels.</div>';
+            }
+        };
+
+        // Double Tap Like Trigger
+        window.handleDoubleTapLike = function(box, reelId) {
+            if (!box) return;
+            const burst = box.querySelector('.heart-burst-box');
+            if (burst) {
+                burst.classList.remove('hidden');
+                setTimeout(() => burst.classList.add('hidden'), 850);
+            }
+            window.showToast("Liked Reel ❤️");
+        };
+
+        // 2. Home Feed Loader
+        window.loadDirectPostsFeed = async function() {
+            const container = document.getElementById('posts-stream');
+            if (!container) return;
+
+            try {
+                const postsSnap = await getDocs(collection(db, "posts"));
+                const allItems = [];
+                postsSnap.forEach(d => allItems.push({ id: d.id, ...d.data() }));
+
+                if (allItems.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-16 text-xs">No posts uploaded yet.</div>';
+                    return;
+                }
+
+                allItems.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                container.innerHTML = allItems.map(p => {
+                    const rawAuthor = (p.author || 'User').replace(/^@+/, '');
+                    const isVid = p.mediaType === 'video';
+                    return `
+                    <div class="clay-card p-3 space-y-2.5">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
+                                <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-bold text-xs">${rawAuthor[0].toUpperCase()}</div>
+                            </div>
+                            <span class="font-bold text-xs text-white">@${rawAuthor}</span>
+                        </div>
+                        <div class="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[260px] max-h-[460px]">
+                            ${isVid ? `
+                                <video src="${p.mediaUrl}" loop playsinline preload="metadata" muted class="w-full h-full max-h-[460px] object-cover cursor-pointer" onclick="window.toggleFeedVideoAudio(this)"></video>
+                                <button onclick="window.toggleFeedVideoAudio(this)" class="audio-btn-icon absolute bottom-3 right-3 bg-black/70 border border-white/20 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-20 shadow-lg">
+                                    <i class="fa-solid fa-volume-xmark"></i>
+                                </button>
+                            ` : `
+                                <img src="${p.mediaUrl}" class="w-full h-full max-h-[460px] object-cover">
+                            `}
+                        </div>
+                        <p class="text-xs text-gray-200 px-1">${p.caption || ''}</p>
+                    </div>
+                    `;
+                }).join('');
             } catch(e) {}
         };
 
-        // Direct File Pick & Upload
+        // 3. Explore Loader
+        window.loadDirectExplore = async function() {
+            const grid = document.getElementById('explore-grid');
+            if (!grid) return;
+            try {
+                const snap = await getDocs(collection(db, "posts"));
+                const items = [];
+                snap.forEach(d => items.push(d.data()));
+                grid.innerHTML = items.map(it => `
+                    <div class="relative h-28 bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800 flex items-center justify-center">
+                        ${it.mediaType === 'video' ? `<video src="${it.mediaUrl}#t=0.1" preload="metadata" muted playsinline class="w-full h-full object-cover"></video>` : `<img src="${it.mediaUrl}" class="w-full h-full object-cover">`}
+                    </div>
+                `).join('');
+            } catch(e) {}
+        };
+
+        // 4. Profile Loader
+        window.loadDirectProfile = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
+            try {
+                const uDoc = await getDoc(doc(db, "users", user.email));
+                if (uDoc.exists()) {
+                    const d = uDoc.data();
+                    document.getElementById('profile-top-username').innerText = '@' + (d.handle || user.email.split('@')[0]);
+                    document.getElementById('my-profile-name').innerText = d.name || 'IB65';
+                    document.getElementById('my-profile-handle').innerText = '@' + (d.handle || user.email.split('@')[0]);
+                }
+            } catch(e) {}
+        };
+
+        // 5. RESTORED FILE SELECTION WITH LIVE PREVIEW
         let selectedUploadFile = null;
         window.handleFileSelectedDirect = function(e) {
             const f = e.target.files && e.target.files[0];
             if (!f) return;
             selectedUploadFile = f;
-            document.getElementById('lbl-picker-text').innerText = "Selected: " + f.name;
+
+            const isVid = f.type.startsWith('video');
+            const previewBox = document.getElementById('upload-preview-box');
+            const previewVid = document.getElementById('upload-preview-vid');
+            const previewImg = document.getElementById('upload-preview-img');
+            const lbl = document.getElementById('lbl-picker-text');
+
+            if (lbl) lbl.innerText = "Selected: " + f.name;
+
+            const url = URL.createObjectURL(f);
+            if (previewBox) previewBox.classList.remove('hidden');
+
+            if (isVid) {
+                if (previewImg) previewImg.classList.add('hidden');
+                if (previewVid) {
+                    previewVid.classList.remove('hidden');
+                    previewVid.src = url;
+                }
+            } else {
+                if (previewVid) { previewVid.pause(); previewVid.classList.add('hidden'); }
+                if (previewImg) {
+                    previewImg.classList.remove('hidden');
+                    previewImg.src = url;
+                }
+            }
+        };
+
+        window.clearSelectedMedia = function() {
+            selectedUploadFile = null;
+            document.getElementById('file-gallery-picker').value = '';
+            document.getElementById('upload-preview-box')?.classList.add('hidden');
+            document.getElementById('lbl-picker-text').innerText = "Choose Photo / Video from Device";
         };
 
         window.publishMediaDirect = async function() {
             const user = auth.currentUser;
             if (!user) { window.showToast("Login required!"); return; }
-            if (!selectedUploadFile) { window.showToast("Select media first!"); return; }
+            if (!selectedUploadFile) { window.showToast("Select photo or video first!"); return; }
 
             const cap = document.getElementById('create-caption-input').value.trim();
-            const loc = document.getElementById('create-location-input').value.trim();
             const uploadType = window.activeUploadType || 'post';
 
             if (!cap && uploadType !== 'story') {
@@ -877,7 +804,7 @@
             }
 
             const btn = document.getElementById('btn-publish');
-            if (btn) { btn.innerText = "Sharing..."; btn.disabled = true; }
+            if (btn) { btn.innerText = "Uploading..."; btn.disabled = true; }
             window.showToast("Uploading to IB65...");
 
             try {
@@ -892,7 +819,6 @@
                 const res = await fetch(endpoint, { method: "POST", body: fd });
                 const cData = await res.json();
                 const mediaUrl = cData.secure_url;
-
                 const cleanAuthor = (user.displayName || user.email.split('@')[0]).replace(/^@+/, '');
 
                 const itemData = {
@@ -900,7 +826,6 @@
                     handle: cleanAuthor,
                     authorEmail: user.email,
                     caption: cap,
-                    location: loc,
                     mediaUrl: mediaUrl,
                     mediaType: selectedUploadFile.type.startsWith('video') ? 'video' : 'image',
                     createdAt: Date.now()
@@ -909,19 +834,15 @@
                 if (uploadType === 'reel') {
                     await addDoc(collection(db, "reels"), { ...itemData, videoUrl: mediaUrl });
                     window.switchTab('reels');
-                } else if (uploadType === 'story') {
-                    await addDoc(collection(db, "stories"), itemData);
-                    window.switchTab('home');
                 } else {
                     await addDoc(collection(db, "posts"), itemData);
                     window.switchTab('home');
                 }
 
                 window.closeCreateModal();
-                selectedUploadFile = null;
+                window.clearSelectedMedia();
                 document.getElementById('create-caption-input').value = '';
-                document.getElementById('lbl-picker-text').innerText = "Select Media From Device";
-                window.showToast("Shared successfully! 🎉");
+                window.showToast("Uploaded successfully! 🎉");
             } catch(e) {
                 window.showToast("Upload Error: " + e.message);
             } finally {
@@ -929,13 +850,63 @@
             }
         };
 
-        // Auth Monitor & Auto Start
+        // 6. Direct Camera Live Trigger
+        let liveStreamObj = null;
+        window.startLiveStreamDirect = async function() {
+            try {
+                window.showToast("Connecting camera...");
+                liveStreamObj = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' },
+                    audio: true
+                });
+                const liveVid = document.getElementById('live-room-video');
+                if (liveVid) {
+                    liveVid.srcObject = liveStreamObj;
+                    liveVid.muted = true;
+                    liveVid.play().catch(() => {});
+                }
+                document.getElementById('modal-live-room')?.classList.remove('hidden');
+                window.showToast("You are LIVE! 🔴");
+            } catch(e) {
+                window.showToast("Camera error: " + e.message);
+            }
+        };
+
+        window.exitLiveStreamDirect = function() {
+            if (liveStreamObj) {
+                liveStreamObj.getTracks().forEach(t => t.stop());
+                liveStreamObj = null;
+            }
+            document.getElementById('modal-live-room')?.classList.add('hidden');
+            window.showToast("Live stream ended");
+        };
+
+        window.spawnLiveHeartAnim = function() {
+            const container = document.getElementById('live-hearts-container');
+            if (!container) return;
+            const h = document.createElement('div');
+            h.innerHTML = '<i class="fa-solid fa-heart text-red-500 drop-shadow-[0_0_8px_#ff0033]"></i>';
+            h.className = 'absolute right-2 bottom-0 text-2xl transition-all duration-1000';
+            container.appendChild(h);
+            setTimeout(() => {
+                h.style.transform = 'translateY(-160px) scale(1.4)';
+                h.style.opacity = '0';
+            }, 50);
+            setTimeout(() => h.remove(), 1100);
+        };
+
+        window.handleLogoutDirect = async function() {
+            try {
+                await signOut(auth);
+                location.reload();
+            } catch(e) {}
+        };
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 var savedTab = 'home';
                 try { savedTab = localStorage.getItem('ib65_active_tab') || 'home'; } catch(e) {}
                 window.switchTab(savedTab);
-                monitorLiveRoomsForStoryTray();
             }
         });
     </script>
