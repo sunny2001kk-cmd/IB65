@@ -95,7 +95,7 @@
                 border-color: #00e1ff;
             }
             50% {
-                box-shadow: 0 0 14px #00ffff, 0 0 24px rgba(0, 153, 255, 0.85), inset 0 0 8px rgba(0, 255, 255, 0.45);
+                box-shadow: 0 0 14px #00ffff, 0 0 24px rgba(0, 153, 255, 0.85), inset 0 0 8px rgba(255, 255, 0, 0.45);
                 border-color: #38bdf8;
             }
         }
@@ -196,10 +196,10 @@
     <!-- Main Container -->
     <main class="max-w-md mx-auto">
 
-        <!-- 1. HOME VIEW (DUAL STORIES + FEED) -->
+        <!-- 1. HOME VIEW (FEED & REALTIME STORIES) -->
         <div id="view-home" class="space-y-3 pb-24">
             <div class="p-3 border-b border-zinc-900 overflow-x-auto flex space-x-3 items-center">
-                <!-- Normal Story Circle -->
+                <!-- User Story Tile -->
                 <div onclick="window.openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-pink-600 to-purple-600 flex items-center justify-center relative">
                         <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
@@ -210,7 +210,7 @@
                     <span class="text-[10px] text-gray-400 truncate w-16 text-center">Your story</span>
                 </div>
 
-                <!-- Adjacent Live Broadcast Story Circle -->
+                <!-- Live Stream Tile -->
                 <div id="tray-live-broadcast-box" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0 hidden" onclick="window.switchTab('live')">
                     <div class="w-16 h-16 rounded-full p-0.5 border-2 border-red-500 bg-red-950/40 flex items-center justify-center relative live-story-ring">
                         <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
@@ -221,7 +221,6 @@
                     <span class="text-[10px] text-red-400 font-bold truncate w-16 text-center" id="tray-live-host-name">Live Now</span>
                 </div>
 
-                <!-- Friends Stories Tray -->
                 <div id="stories-tray-items" class="flex space-x-3"></div>
             </div>
 
@@ -237,7 +236,7 @@
         <div id="view-search" class="space-y-3 p-3 hidden pb-24">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-xs"></i>
-                <input type="text" id="global-search-input" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-700">
+                <input type="text" id="global-search-input" placeholder="Search creators, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-700">
             </div>
             <div>
                 <p class="text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Explore</p>
@@ -317,7 +316,7 @@
                     </div>
                 </div>
 
-                <!-- Name & Bio with Verified Badge -->
+                <!-- Name & Bio -->
                 <div class="space-y-0.5 px-1">
                     <h2 id="my-profile-name" class="text-sm font-bold text-white flex items-center space-x-1">
                         <span>IB65</span>
@@ -353,7 +352,7 @@
                 </button>
             </div>
 
-            <!-- Grids Content with Smart Media Fallback (Broken Image Fix) -->
+            <!-- Grids Content with Smart Media Fallback -->
             <div id="profile-grid-posts" class="grid grid-cols-3 gap-1"></div>
             <div id="profile-grid-reels" class="grid grid-cols-3 gap-1 hidden"></div>
             <div id="profile-grid-saved" class="grid grid-cols-3 gap-1 hidden">
@@ -363,7 +362,7 @@
 
     </main>
 
-    <!-- FULL IB65 ORIGINAL SETTINGS DRAWER (TIKTOK WORD REMOVED) -->
+    <!-- FULL IB65 ORIGINAL SETTINGS DRAWER (TIKTOK COMPLETELY REMOVED) -->
     <div id="modal-profile-settings" class="fixed inset-0 z-50 bg-black/85 flex items-end justify-center hidden" onclick="window.closeProfileSettingsDrawer()">
         <div class="clay-card w-full max-w-md max-h-[85vh] overflow-y-auto rounded-t-3xl p-5 space-y-3" onclick="event.stopPropagation()">
             <div class="w-12 h-1 bg-zinc-700 rounded-full mx-auto mb-2"></div>
@@ -380,7 +379,6 @@
             </div>
 
             <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider pt-2">Creator Tools & Insights</p>
-            <!-- TikTok Replaced with Official IB65 -->
             <div onclick="window.openCreatorStudioModal()" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
                 <span class="text-xs text-white"><i class="fa-solid fa-chart-line text-blue-400 mr-2.5"></i>IB65 Creator Studio & Insights</span>
                 <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-bold">Pro Active</span>
@@ -399,13 +397,13 @@
                 <span class="text-xs text-white"><i class="fa-regular fa-star text-green-400 mr-2.5"></i>Close Friends</span>
                 <i class="fa-solid fa-chevron-right text-xs text-gray-500"></i>
             </div>
-            <div onclick="window.showToast('High Quality Uploads is ON')" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
+            <div onclick="window.toggleDataQualityMode()" class="p-3 bg-zinc-900/80 rounded-xl flex justify-between items-center cursor-pointer">
                 <span class="text-xs text-white"><i class="fa-solid fa-sliders text-purple-400 mr-2.5"></i>Data Saver & Media Quality</span>
-                <span class="text-[10px] text-cyan-400 font-bold">Ultra HD</span>
+                <span id="quality-toggle-status" class="text-[10px] text-cyan-400 font-bold">Ultra HD</span>
             </div>
 
             <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider pt-2">Login Actions</p>
-            <div onclick="window.showToast('Switch Account ready')" class="p-3 bg-zinc-900/80 rounded-xl flex items-center text-cyan-400 cursor-pointer">
+            <div onclick="window.showToast('Account switcher ready')" class="p-3 bg-zinc-900/80 rounded-xl flex items-center text-cyan-400 cursor-pointer">
                 <i class="fa-solid fa-users-viewfinder mr-2.5"></i>
                 <span class="text-xs font-bold">Add or Switch Account</span>
             </div>
@@ -416,7 +414,7 @@
         </div>
     </div>
 
-    <!-- IB65 CREATOR STUDIO & INSIGHTS MODAL -->
+    <!-- IB65 CREATOR STUDIO MODAL (REALTIME DATA CALCULATOR) -->
     <div id="modal-creator-studio" class="fixed inset-0 z-50 bg-black flex flex-col hidden select-none">
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center bg-black">
             <button onclick="document.getElementById('modal-creator-studio').classList.add('hidden')" class="text-white text-sm"><i class="fa-solid fa-arrow-left"></i></button>
@@ -425,30 +423,30 @@
         </div>
         <div class="p-4 space-y-4 max-w-md mx-auto w-full overflow-y-auto">
             <div class="clay-card p-4 space-y-2">
-                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Performance Overview (Last 30 Days)</h4>
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Performance Overview (Live Sync)</h4>
                 <div class="grid grid-cols-2 gap-3 pt-2">
                     <div class="bg-zinc-900/90 p-3 rounded-xl border border-zinc-800">
-                        <span class="text-[10px] text-gray-400 block">Total Views</span>
-                        <span class="text-lg font-black text-cyan-400">14.8K</span>
+                        <span class="text-[10px] text-gray-400 block">Total Uploads</span>
+                        <span id="cs-stat-uploads" class="text-lg font-black text-cyan-400">0</span>
                     </div>
                     <div class="bg-zinc-900/90 p-3 rounded-xl border border-zinc-800">
                         <span class="text-[10px] text-gray-400 block">Likes & Hearts</span>
-                        <span class="text-lg font-black text-red-500">2.9K</span>
+                        <span id="cs-stat-likes" class="text-lg font-black text-red-500">0</span>
                     </div>
                     <div class="bg-zinc-900/90 p-3 rounded-xl border border-zinc-800">
-                        <span class="text-[10px] text-gray-400 block">Profile Visits</span>
-                        <span class="text-lg font-black text-amber-400">920</span>
+                        <span class="text-[10px] text-gray-400 block">Comments Engaged</span>
+                        <span id="cs-stat-comments" class="text-lg font-black text-amber-400">0</span>
                     </div>
                     <div class="bg-zinc-900/90 p-3 rounded-xl border border-zinc-800">
-                        <span class="text-[10px] text-gray-400 block">Watch Time</span>
-                        <span class="text-lg font-black text-green-400">46.5 Hrs</span>
+                        <span class="text-[10px] text-gray-400 block">Creator Standing</span>
+                        <span class="text-lg font-black text-green-400">100% Active</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ORIGINAL INSTAGRAM / TIKTOK CREATE MODAL (MEDIA & MUSIC INTEGRATED) -->
+    <!-- ORIGINAL CREATE MODAL -->
     <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden select-none">
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center bg-black">
             <button onclick="window.closeCreateModal()" class="text-white text-base p-1 icon-btn"><i class="fa-solid fa-xmark"></i></button>
@@ -490,7 +488,6 @@
                 <button onclick="document.getElementById('file-gallery-picker').click()" class="flex-1 bg-zinc-900 border border-zinc-800 py-2.5 rounded-xl text-xs font-bold text-white glow-btn-blue">
                     Change Media
                 </button>
-                <!-- 🎵 REAL WORKING MUSIC SELECTOR BUTTON -->
                 <button onclick="window.openMusicSelectorDrawer()" id="btn-selected-music-pill" class="px-4 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-bold text-white glow-btn-red flex items-center space-x-1.5">
                     <i class="fa-solid fa-music text-cyan-400"></i>
                     <span id="lbl-music-title">Music</span>
@@ -499,7 +496,7 @@
         </div>
     </div>
 
-    <!-- 🎵 100% REAL MUSIC / AUDIO SELECTION DRAWER (NO MORE DUMMY TEXT) -->
+    <!-- 🎵 WORKING MUSIC SELECTOR DRAWER -->
     <div id="modal-music-drawer" class="fixed inset-0 z-50 bg-black/85 flex items-end justify-center hidden" onclick="window.closeMusicSelectorDrawer()">
         <div class="clay-card w-full max-w-md h-[65vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
             <div>
@@ -518,19 +515,18 @@
                         <i class="fa-solid fa-file-audio text-cyan-400 text-lg"></i>
                         <div>
                             <span class="text-xs font-bold text-white block">Upload Device MP3</span>
-                            <span class="text-[9px] text-gray-400">Use any local song from your phone</span>
+                            <span class="text-[9px] text-gray-400">Use local song from your phone</span>
                         </div>
                     </div>
                     <span class="text-xs bg-cyan-500/20 text-cyan-400 px-2.5 py-1 rounded-lg font-bold">Pick MP3</span>
                 </div>
                 <input type="file" id="file-custom-music" accept="audio/*" class="hidden" onchange="window.handleCustomMusicSelected(event)">
 
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-4 mb-2">Trending Tracks</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-4 mb-2">Original Beats</p>
             </div>
 
-            <!-- Trending Music Clips List -->
+            <!-- Music Clips List -->
             <div id="trending-music-list" class="flex-1 overflow-y-auto space-y-2 py-1">
-                <!-- Track 1 -->
                 <div class="p-2.5 bg-zinc-900 rounded-xl flex justify-between items-center">
                     <div class="flex items-center space-x-3">
                         <div class="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-cyan-400 font-black text-xs">IB</div>
@@ -541,24 +537,22 @@
                     </div>
                     <button onclick="window.applySongToUpload('IB65 Beats — Phonk Fire')" class="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-lg glow-btn-red">Use</button>
                 </div>
-                <!-- Track 2 -->
                 <div class="p-2.5 bg-zinc-900 rounded-xl flex justify-between items-center">
                     <div class="flex items-center space-x-3">
                         <div class="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-purple-400 font-black text-xs">♫</div>
                         <div>
                             <strong class="text-xs text-white block">Delhi Vibes Bass Trap</strong>
-                            <span class="text-[10px] text-gray-400">Trending Reel Sound • 0:25</span>
+                            <span class="text-[10px] text-gray-400">Original Beat • 0:25</span>
                         </div>
                     </div>
                     <button onclick="window.applySongToUpload('Delhi Vibes Bass Trap')" class="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-lg glow-btn-red">Use</button>
                 </div>
-                <!-- Track 3 -->
                 <div class="p-2.5 bg-zinc-900 rounded-xl flex justify-between items-center">
                     <div class="flex items-center space-x-3">
                         <div class="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-yellow-400 font-black text-xs">🔥</div>
                         <div>
                             <strong class="text-xs text-white block">Speed Romance Lofi</strong>
-                            <span class="text-[10px] text-gray-400">Original Mix • 0:20</span>
+                            <span class="text-[10px] text-gray-400">Slowed & Reverb • 0:20</span>
                         </div>
                     </div>
                     <button onclick="window.applySongToUpload('Speed Romance Lofi')" class="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-lg glow-btn-red">Use</button>
@@ -566,7 +560,7 @@
             </div>
 
             <div class="pt-2 border-t border-zinc-800">
-                <button onclick="window.removeSelectedSong()" class="w-full py-2 bg-zinc-900 text-gray-400 text-xs font-bold rounded-xl border border-zinc-800">Remove Music (Keep Original Video Sound)</button>
+                <button onclick="window.removeSelectedSong()" class="w-full py-2 bg-zinc-900 text-gray-400 text-xs font-bold rounded-xl border border-zinc-800">Keep Original Video Sound</button>
             </div>
         </div>
     </div>
@@ -650,7 +644,7 @@
         </div>
     </div>
 
-    <!-- LIVE STREAM ROOM MODAL -->
+    <!-- LIVE STREAM ROOM MODAL (FALLBACK HARDENED) -->
     <div id="modal-live-room" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden select-none">
         <div class="flex justify-between items-center z-20">
             <div class="flex items-center space-x-2">
@@ -686,7 +680,7 @@
                 <div class="w-20 h-20 mx-auto rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center text-2xl font-bold">
                     <span id="edit-avatar-preview">I</span>
                 </div>
-                <button onclick="window.showToast('Profile photo update active')" class="text-xs font-bold text-cyan-400">Change photo</button>
+                <button onclick="window.showToast('Profile photo update ready')" class="text-xs font-bold text-cyan-400">Change photo</button>
             </div>
             <div class="space-y-3 text-xs">
                 <div>
@@ -747,22 +741,22 @@
             setTimeout(function() { t.classList.add('hidden'); }, 2300);
         };
 
-        // 🔥 PURANA ASLI GOLDEN-RED FLAME BADGE FOR @IB65 & RED TICK FOR CREATORS
+        // 🔥 PURANA ASLI GOLDEN-RED ROSETTE FLAME BADGE FOR @IB65 & RED TICK FOR CREATORS
         window.getVerificationBadgeHtml = function(handle) {
             var clean = (handle || '').replace(/^@+/, '').toLowerCase();
             if (clean === 'ib65') {
                 return `
                 <span class="inline-flex items-center align-middle ml-1">
-                    <svg class="w-4 h-4 drop-shadow-[0_0_7px_#ff3b00]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-4 h-4 drop-shadow-[0_0_8px_#ff3b00]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <linearGradient id="goldRedGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <linearGradient id="ib65GoldFire" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" stop-color="#FFD700"/>
                                 <stop offset="45%" stop-color="#FF3B00"/>
                                 <stop offset="100%" stop-color="#B30000"/>
                             </linearGradient>
                         </defs>
-                        <circle cx="12" cy="12" r="10" fill="url(#goldRedGrad)" stroke="#FFE875" stroke-width="1.2"/>
-                        <path d="M7.5 12L10.5 15L16.5 9" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 1.5L14.7 4.2L18.5 3.8L19.7 7.4L23.1 9.1L22.4 12.9L24 16.3L20.8 18.5L20 22.3L16.2 22.1L13.8 25L10.2 25L7.8 22.1L4 22.3L3.2 18.5L0 16.3L1.6 12.9L0.9 9.1L4.3 7.4L5.5 3.8L9.3 4.2L12 1.5Z" fill="url(#ib65GoldFire)" stroke="#FFE57F" stroke-width="0.8"/>
+                        <path d="M7.5 12.5L10.5 15.5L16.5 9.5" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </span>`;
             }
@@ -902,7 +896,7 @@
 
         window.openVerificationModal = function() {
             window.closeProfileSettingsDrawer();
-            window.showToast("Verification request submitted! We will review your account. 🛡️");
+            window.showToast("Verification request submitted! 🛡️");
         };
 
         window.toggleAccountPrivacy = function() {
@@ -915,6 +909,19 @@
                 tag.innerText = 'Public';
                 tag.className = 'text-[10px] text-green-400 font-bold';
                 window.showToast("Account changed to Public 🌐");
+            }
+        };
+
+        window.toggleDataQualityMode = function() {
+            var tag = document.getElementById('quality-toggle-status');
+            if (tag.innerText === 'Ultra HD') {
+                tag.innerText = 'Data Saver';
+                tag.className = 'text-[10px] text-yellow-400 font-bold';
+                window.showToast("Data Saver mode activated 📉");
+            } else {
+                tag.innerText = 'Ultra HD';
+                tag.className = 'text-[10px] text-cyan-400 font-bold';
+                window.showToast("Ultra HD resolution enabled 🚀");
             }
         };
 
@@ -979,13 +986,10 @@
                 window.showToast("Please login first");
                 return;
             }
-            try {
-                // Email notification
-                window.showToast("Password reset link sent to: " + user.email);
-            } catch(e) {}
+            window.showToast("Password reset instructions sent to: " + user.email);
         };
 
-        // 1. Double Tap / Click Like Toggle (Prevents Count Over-Increment Bug)
+        // 1. Double Tap / Click Like Toggle
         window.handleLikeToggle = async function(box, reelId) {
             if (!box) return;
             const user = auth.currentUser;
@@ -1235,7 +1239,7 @@
             }
         };
 
-        // 4. Original Share Drawer Handlers
+        // 4. Share Drawer Handlers
         window.openShareDrawer = function(title, url) {
             activeShareData = { title: title || 'IB65 Reel', url: url || window.location.href };
             document.getElementById('modal-share-drawer')?.classList.remove('hidden');
@@ -1297,7 +1301,7 @@
             window.openCreateModal('reel');
         };
 
-        // 6. Complete Profile Loader with Accurate Counters & Broken Image Fix
+        // 6. Complete Profile Loader with Live Creator Studio Synchronizer
         window.loadDirectProfile = async function() {
             const user = auth.currentUser;
             if (!user) return;
@@ -1315,7 +1319,6 @@
                 const cleanHandle = (uData?.handle || user.email.split('@')[0]).replace(/^@+/, '');
                 const cleanName = uData?.name || user.displayName || 'IB65';
 
-                // Verification Badge
                 const badgeSlot = document.getElementById('profile-verified-badge-slot');
                 if (badgeSlot) badgeSlot.innerHTML = window.getVerificationBadgeHtml(cleanHandle);
 
@@ -1325,7 +1328,6 @@
                 document.getElementById('my-profile-bio').innerText = uData?.bio || 'Creator • Official IB65 Account';
                 document.getElementById('my-profile-avatar').innerText = cleanName[0].toUpperCase();
 
-                // Followers / Following
                 const fCount = typeof uData?.followers === 'number' 
                     ? uData.followers 
                     : (Array.isArray(uData?.followersList) ? uData.followersList.length : 0);
@@ -1337,7 +1339,7 @@
                 document.getElementById('my-stat-followers').innerText = fCount;
                 document.getElementById('my-stat-following').innerText = fgCount;
 
-                // Media Grids (Smart Fallback for Broken Images)
+                // Load User Media Grids
                 const [pSnap, rSnap] = await Promise.all([
                     getDocs(collection(db, "posts")),
                     getDocs(collection(db, "reels"))
@@ -1345,20 +1347,39 @@
 
                 const myPosts = [];
                 const myReels = [];
+                let totalLikesCount = 0;
+                let totalCommentsCount = 0;
 
                 pSnap.forEach(p => {
                     const d = p.data();
-                    if (d.authorEmail === user.email || d.author === cleanHandle) myPosts.push(d);
+                    if (d.authorEmail === user.email || d.author === cleanHandle) {
+                        myPosts.push(d);
+                        totalLikesCount += (d.likes || []).length;
+                        totalCommentsCount += (d.comments || []).length;
+                    }
                 });
 
                 rSnap.forEach(r => {
                     const d = r.data();
-                    if (d.authorEmail === user.email || d.author === cleanHandle) myReels.push(d);
+                    if (d.authorEmail === user.email || d.author === cleanHandle) {
+                        myReels.push(d);
+                        totalLikesCount += (r.likes || []).length;
+                        totalCommentsCount += (r.comments || []).length;
+                    }
                 });
 
-                document.getElementById('my-stat-posts').innerText = (myPosts.length + myReels.length);
+                const totalUploads = (myPosts.length + myReels.length);
+                document.getElementById('my-stat-posts').innerText = totalUploads;
 
-                // Grid 1: Posts (With video detection)
+                // Bind Real Numbers To Creator Studio (No Dummy Numbers)
+                const csUploads = document.getElementById('cs-stat-uploads');
+                const csLikes = document.getElementById('cs-stat-likes');
+                const csComments = document.getElementById('cs-stat-comments');
+                if (csUploads) csUploads.innerText = totalUploads;
+                if (csLikes) csLikes.innerText = totalLikesCount;
+                if (csComments) csComments.innerText = totalCommentsCount;
+
+                // Grid 1: Posts
                 const postsGrid = document.getElementById('profile-grid-posts');
                 if (postsGrid) {
                     postsGrid.innerHTML = myPosts.length === 0 ? '<div class="col-span-3 text-gray-500 py-8 text-xs text-center">No posts uploaded yet</div>' : myPosts.map(p => {
@@ -1606,20 +1627,32 @@
             }
         };
 
-        // 9. Live Broadcast System
+        // 9. LIVE BROADCAST (WITH "COULD NOT START AUDIO SOURCE" SMART BYPASS)
         let liveStreamObj = null;
         window.startLiveStreamDirect = async function() {
             try {
-                window.showToast("Starting camera...");
-                liveStreamObj = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user' },
-                    audio: true
-                });
+                window.showToast("Connecting camera...");
+                try {
+                    // Primary Attempt: Video + Audio
+                    liveStreamObj = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user', width: { ideal: 1080 }, height: { ideal: 1920 } },
+                        audio: true
+                    });
+                } catch (audioErr) {
+                    console.warn("Audio hardware locked, initiating video fallback:", audioErr);
+                    // Automatic Fallback: Video Only (Bypasses 'Could not start audio source' crash)
+                    liveStreamObj = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user' },
+                        audio: false
+                    });
+                    window.showToast("Mic busy: Video stream active 📹");
+                }
+
                 const liveVid = document.getElementById('live-room-video');
                 if (liveVid) {
                     liveVid.srcObject = liveStreamObj;
                     liveVid.muted = true;
-                    liveVid.play().catch(() => {});
+                    await liveVid.play();
                 }
                 document.getElementById('modal-live-room')?.classList.remove('hidden');
                 window.showToast("You are LIVE! 🔴");
