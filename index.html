@@ -25,8 +25,10 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #000000;
             color: #ffffff;
-            overscroll-behavior-y: contain;
-            overscroll-behavior: contain;
+            /* 🚫 Disable mobile browser pull-to-refresh while allowing smooth scrolling */
+            overscroll-behavior-y: none !important;
+            overscroll-behavior: none !important;
+            -webkit-overscroll-behavior: none !important;
             touch-action: pan-x pan-y;
         }
 
@@ -178,7 +180,7 @@
     <!-- Main Container -->
     <main class="max-w-md mx-auto">
 
-        <!-- 1. HOME -->
+        <!-- 1. HOME VIEW -->
         <div id="view-home" class="space-y-3 pb-24">
             <div class="p-3 border-b border-zinc-900 overflow-x-auto flex space-x-3 items-center">
                 <div onclick="window.openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
@@ -201,7 +203,7 @@
             </div>
         </div>
 
-        <!-- 2. SEARCH -->
+        <!-- 2. SEARCH VIEW -->
         <div id="view-search" class="space-y-3 p-3 hidden pb-24">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-xs"></i>
@@ -218,14 +220,14 @@
             </div>
         </div>
 
-        <!-- 3. REELS -->
+        <!-- 3. REELS VIEW -->
         <div id="view-reels" class="hidden">
             <div id="reels-container" class="reels-scroll-container">
                 <div class="text-center text-gray-500 py-24 text-xs">Loading Reels...</div>
             </div>
         </div>
 
-        <!-- 4. LIVE -->
+        <!-- 4. LIVE VIEW -->
         <div id="view-live" class="space-y-4 p-4 hidden pb-24">
             <div class="clay-card p-4 flex justify-between items-center">
                 <div>
@@ -246,7 +248,7 @@
             </div>
         </div>
 
-        <!-- 5. MY PROFILE -->
+        <!-- 5. MY PROFILE VIEW -->
         <div id="view-profile" class="space-y-3 p-4 hidden pb-24">
             <div class="flex justify-between items-center px-1">
                 <div onclick="window.openAccountSwitcher?.()" class="flex items-center space-x-1.5 cursor-pointer icon-btn">
@@ -305,7 +307,7 @@
             <div class="grid grid-cols-3 gap-1" id="my-media-grid"></div>
         </div>
 
-        <!-- 6. PUBLIC CREATOR PROFILE -->
+        <!-- 6. PUBLIC CREATOR PROFILE VIEW -->
         <div id="view-public-profile" class="space-y-4 p-4 hidden pb-24">
             <div class="flex items-center space-x-3">
                 <button onclick="window.switchTab('home')" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
@@ -553,7 +555,7 @@
 
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
-    <!-- BULLETPROOF AUDIO & UI ROUTING SCRIPTS -->
+    <!-- CORE UI ROUTING WITH REFRESH TAB MEMORY PERSISTENCE -->
     <script>
         window.showToast = function(msg) {
             var t = document.getElementById('toast');
@@ -583,6 +585,61 @@
                 window.showToast("Sound Muted 🔇");
             }
         };
+
+        // 🧠 TAB SWITCHING WITH PERSISTENT ACTIVE STATE
+        window.switchTab = function(tab) {
+            // Memory mein save karein taaki refresh karne par wahi page open rahe
+            try { localStorage.setItem('ib65_active_tab', tab); } catch(e) {}
+
+            document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(function(v) { v.pause(); });
+
+            var header = document.getElementById('main-app-header');
+            var homeActions = document.getElementById('home-header-actions');
+
+            if (tab === 'reels') {
+                if (header) header.classList.add('hidden');
+            } else {
+                if (header) header.classList.remove('hidden');
+                if (tab === 'home') {
+                    if (homeActions) homeActions.classList.remove('hidden');
+                } else {
+                    if (homeActions) homeActions.classList.add('hidden');
+                }
+            }
+
+            ['home', 'search', 'reels', 'live', 'profile', 'public-profile'].forEach(function(t) {
+                var el = document.getElementById('view-' + t);
+                var nav = document.getElementById('nav-' + t);
+                if (el) el.classList.add('hidden');
+                if (nav) nav.className = 'text-gray-500 text-xl icon-btn';
+            });
+
+            var active = document.getElementById('view-' + tab);
+            var activeNav = document.getElementById('nav-' + tab);
+            if (active) active.classList.remove('hidden');
+            if (activeNav) {
+                if (tab === 'home') activeNav.className = 'neon-nav-home text-xl icon-btn';
+                else if (tab === 'search') activeNav.className = 'neon-nav-search text-xl icon-btn';
+                else if (tab === 'reels') activeNav.className = 'neon-nav-reels text-xl icon-btn';
+                else if (tab === 'profile') activeNav.className = 'neon-nav-profile text-xl icon-btn';
+                else activeNav.className = 'text-white text-xl icon-btn';
+            }
+
+            if (tab === 'home') { 
+                if (window.loadStoriesTray) window.loadStoriesTray(); 
+                if (window.loadPostsFeed) window.loadPostsFeed(); 
+            }
+            if (tab === 'search' && window.loadExploreMedia) window.loadExploreMedia();
+            if (tab === 'reels' && window.loadReelsFeed) window.loadReelsFeed();
+            if (tab === 'profile' && window.loadMyProfile) window.loadMyProfile();
+        };
+
+        // 🔄 RESTORE SAVED TAB ON PAGE RELOAD
+        window.addEventListener('DOMContentLoaded', function() {
+            var savedTab = 'home';
+            try { savedTab = localStorage.getItem('ib65_active_tab') || 'home'; } catch(e) {}
+            window.switchTab(savedTab);
+        });
 
         window.openCreateModal = function(type) {
             window.activeUploadType = type || 'post';
@@ -637,7 +694,6 @@
                 const lbl = document.getElementById('lbl-picker-text');
                 if (lbl) lbl.innerText = "Selected: " + f.name;
 
-                // Close create modal and launch Pro Editor Studio
                 window.closeCreateModal();
                 openProEditorSuite(currentSelectedDataUrl, currentSelectedType);
             };
@@ -731,6 +787,6 @@
     </script>
 
     <!-- MODULAR SCRIPT ENTRY POINT -->
-    <script type="module" src="./js/app.js?v=10"></script>
+    <script type="module" src="./js/app.js?v=11"></script>
 </body>
 </html>
