@@ -126,6 +126,10 @@ window.closeDirectChat = closeDirectChat;
 window.navigateToChatUserProfile = navigateToChatUserProfile;
 window.sendChatMessageDirect = sendChatMessageDirect;
 
+window.loadPostsFeed = loadPostsFeed;
+window.loadReelsFeed = loadReelsFeed;
+window.loadExploreMedia = loadExploreMedia;
+window.loadStoriesTray = loadStoriesTray;
 window.openStoryQueueIndex = openStoryQueueIndex;
 window.closeStory = closeStory;
 window.openProfileFromStory = openProfileFromStory;
