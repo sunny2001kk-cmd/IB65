@@ -91,9 +91,8 @@ let uploadType = 'post';
 let selectedFileBlob = null;
 let selectedFileUrl = '';
 let selectedFileType = 'image';
-let presenceInterval = null;
 
-// Bind All Functions Globally to Window
+// Bind to Window
 window.handleSignup = handleSignup;
 window.handleLogin = handleLogin;
 window.handleLogout = handleLogout;
@@ -144,7 +143,7 @@ window.triggerDoubleTapLike = triggerDoubleTapLike;
 window.toggleSavePost = toggleSavePost;
 window.deleteMyContent = deleteMyContent;
 
-// Single-Page Tab Router
+// Tab Routing System
 window.switchTab = function(tab) {
     currentTab = tab;
     document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(v => v.pause());
@@ -170,7 +169,13 @@ window.switchTab = function(tab) {
     const activeView = document.getElementById('view-' + tab);
     const activeNav = document.getElementById('nav-' + tab);
     if (activeView) activeView.classList.remove('hidden');
-    if (activeNav) activeNav.className = 'text-white text-xl icon-btn';
+    if (activeNav) {
+        if (tab === 'home') activeNav.className = 'neon-nav-home text-xl icon-btn';
+        else if (tab === 'search') activeNav.className = 'neon-nav-search text-xl icon-btn';
+        else if (tab === 'reels') activeNav.className = 'neon-nav-reels text-xl icon-btn';
+        else if (tab === 'profile') activeNav.className = 'neon-nav-profile text-xl icon-btn';
+        else activeNav.className = 'text-white text-xl icon-btn';
+    }
 
     if (tab === 'home') { loadStoriesTray(); loadPostsFeed(); }
     if (tab === 'search') loadExploreMedia();
@@ -180,7 +185,7 @@ window.switchTab = function(tab) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Profile Sync Logic
+// Profile Loading Function
 export async function loadMyProfile() {
     const user = auth.currentUser;
     if (!user) return;
@@ -269,7 +274,7 @@ export async function loadMyProfile() {
 
 window.loadMyProfile = loadMyProfile;
 
-// Public Creator Profile
+// Public Profile Navigation
 window.openPublicProfile = async function(email) {
     const user = auth.currentUser;
     if (user && user.email === email) {
@@ -321,7 +326,7 @@ window.openPublicProfile = async function(email) {
         const fBtn = document.getElementById('pub-follow-btn');
         if (fBtn) {
             fBtn.innerText = isFollowing ? 'Following' : 'Follow';
-            fBtn.className = isFollowing ? 'flex-1 border border-zinc-700 text-gray-300 py-2 rounded-xl text-xs font-bold' : 'flex-1 clay-btn py-2 text-xs font-bold';
+            fBtn.className = isFollowing ? 'flex-1 border border-zinc-700 text-gray-300 py-2 rounded-xl text-xs font-bold' : 'flex-1 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red';
             fBtn.onclick = async () => {
                 await window.toggleFollowUser(email, d.name || 'Creator');
                 window.openPublicProfile(email);
@@ -358,7 +363,7 @@ window.openPublicProfile = async function(email) {
     } catch(e) {}
 };
 
-// Follow Toggle
+// Follow / Unfollow Logic
 window.toggleFollowUser = async function(targetEmail, targetName) {
     const user = auth.currentUser;
     if (!user || user.email === targetEmail) return;
@@ -396,7 +401,7 @@ window.toggleFollowUser = async function(targetEmail, targetName) {
     } catch(e) { showToast(e.message); }
 };
 
-// Create / Publish Media Flow
+// Media Create & Upload Handlers
 window.openCreateModal = function(type) {
     uploadType = type || 'post';
     document.getElementById('modal-create')?.classList.remove('hidden');
@@ -444,7 +449,7 @@ window.publishMedia = async function() {
     const location = locationInput ? locationInput.value.trim() : '';
 
     if (!caption && uploadType !== 'story') {
-        showToast("Caption likhna anivarya hai!");
+        showToast("Caption is required!");
         captionInput?.focus();
         return;
     }
@@ -546,51 +551,13 @@ window.shareLink = function() {
     showToast("Link copied to clipboard!");
 };
 
-// Presence Tracking
-function initPresenceTracking(user) {
-    if (!user) return;
-    const updateOnlineStatus = async (isOnline) => {
-        try {
-            await updateDoc(doc(db, "users", user.email), {
-                isOnline: isOnline,
-                lastSeen: Date.now()
-            });
-        } catch(e) {}
-    };
-
-    updateOnlineStatus(true);
-    clearInterval(presenceInterval);
-    presenceInterval = setInterval(() => updateOnlineStatus(true), 25000);
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') updateOnlineStatus(false);
-        else updateOnlineStatus(true);
-    });
-    window.addEventListener('beforeunload', () => updateOnlineStatus(false));
-}
-
-// Splash Screen Auto Dismiss
-function dismissSplashScreen() {
-    const sp = document.getElementById('splash');
-    if (sp) {
-        sp.style.opacity = '0';
-        setTimeout(() => {
-            sp.style.display = 'none';
-            sp.remove();
-        }, 350);
-    }
-}
-
-// Firebase Auth Lifecycle Observer
-onAuthStateChanged(auth, async (user) => {
-    dismissSplashScreen();
+// Auto Firebase Auth Listener
+onAuthStateChanged(auth, (user) => {
     if (user) {
         document.getElementById('modal-auth')?.classList.add('hidden');
-        initPresenceTracking(user);
         window.loadMyProfile();
         window.switchTab('home');
     } else {
         document.getElementById('modal-auth')?.classList.remove('hidden');
-        clearInterval(presenceInterval);
     }
 });
