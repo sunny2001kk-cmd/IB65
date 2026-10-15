@@ -86,7 +86,9 @@ export async function loadStoriesTray() {
                 </div>
             `;
         }).join('');
-    } catch(e) {}
+    } catch(e) {
+        tray.innerHTML = '<span class="text-[11px] text-gray-500 pl-2">No active stories</span>';
+    }
 }
 
 export function openStoryQueueIndex(idx) {
@@ -165,7 +167,7 @@ export function openProfileFromStory() {
     }
 }
 
-// 3. Home Feed
+// 3. Home Feed (Safe-Loaded - Never Freezes)
 export async function loadPostsFeed() {
     const container = document.getElementById('posts-stream');
     if (!container) return;
@@ -190,7 +192,15 @@ export async function loadPostsFeed() {
         });
 
         if (allItems.length === 0) {
-            container.innerHTML = '<div class="text-center text-gray-500 py-16 text-xs">No posts yet. Tap + to upload!</div>';
+            container.innerHTML = `
+                <div class="clay-card p-8 text-center space-y-3 my-6">
+                    <i class="fa-regular fa-compass text-3xl text-zinc-600"></i>
+                    <p class="text-xs text-zinc-400">No posts yet on IB65.</p>
+                    <button onclick="window.openCreateModal('post')" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">
+                        Upload Your First Post
+                    </button>
+                </div>
+            `;
             return;
         }
 
@@ -206,11 +216,13 @@ export async function loadPostsFeed() {
         let myFollowing = [];
         let mySaved = [];
         if (user) {
-            const uSnap = await getDoc(doc(db, "users", user.email));
-            if (uSnap.exists()) {
-                myFollowing = uSnap.data().followingList || [];
-                mySaved = uSnap.data().savedPosts || [];
-            }
+            try {
+                const uSnap = await getDoc(doc(db, "users", user.email));
+                if (uSnap.exists()) {
+                    myFollowing = uSnap.data().followingList || [];
+                    mySaved = uSnap.data().savedPosts || [];
+                }
+            } catch(e) {}
         }
 
         container.innerHTML = allItems.map(p => {
@@ -244,7 +256,7 @@ export async function loadPostsFeed() {
                     </div>
                     <div class="flex items-center space-x-2">
                         ${!isSelf ? `
-                            <button onclick="window.toggleFollowUser('${authorEmail}', '${rawAuthor}')" class="text-[11px] font-bold px-3 py-1 rounded-full ${isFollowing ? 'border border-zinc-700 text-gray-300' : 'clay-btn'}">
+                            <button onclick="window.toggleFollowUser('${authorEmail}', '${rawAuthor}')" class="text-[11px] font-bold px-3 py-1 rounded-full bg-zinc-900 ${isFollowing ? 'border border-zinc-700 text-gray-300' : 'text-white glow-btn-red'}">
                                 ${isFollowing ? 'Following' : 'Follow'}
                             </button>
                         ` : `
@@ -262,7 +274,7 @@ export async function loadPostsFeed() {
                             <i class="fa-solid fa-volume-xmark"></i>
                         </button>
                     ` : `
-                        <img src="${media}" style="filter: ${p.filter || 'none'}" class="w-full h-full max-h-[460px] object-cover">
+                        <img src="${media}" style="filter: ${p.filter || 'none'}" class="w-full h-full max-h-[460px] object-cover" onerror="this.parentElement.style.display='none'">
                     `}
                     <div class="absolute pointer-events-none hidden" id="burst-${p.id}">
                         <i class="fa-solid fa-heart text-red-500 text-7xl drop-shadow-2xl"></i>
@@ -297,7 +309,14 @@ export async function loadPostsFeed() {
         }).join('');
 
         initGlobalSingleVideoObserver();
-    } catch(e) {}
+    } catch(e) {
+        container.innerHTML = `
+            <div class="clay-card p-6 text-center space-y-2 my-6">
+                <p class="text-xs text-zinc-400">Could not refresh feed.</p>
+                <button onclick="window.loadPostsFeed()" class="px-3.5 py-1.5 rounded-xl bg-zinc-900 text-white text-xs glow-btn-blue">Retry</button>
+            </div>
+        `;
+    }
 }
 
 // 4. Reels Feed
@@ -311,7 +330,7 @@ export async function loadReelsFeed() {
         snap.forEach(d => reels.push({ id: d.id, ...d.data() }));
 
         if (reels.length === 0) {
-            container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">No reels available right now.</div>';
+            container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">No reels available right now. Tap + to create one!</div>';
             return;
         }
 
@@ -321,11 +340,13 @@ export async function loadReelsFeed() {
         let myFollowing = [];
         let mySaved = [];
         if (user) {
-            const uSnap = await getDoc(doc(db, "users", user.email));
-            if (uSnap.exists()) {
-                myFollowing = uSnap.data().followingList || [];
-                mySaved = uSnap.data().savedPosts || [];
-            }
+            try {
+                const uSnap = await getDoc(doc(db, "users", user.email));
+                if (uSnap.exists()) {
+                    myFollowing = uSnap.data().followingList || [];
+                    mySaved = uSnap.data().savedPosts || [];
+                }
+            } catch(e) {}
         }
 
         container.innerHTML = reels.map(r => {
@@ -386,7 +407,7 @@ export async function loadReelsFeed() {
                             <span class="text-[10px] text-gray-400 ml-1.5">• ${relativeTime}</span>
                         </div>
                         ${!isSelf ? `
-                            <button onclick="window.toggleFollowUser('${authorEmail}', '${rawAuthor}')" class="px-3 py-1 rounded-full text-[11px] font-bold ${isFollowing ? 'border border-zinc-700 text-gray-300' : 'bg-white text-black'}">
+                            <button onclick="window.toggleFollowUser('${authorEmail}', '${rawAuthor}')" class="px-3 py-1 rounded-full text-[11px] font-bold bg-zinc-900 ${isFollowing ? 'border border-zinc-700 text-gray-300' : 'text-white glow-btn-red'}">
                                 ${isFollowing ? 'Following' : 'Follow'}
                             </button>
                         ` : ''}
@@ -398,7 +419,9 @@ export async function loadReelsFeed() {
         }).join('');
 
         initGlobalSingleVideoObserver();
-    } catch(e) {}
+    } catch(e) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">No reels available right now.</div>';
+    }
 }
 
 // 5. Explore Media Loader
@@ -492,7 +515,7 @@ export function closeMediaViewer() {
     if (modal) modal.classList.add('hidden');
 }
 
-// 7. Global Search Fix (Users + Hashtags)
+// 7. Global Search (Users + Tags)
 export async function handleSearch(e) {
     const q = e.target.value.toLowerCase().trim();
     const resultsBox = document.getElementById('search-users-results');
@@ -559,7 +582,7 @@ export async function handleSearch(e) {
 
         if (matchedMedia.length > 0) {
             html += `
-                <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase">Matching Posts & Tags</p>
+                <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase">Matching Media</p>
                 <div class="grid grid-cols-3 gap-1">
                     ${matchedMedia.map(m => `
                         <div onclick='window.openMediaViewer(${JSON.stringify(m)})' class="h-24 bg-zinc-900 rounded overflow-hidden cursor-pointer border border-zinc-800">
@@ -575,7 +598,7 @@ export async function handleSearch(e) {
     } catch(e) {}
 }
 
-// 8. Like / Double Tap / Save Handlers
+// 8. Like / Save Engine
 export async function toggleCloudLike(col, id) {
     const user = auth.currentUser;
     if (!user) return;
@@ -646,7 +669,7 @@ export async function deleteMyContent(col, docId, authorEmail) {
     } catch(e) { showToast(e.message); }
 }
 
-// 9. Watch Tracking
+// 9. Watch Tracking Engine
 export async function startWatchTracking(col, docId, authorEmail) {
     const user = auth.currentUser;
     if (!user) return;
@@ -695,7 +718,7 @@ export function stopWatchTracking() {
     clearInterval(watchInterval);
 }
 
-// 10. Comments
+// 10. Comments Modal & Engine
 export function openComments(col, id) {
     activeCommentCol = col;
     activeCommentDocId = id;
