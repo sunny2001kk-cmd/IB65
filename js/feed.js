@@ -27,7 +27,7 @@ let storyTimer = null;
 let activeCommentCol = 'posts';
 let activeCommentDocId = null;
 
-// 1. Single Active Video Observer
+// 1. Single Active Video Observer (Muted Autoplay for Smooth Playback)
 export function initGlobalSingleVideoObserver() {
     if (globalVideoObserver) {
         try { globalVideoObserver.disconnect(); } catch(e) {}
@@ -38,7 +38,7 @@ export function initGlobalSingleVideoObserver() {
 
         entries.forEach(entry => {
             const vid = entry.target;
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.55) {
                 document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(v => {
                     if (v !== vid && !v.paused) v.pause();
                 });
@@ -47,7 +47,7 @@ export function initGlobalSingleVideoObserver() {
                 if (!vid.paused) vid.pause();
             }
         });
-    }, { threshold: 0.6 });
+    }, { threshold: 0.55 });
 
     document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(el => globalVideoObserver.observe(el));
 }
@@ -127,6 +127,8 @@ function renderActiveStory(story) {
         if (sVid) {
             sVid.classList.remove('hidden');
             sVid.src = story.mediaUrl;
+            sVid.muted = false;
+            sVid.volume = 1.0;
             sVid.play().catch(() => {});
         }
     } else {
@@ -162,7 +164,7 @@ export function openProfileFromStory() {
     }
 }
 
-// 3. Home Feed (Safe-Loaded - Directly Replaces Connecting Feed Spinner)
+// 3. Home Feed Loader (With Clickable Sound Toggle)
 export async function loadPostsFeed() {
     const container = document.getElementById('posts-stream');
     if (!container) return;
@@ -203,13 +205,7 @@ export async function loadPostsFeed() {
             return;
         }
 
-        allItems.sort((a, b) => {
-            const aIsOwner = (a.author || a.handle || '').toLowerCase() === 'ib65';
-            const bIsOwner = (b.author || b.handle || '').toLowerCase() === 'ib65';
-            if (aIsOwner && !bIsOwner) return -1;
-            if (!aIsOwner && bIsOwner) return 1;
-            return (b.createdAt || 0) - (a.createdAt || 0);
-        });
+        allItems.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
         const user = auth.currentUser;
         let myFollowing = [];
@@ -266,14 +262,14 @@ export async function loadPostsFeed() {
                     </div>
                 </div>
 
-                <div class="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[260px] max-h-[460px]" ondblclick="window.triggerDoubleTapLike('${p.col}', '${p.id}', event)">
+                <div class="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[260px] max-h-[460px]">
                     ${isVid ? `
-                        <video src="${media}" poster="${p.thumbnailUrl || ''}" loop playsinline preload="metadata" muted onplay="window.startWatchTracking('${p.col}', '${p.id}', '${authorEmail}')" onpause="window.stopWatchTracking()" class="feed-video-card w-full h-full max-h-[460px] object-cover" onclick="window.toggleFeedVideoAudio(this)"></video>
-                        <button onclick="window.toggleFeedVideoAudio(this.previousElementSibling)" class="absolute bottom-3 right-3 bg-black/60 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-10 shadow">
+                        <video src="${media}" poster="${p.thumbnailUrl || ''}" loop playsinline preload="metadata" muted class="feed-video-card w-full h-full max-h-[460px] object-cover cursor-pointer" onclick="window.toggleFeedVideoAudio(this)"></video>
+                        <button onclick="window.toggleFeedVideoAudio(this)" class="audio-btn-icon absolute bottom-3 right-3 bg-black/70 border border-white/20 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-20 shadow-lg">
                             <i class="fa-solid fa-volume-xmark"></i>
                         </button>
                     ` : `
-                        <img src="${media}" style="filter: ${p.filter || 'none'}" class="w-full h-full max-h-[460px] object-cover" onerror="this.parentElement.style.display='none'">
+                        <img src="${media}" class="w-full h-full max-h-[460px] object-cover" onerror="this.parentElement.style.display='none'">
                     `}
                     <div class="absolute pointer-events-none hidden" id="burst-${p.id}">
                         <i class="fa-solid fa-heart text-red-500 text-7xl drop-shadow-2xl"></i>
@@ -290,7 +286,7 @@ export async function loadPostsFeed() {
                             <i class="fa-regular fa-comment text-lg"></i>
                             <span class="text-xs font-bold">${(p.comments || []).length}</span>
                         </button>
-                        <button onclick="window.shareMediaTracked('${p.col}', '${p.id}', '${authorEmail}')" class="icon-btn">
+                        <button onclick="window.shareLink()" class="icon-btn">
                             <i class="fa-solid fa-paper-plane text-base"></i>
                         </button>
                     </div>
@@ -318,7 +314,7 @@ export async function loadPostsFeed() {
     }
 }
 
-// 4. Reels Feed
+// 4. Reels Feed Loader (With Audio Sync)
 export async function loadReelsFeed() {
     const container = document.getElementById('reels-container');
     if (!container) return;
@@ -329,44 +325,30 @@ export async function loadReelsFeed() {
         snap.forEach(d => reels.push({ id: d.id, ...d.data() }));
 
         if (reels.length === 0) {
-            container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">No reels available right now. Tap + to create one!</div>';
+            container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">No reels available right now. Tap + to upload one!</div>';
             return;
         }
 
         reels.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
         const user = auth.currentUser;
 
-        let myFollowing = [];
-        let mySaved = [];
-        if (user) {
-            try {
-                const uSnap = await getDoc(doc(db, "users", user.email));
-                if (uSnap.exists()) {
-                    myFollowing = uSnap.data().followingList || [];
-                    mySaved = uSnap.data().savedPosts || [];
-                }
-            } catch(e) {}
-        }
-
         container.innerHTML = reels.map(r => {
             const rawAuthor = (r.author || r.handle || 'Creator').replace(/^@+/, '');
             const authorEmail = r.authorEmail || r.email || '';
             const vidUrl = r.videoUrl || r.mediaUrl || '';
             const isLiked = user && (r.likes || []).includes(user.email);
-            const isSaved = mySaved.includes(r.id);
-            const isFollowing = myFollowing.includes(authorEmail);
             const isSelf = user && user.email === authorEmail;
             const reelCaption = r.caption || r.title || '';
             const badgeSvg = getVerificationBadgeSvg(r.badgeType || (rawAuthor.toLowerCase() === 'ib65' ? 'gold_red' : 'none'));
             const relativeTime = getRelativeTime(r.createdAt);
 
             return `
-            <div class="reel-item-box relative w-full bg-black flex flex-col justify-between overflow-hidden" ondblclick="window.triggerDoubleTapLike('reels', '${r.id}', event)">
-                <video src="${vidUrl}" poster="${r.thumbnailUrl || ''}" style="filter: ${r.filter || 'none'}" onplay="window.startWatchTracking('reels', '${r.id}', '${authorEmail}')" onpause="window.stopWatchTracking()" class="reel-video-element absolute inset-0 w-full h-full object-cover" loop playsinline></video>
+            <div class="reel-item-box relative w-full bg-black flex flex-col justify-between overflow-hidden">
+                <video src="${vidUrl}" poster="${r.thumbnailUrl || ''}" class="reel-video-element absolute inset-0 w-full h-full object-cover cursor-pointer" loop playsinline muted onclick="window.toggleFeedVideoAudio(this)"></video>
                 
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none hidden" id="burst-${r.id}">
-                    <i class="fa-solid fa-heart text-red-500 text-7xl drop-shadow-2xl"></i>
-                </div>
+                <button onclick="window.toggleFeedVideoAudio(this)" class="audio-btn-icon absolute top-5 left-5 bg-black/60 border border-white/20 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-30 shadow-lg">
+                    <i class="fa-solid fa-volume-xmark"></i>
+                </button>
 
                 <div class="relative z-20 flex justify-between items-center p-4">
                     <span class="text-lg font-bold text-white tracking-wide">Reels</span>
@@ -382,11 +364,8 @@ export async function loadReelsFeed() {
                         <i class="fa-regular fa-comment text-2xl drop-shadow-lg"></i>
                         <span class="text-[11px] font-bold text-white">${(r.comments || []).length}</span>
                     </button>
-                    <button onclick="window.shareMediaTracked('reels', '${r.id}', '${authorEmail}')" class="flex flex-col items-center space-y-1 icon-btn">
+                    <button onclick="window.shareLink()" class="flex flex-col items-center space-y-1 icon-btn">
                         <i class="fa-solid fa-paper-plane text-xl drop-shadow-lg"></i>
-                    </button>
-                    <button onclick="window.toggleSavePost('${r.id}')" class="flex flex-col items-center space-y-1 icon-btn">
-                        <i class="${isSaved ? 'fa-solid text-white' : 'fa-regular text-gray-400'} fa-bookmark text-xl drop-shadow-lg"></i>
                     </button>
                     ${isSelf ? `
                         <button onclick="window.deleteMyContent('reels', '${r.id}', '${authorEmail}')" class="text-gray-300 hover:text-red-500 icon-btn" title="Delete">
@@ -405,11 +384,6 @@ export async function loadReelsFeed() {
                             ${badgeSvg}
                             <span class="text-[10px] text-gray-400 ml-1.5">• ${relativeTime}</span>
                         </div>
-                        ${!isSelf ? `
-                            <button onclick="window.toggleFollowUser('${authorEmail}', '${rawAuthor}')" class="px-3 py-1 rounded-full text-[11px] font-bold bg-zinc-900 ${isFollowing ? 'border border-zinc-700 text-gray-300' : 'text-white glow-btn-red'}">
-                                ${isFollowing ? 'Following' : 'Follow'}
-                            </button>
-                        ` : ''}
                     </div>
                     <p class="text-xs text-gray-200 line-clamp-3">${reelCaption}</p>
                 </div>
@@ -419,11 +393,11 @@ export async function loadReelsFeed() {
 
         initGlobalSingleVideoObserver();
     } catch(e) {
-        container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">No reels available right now.</div>';
+        container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">No reels found.</div>';
     }
 }
 
-// 5. Explore Media Loader
+// 5. Explore Loader
 export async function loadExploreMedia() {
     const grid = document.getElementById('explore-grid');
     if (!grid) return;
@@ -445,15 +419,7 @@ export async function loadExploreMedia() {
             reelsSnap.value.forEach(d => {
                 const data = d.data();
                 const vidUrl = data.videoUrl || data.mediaUrl || data.url;
-                if (vidUrl) {
-                    items.push({ 
-                        id: d.id, 
-                        col: 'reels', 
-                        mediaType: 'video', 
-                        mediaUrl: vidUrl, 
-                        ...data 
-                    });
-                }
+                if (vidUrl) items.push({ id: d.id, col: 'reels', mediaType: 'video', mediaUrl: vidUrl, ...data });
             });
         }
 
@@ -467,12 +433,11 @@ export async function loadExploreMedia() {
         grid.innerHTML = items.map(it => {
             const media = it.mediaUrl || it.url || it.videoUrl || '';
             const isVid = it.mediaType === 'video' || it.col === 'reels';
-            const videoSrc = isVid ? (media.includes('#t=') ? media : media + '#t=0.1') : '';
 
             return `
                 <div class="relative h-32 bg-zinc-900 overflow-hidden cursor-pointer rounded-lg border border-zinc-800 flex items-center justify-center" onclick='window.openMediaViewer(${JSON.stringify(it)})'>
                     ${isVid ? `
-                        <video src="${videoSrc}" poster="${it.thumbnailUrl || ''}" preload="metadata" muted playsinline class="w-full h-full object-cover pointer-events-none"></video>
+                        <video src="${media}#t=0.1" poster="${it.thumbnailUrl || ''}" preload="metadata" muted playsinline class="w-full h-full object-cover pointer-events-none"></video>
                         <span class="absolute top-1.5 right-1.5 bg-black/60 rounded-full px-1.5 py-0.5 text-[9px] text-white">
                             <i class="fa-solid fa-play text-[8px]"></i>
                         </span>
@@ -482,12 +447,9 @@ export async function loadExploreMedia() {
                 </div>
             `;
         }).join('');
-    } catch(e) {
-        grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-12 text-xs">Explore loading error</div>';
-    }
+    } catch(e) {}
 }
 
-// 6. Media Viewer Modal
 export function openMediaViewer(it) {
     const modal = document.getElementById('modal-media-viewer');
     const container = document.getElementById('media-viewer-content');
@@ -496,18 +458,14 @@ export function openMediaViewer(it) {
     const media = it.mediaUrl || it.url || it.videoUrl || '';
     const isVid = it.mediaType === 'video' || it.col === 'reels';
     const cleanAuthor = (it.author || it.handle || 'Creator').replace(/^@+/, '');
-    const badgeSvg = getVerificationBadgeSvg(cleanAuthor.toLowerCase() === 'ib65' ? 'gold_red' : 'none');
 
     container.innerHTML = `
         <div class="clay-card p-3 w-full max-w-sm space-y-3">
-            <div class="flex items-center space-x-2 cursor-pointer" onclick="window.closeMediaViewer(); window.openPublicProfile('${it.authorEmail || ''}')">
-                <div class="w-8 h-8 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs">${cleanAuthor[0]}</div>
-                <span class="font-bold text-xs text-white flex items-center">@${cleanAuthor} ${badgeSvg}</span>
-            </div>
+            <span class="font-bold text-xs text-white">@${cleanAuthor}</span>
             <div class="rounded-xl overflow-hidden bg-black max-h-80 flex items-center justify-center">
-                ${isVid ? `<video src="${media}" poster="${it.thumbnailUrl || ''}" class="w-full max-h-80 object-cover" controls autoplay playsinline></video>` : `<img src="${media}" class="w-full max-h-80 object-cover">`}
+                ${isVid ? `<video src="${media}" class="w-full max-h-80 object-cover" controls autoplay playsinline></video>` : `<img src="${media}" class="w-full max-h-80 object-cover">`}
             </div>
-            ${it.caption || it.title ? `<p class="text-xs text-gray-200">${it.caption || it.title}</p>` : ''}
+            ${it.caption ? `<p class="text-xs text-gray-200">${it.caption}</p>` : ''}
         </div>
     `;
     modal.classList.remove('hidden');
@@ -515,95 +473,9 @@ export function openMediaViewer(it) {
 
 export function closeMediaViewer() {
     const modal = document.getElementById('modal-media-viewer');
-    const container = document.getElementById('media-viewer-content');
-    if (container) container.innerHTML = '';
     if (modal) modal.classList.add('hidden');
 }
 
-// 7. Global Search
-export async function handleSearch(e) {
-    const q = e.target.value.toLowerCase().trim();
-    const resultsBox = document.getElementById('search-users-results');
-    if (!resultsBox) return;
-
-    if (!q) {
-        resultsBox.classList.add('hidden');
-        loadExploreMedia();
-        return;
-    }
-
-    resultsBox.classList.remove('hidden');
-    try {
-        const [uSnap, pSnap, rSnap] = await Promise.all([
-            getDocs(collection(db, "users")),
-            getDocs(collection(db, "posts")),
-            getDocs(collection(db, "reels"))
-        ]);
-
-        const matchedUsers = [];
-        uSnap.forEach(d => {
-            const u = d.data();
-            const name = (u.name || '').toLowerCase();
-            const handle = (u.handle || d.id.split('@')[0]).toLowerCase();
-            if (name.includes(q) || handle.includes(q)) {
-                matchedUsers.push({ email: d.id, priority: handle === 'ib65' ? 1 : 0, ...u });
-            }
-        });
-
-        matchedUsers.sort((a,b) => b.priority - a.priority);
-
-        const matchedMedia = [];
-        const checkMatch = (d, col) => {
-            const data = d.data();
-            const cap = (data.caption || data.title || '').toLowerCase();
-            const tags = data.tags || [];
-            if (cap.includes(q) || tags.some(t => t.includes(q))) {
-                matchedMedia.push({ id: d.id, col, ...data });
-            }
-        };
-        pSnap.forEach(d => checkMatch(d, 'posts'));
-        rSnap.forEach(d => checkMatch(d, 'reels'));
-
-        let html = '';
-        if (matchedUsers.length > 0) {
-            html += matchedUsers.map(u => {
-                const bType = u.badgeType || (u.handle?.toLowerCase() === 'ib65' ? 'gold_red' : 'none');
-                return `
-                <div onclick="window.openPublicProfile('${u.email}')" class="clay-card p-2.5 flex justify-between items-center cursor-pointer hover:border-zinc-500 transition">
-                    <div class="flex items-center space-x-2.5">
-                        <div class="w-9 h-9 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-xs overflow-hidden">
-                            ${u.photoUrl ? `<img src="${u.photoUrl}" class="w-full h-full object-cover">` : (u.name || 'U')[0]}
-                        </div>
-                        <div>
-                            <p class="font-bold text-xs text-white flex items-center">${u.name || 'User'} ${getVerificationBadgeSvg(bType)}</p>
-                            <p class="text-[10px] text-gray-400">@${(u.handle || u.email.split('@')[0]).replace(/^@+/, '')}</p>
-                        </div>
-                    </div>
-                    <span class="text-[10px] text-gray-400 font-bold pr-2">Profile</span>
-                </div>
-                `;
-            }).join('');
-        }
-
-        if (matchedMedia.length > 0) {
-            html += `
-                <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase">Matching Media</p>
-                <div class="grid grid-cols-3 gap-1">
-                    ${matchedMedia.map(m => `
-                        <div onclick='window.openMediaViewer(${JSON.stringify(m)})' class="h-24 bg-zinc-900 rounded overflow-hidden cursor-pointer border border-zinc-800">
-                            ${m.mediaType === 'video' || m.col === 'reels' ? `<video src="${m.mediaUrl || m.videoUrl}#t=0.001" poster="${m.thumbnailUrl || ''}" class="w-full h-full object-cover"></video>` : `<img src="${m.mediaUrl}" class="w-full h-full object-cover">`}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        if (!html) html = '<div class="text-gray-500 text-xs py-3 text-center">No results found for "' + q + '"</div>';
-        resultsBox.innerHTML = html;
-    } catch(e) {}
-}
-
-// 8. Like / Save Engine
 export async function toggleCloudLike(col, id) {
     const user = auth.currentUser;
     if (!user) return;
@@ -622,22 +494,6 @@ export async function toggleCloudLike(col, id) {
     } catch(e) {}
 }
 
-export async function triggerDoubleTapLike(col, docId, event) {
-    const burst = document.getElementById('burst-' + docId);
-    if (burst) {
-        burst.classList.remove('hidden');
-        burst.classList.remove('heart-burst-animate');
-        void burst.offsetWidth;
-        burst.classList.add('heart-burst-animate');
-        setTimeout(() => burst.classList.add('hidden'), 750);
-    }
-    const user = auth.currentUser;
-    if (!user) return;
-    await updateDoc(doc(db, col, docId), { likes: arrayUnion(user.email) }).catch(()=>{});
-    if (col === 'posts') loadPostsFeed();
-    if (col === 'reels') loadReelsFeed();
-}
-
 export async function toggleSavePost(docId) {
     const user = auth.currentUser;
     if (!user) return;
@@ -654,16 +510,12 @@ export async function toggleSavePost(docId) {
             showToast("Saved to collection");
         }
         loadPostsFeed();
-        loadReelsFeed();
     } catch(e) {}
 }
 
 export async function deleteMyContent(col, docId, authorEmail) {
     const user = auth.currentUser;
-    if (!user || user.email !== authorEmail) {
-        showToast("You can only delete your own content!");
-        return;
-    }
+    if (!user || user.email !== authorEmail) return;
     if (!confirm("Delete this permanently?")) return;
 
     try {
@@ -671,49 +523,9 @@ export async function deleteMyContent(col, docId, authorEmail) {
         showToast("Deleted successfully");
         if (col === 'posts') loadPostsFeed();
         if (col === 'reels') loadReelsFeed();
-    } catch(e) { showToast(e.message); }
+    } catch(e) {}
 }
 
-// 9. Watch Tracking Engine
-export async function startWatchTracking(col, docId, authorEmail) {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    if (user.email !== authorEmail) {
-        try {
-            const docRef = doc(db, col, docId);
-            const snap = await getDoc(docRef);
-            if (snap.exists()) {
-                const viewed = snap.data().viewedUsers || [];
-                if (!viewed.includes(user.email)) {
-                    await updateDoc(docRef, {
-                        viewedUsers: arrayUnion(user.email),
-                        views: increment(1)
-                    });
-                    if (authorEmail) {
-                        await updateDoc(doc(db, "users", authorEmail), { totalViews: increment(1) });
-                    }
-                }
-            }
-        } catch(e) {}
-    }
-
-    clearInterval(watchInterval);
-    watchInterval = setInterval(async () => {
-        try {
-            await updateDoc(doc(db, col, docId), { watchSeconds: increment(2) });
-            if (authorEmail) {
-                await updateDoc(doc(db, "users", authorEmail), { totalWatchSeconds: increment(2) });
-            }
-        } catch(e) {}
-    }, 2000);
-}
-
-export function stopWatchTracking() {
-    clearInterval(watchInterval);
-}
-
-// 10. Comments
 export function openComments(col, id) {
     activeCommentCol = col;
     activeCommentDocId = id;
@@ -732,14 +544,12 @@ async function loadCommentsData() {
     try {
         const snap = await getDoc(doc(db, activeCommentCol, activeCommentDocId));
         const comments = snap.exists() ? (snap.data().comments || []) : [];
-
         if (comments.length === 0) {
             list.innerHTML = '<div class="text-center text-gray-500 py-8">No comments yet.</div>';
             return;
         }
-
         list.innerHTML = comments.map(c => `
-            <div class="clay-card p-2.5 space-y-0.5">
+            <div class="clay-card p-2 space-y-0.5">
                 <strong class="text-white text-[11px]">${c.user}</strong>
                 <p class="text-gray-300 text-xs">${c.text}</p>
             </div>
@@ -759,7 +569,5 @@ export async function submitComment() {
         });
         if (input) input.value = '';
         loadCommentsData();
-        if (activeCommentCol === 'posts') loadPostsFeed();
-        if (activeCommentCol === 'reels') loadReelsFeed();
     } catch(e) {}
 }
