@@ -99,7 +99,7 @@
             }
         }
 
-        /* 🌈 BOTTOM NAVBAR NEON FIRE ICONS */
+        /* 🌈 NAVBAR NEON ICONS */
         .neon-nav-home { color: #ff3333 !important; filter: drop-shadow(0 0 8px rgba(255, 51, 51, 0.9)); }
         .neon-nav-search { color: #c084fc !important; filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.9)); }
         .neon-nav-reels { color: #f43f5e !important; filter: drop-shadow(0 0 8px rgba(244, 63, 94, 0.9)); }
@@ -131,12 +131,6 @@
 
         @keyframes storyBar { from { width: 0%; } to { width: 100%; } }
         .story-progress-active { animation: storyBar 7s linear forwards; }
-
-        @keyframes flyHeart {
-            0% { transform: translateY(0) scale(0.8); opacity: 1; }
-            100% { transform: translateY(-160px) scale(1.4); opacity: 0; }
-        }
-        .live-heart-fly { animation: flyHeart 1.5s ease-out forwards; }
     </style>
 </head>
 <body class="min-h-screen select-none bg-black text-white">
@@ -147,7 +141,6 @@
         <p class="text-[10px] text-gray-500 uppercase tracking-widest">Connect & Live</p>
     </div>
 
-    <!-- Fail-safe Auto-Dismiss Script for Splash Screen -->
     <script>
         setTimeout(function() {
             var sp = document.getElementById('splash');
@@ -158,37 +151,34 @@
                     if (sp.parentNode) sp.parentNode.removeChild(sp);
                 }, 350);
             }
-        }, 900);
+        }, 800);
     </script>
 
-    <!-- Top Navigation Header -->
+    <!-- Header -->
     <header id="main-app-header" class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-zinc-900 px-4 py-2.5 flex justify-between items-center">
         <h1 class="text-2xl font-black tracking-wider neon-fire-logo cursor-pointer" onclick="window.switchTab('home')">IB65</h1>
         
         <div id="home-header-actions" class="flex items-center space-x-3.5">
-            <!-- LIVE BUTTON -->
             <button onclick="window.switchTab('live')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5 shadow-lg icon-btn">
                 <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                 <span>LIVE</span>
             </button>
 
-            <!-- NOTIFICATION BELL ICON -->
             <button onclick="window.showToast?.('No new notifications')" class="text-gray-300 hover:text-white text-lg icon-btn relative p-1">
                 <i class="fa-regular fa-bell"></i>
                 <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ff0000]"></span>
             </button>
 
-            <!-- MESSENGER DIRECT ICON -->
             <button onclick="window.openDirectInbox()" class="text-gray-300 hover:text-white text-lg icon-btn relative p-1">
                 <i class="fa-brands fa-facebook-messenger"></i>
             </button>
         </div>
     </header>
 
-    <!-- Main Views Container -->
+    <!-- Main Container -->
     <main class="max-w-md mx-auto">
 
-        <!-- 1. HOME VIEW -->
+        <!-- 1. HOME -->
         <div id="view-home" class="space-y-3 pb-24">
             <div class="p-3 border-b border-zinc-900 overflow-x-auto flex space-x-3 items-center">
                 <div onclick="window.openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
@@ -211,7 +201,7 @@
             </div>
         </div>
 
-        <!-- 2. SEARCH & EXPLORE VIEW -->
+        <!-- 2. SEARCH -->
         <div id="view-search" class="space-y-3 p-3 hidden pb-24">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-xs"></i>
@@ -228,14 +218,14 @@
             </div>
         </div>
 
-        <!-- 3. REELS FEED -->
+        <!-- 3. REELS -->
         <div id="view-reels" class="hidden">
             <div id="reels-container" class="reels-scroll-container">
                 <div class="text-center text-gray-500 py-24 text-xs">Loading Reels...</div>
             </div>
         </div>
 
-        <!-- 4. LIVE HUB -->
+        <!-- 4. LIVE -->
         <div id="view-live" class="space-y-4 p-4 hidden pb-24">
             <div class="clay-card p-4 flex justify-between items-center">
                 <div>
@@ -256,7 +246,7 @@
             </div>
         </div>
 
-        <!-- 5. MY PROFILE VIEW -->
+        <!-- 5. MY PROFILE -->
         <div id="view-profile" class="space-y-3 p-4 hidden pb-24">
             <div class="flex justify-between items-center px-1">
                 <div onclick="window.openAccountSwitcher?.()" class="flex items-center space-x-1.5 cursor-pointer icon-btn">
@@ -274,7 +264,7 @@
                 </div>
             </div>
 
-            <!-- Professional Dashboard Pill -->
+            <!-- Professional Dashboard -->
             <div id="pro-dashboard-pill" onclick="window.openProfessionalDashboard?.()" class="clay-card p-3 flex justify-between items-center cursor-pointer hover:border-zinc-600 transition hidden">
                 <div>
                     <p class="text-xs font-bold text-white flex items-center space-x-1.5">
@@ -315,7 +305,7 @@
             <div class="grid grid-cols-3 gap-1" id="my-media-grid"></div>
         </div>
 
-        <!-- 6. PUBLIC CREATOR PROFILE VIEW -->
+        <!-- 6. PUBLIC CREATOR PROFILE -->
         <div id="view-public-profile" class="space-y-4 p-4 hidden pb-24">
             <div class="flex items-center space-x-3">
                 <button onclick="window.switchTab('home')" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
@@ -350,93 +340,6 @@
         </div>
 
     </main>
-
-    <!-- ACCOUNT SWITCHER BOTTOM SHEET -->
-    <div id="modal-account-switcher" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="document.getElementById('modal-account-switcher').classList.add('hidden')">
-        <div class="clay-card w-full max-w-md rounded-t-3xl p-4 space-y-3" onclick="event.stopPropagation()">
-            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-2"></div>
-            <div class="flex justify-between items-center px-1">
-                <span class="font-bold text-sm text-white">Switch Accounts</span>
-                <button onclick="document.getElementById('modal-account-switcher').classList.add('hidden')" class="text-gray-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div id="switcher-accounts-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
-
-            <button onclick="document.getElementById('modal-account-switcher').classList.add('hidden'); document.getElementById('modal-auth').classList.remove('hidden');" class="w-full p-3 bg-zinc-900 rounded-xl flex items-center space-x-3 text-xs font-bold text-white glow-btn-blue">
-                <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-white"><i class="fa-solid fa-plus"></i></div>
-                <span>Add new IB65 account</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- 100% REAL PROFESSIONAL DASHBOARD MODAL -->
-    <div id="modal-pro-dashboard" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
-        <div class="p-3 border-b border-zinc-800 flex justify-between items-center bg-black">
-            <div class="flex items-center space-x-3">
-                <button onclick="window.closeProfessionalDashboard?.()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
-                <span class="text-sm font-bold text-white">Professional Dashboard</span>
-            </div>
-        </div>
-        <div class="flex-1 p-4 overflow-y-auto space-y-4 max-w-md mx-auto w-full">
-            <div class="clay-card p-4 space-y-1">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Account Insights</h3>
-                <p class="text-xl font-black text-white" id="dash-total-reach">0 Unique Views</p>
-                <p class="text-[11px] text-gray-400">Unique view count and genuine playback watch time.</p>
-            </div>
-
-            <div class="grid grid-cols-3 gap-2">
-                <div class="clay-card p-3 text-center">
-                    <i class="fa-solid fa-eye text-blue-400 mb-1 text-base"></i>
-                    <span id="dash-stat-views" class="font-extrabold text-sm block">0</span>
-                    <span class="text-[10px] text-gray-400">Unique Views</span>
-                </div>
-                <div class="clay-card p-3 text-center">
-                    <i class="fa-solid fa-share-nodes text-green-400 mb-1 text-base"></i>
-                    <span id="dash-stat-shares" class="font-extrabold text-sm block">0</span>
-                    <span class="text-[10px] text-gray-400">Total Shares</span>
-                </div>
-                <div class="clay-card p-3 text-center">
-                    <i class="fa-solid fa-clock text-pink-400 mb-1 text-base"></i>
-                    <span id="dash-stat-watch" class="font-extrabold text-sm block">0.00h</span>
-                    <span class="text-[10px] text-gray-400">Watch Hours</span>
-                </div>
-            </div>
-
-            <div class="clay-card p-4 space-y-3">
-                <div class="flex justify-between items-center">
-                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Audience Demographics</h4>
-                    <span class="text-[9px] bg-zinc-800 text-gray-400 px-2 py-0.5 rounded-full font-bold">Anonymous</span>
-                </div>
-
-                <div class="space-y-2">
-                    <p class="text-[10px] font-bold text-gray-300">Top Locations</p>
-                    <div id="demographics-locations" class="space-y-1.5 text-xs text-gray-300">
-                        <p class="text-[11px] text-gray-500 py-1">Gathering authentic viewer locations...</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-800">
-                    <div>
-                        <p class="text-[10px] font-bold text-gray-300 mb-1">Gender</p>
-                        <div id="demographics-gender" class="text-xs text-gray-400 space-y-0.5">
-                            <p class="text-[11px] text-gray-500">Calculating ratio...</p>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-bold text-gray-300 mb-1">Top Age Group</p>
-                        <div id="demographics-age" class="text-xs text-white space-y-0.5">
-                            <p class="text-[11px] text-gray-500">Calculating age...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Video Breakdown</h4>
-                <div id="dash-breakdown-list" class="space-y-2"></div>
-            </div>
-        </div>
-    </div>
 
     <!-- PRO REEL EDITOR SUITE -->
     <div id="modal-pro-editor" class="fixed inset-0 z-50 bg-black flex flex-col justify-between hidden">
@@ -481,7 +384,7 @@
         <div class="bg-zinc-950 p-3 space-y-2 border-t border-zinc-900">
             <div class="relative h-14 bg-zinc-900 rounded-xl overflow-hidden flex items-center border border-zinc-800 select-none">
                 <div id="timeline-frames-preview" class="flex-1 flex overflow-hidden h-full items-center">
-                    <div class="w-full text-center text-[10px] text-gray-500 animate-pulse">Extracting Real Frames...</div>
+                    <div class="w-full text-center text-[10px] text-gray-500">Real Video Frames Loaded</div>
                 </div>
                 <div id="timeline-playhead-line" class="absolute top-0 bottom-0 left-0 w-1 bg-white z-20 pointer-events-none shadow-lg"></div>
             </div>
@@ -511,7 +414,7 @@
         <div class="p-3 border-b border-zinc-800 flex justify-between items-center">
             <button onclick="window.closeCreateModal()" class="text-white text-base"><i class="fa-solid fa-xmark"></i></button>
             <span class="font-bold text-xs">Create New</span>
-            <button onclick="window.publishMedia?.()" id="btn-publish" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Share</button>
+            <button onclick="window.publishMediaDirect()" id="btn-publish" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Share</button>
         </div>
         <div class="flex-1 p-4 space-y-3 max-w-md mx-auto w-full overflow-y-auto">
             <div class="flex space-x-2 border-b border-zinc-800 pb-2 text-xs">
@@ -534,9 +437,9 @@
             
             <div class="p-6 text-center rounded-2xl bg-zinc-900 transition cursor-pointer glow-btn-blue" onclick="document.getElementById('file-gallery-picker').click()">
                 <i class="fa-solid fa-images text-3xl mb-2 text-white"></i>
-                <p class="text-xs text-gray-300 font-bold">Select Media From Device</p>
+                <p class="text-xs text-gray-300 font-bold" id="lbl-picker-text">Select Media From Device</p>
             </div>
-            <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="window.handleFileSelected?.(event)">
+            <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="window.handleFileSelectedDirect(event)">
         </div>
     </div>
 
@@ -586,35 +489,6 @@
         </div>
     </div>
 
-    <!-- IB65 LIVE BROADCAST VIEW -->
-    <div id="modal-live-room" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-4 hidden">
-        <div class="flex justify-between items-center z-20">
-            <div class="flex items-center space-x-2">
-                <span class="bg-red-600 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold animate-pulse">IB65 LIVE</span>
-                <span id="live-viewers-tag" class="text-xs font-bold text-white">👁️ 1</span>
-                <div class="flex items-center space-x-1.5 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-zinc-800">
-                    <div class="w-4 h-4 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-[9px]" id="live-host-avatar">I</div>
-                    <span id="live-host-title" class="text-xs text-white font-bold flex items-center">Host</span>
-                </div>
-            </div>
-            <button onclick="window.exitLiveRoom?.()" class="text-xs bg-red-600 px-3.5 py-1.5 rounded-xl text-white font-bold">End</button>
-        </div>
-
-        <div class="absolute inset-0 flex items-center justify-center overflow-hidden bg-black" onclick="window.resumeLiveStreamPlayback?.()">
-            <video id="live-room-video" autoplay playsinline webkit-playsinline class="w-full h-full object-cover bg-black"></video>
-            <div id="live-hearts-container" class="absolute right-6 bottom-28 pointer-events-none z-30"></div>
-        </div>
-
-        <div class="z-20 space-y-3">
-            <div id="live-chat-messages" class="space-y-1.5 max-h-48 overflow-y-auto p-2 text-xs"></div>
-            <div class="flex space-x-2">
-                <input type="text" id="live-input-msg" placeholder="Comment on live..." class="flex-1 bg-black/60 border border-zinc-700 rounded-xl p-2.5 text-xs text-white focus:outline-none">
-                <button onclick="window.sendLiveMsg?.()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
-                <button onclick="window.triggerLiveHeartGlobal?.()" class="bg-red-600 text-white px-3.5 py-2 rounded-xl text-base icon-btn shadow-lg"><i class="fa-solid fa-heart"></i></button>
-            </div>
-        </div>
-    </div>
-
     <!-- DIRECT INBOX & MESSAGING -->
     <div id="modal-direct-inbox" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
         <div class="p-4 border-b border-zinc-900 flex justify-between items-center">
@@ -649,43 +523,13 @@
         </div>
     </div>
 
-    <!-- MEDIA VIEWER MODAL -->
+    <!-- MEDIA VIEWER -->
     <div id="modal-media-viewer" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-3 hidden">
         <div class="flex justify-between items-center pt-2">
             <button onclick="window.closeMediaViewer?.()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i> Back</button>
             <span class="text-xs font-bold text-gray-400">IB65 View</span>
         </div>
         <div class="flex-1 flex items-center justify-center overflow-hidden my-3" id="media-viewer-content"></div>
-    </div>
-
-    <!-- AUTH MODAL -->
-    <div id="modal-auth" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
-        <div class="clay-card p-6 w-full max-w-sm space-y-3">
-            <h2 class="text-3xl font-black text-center neon-fire-logo">IB65</h2>
-            <p class="text-xs text-center text-gray-400">Social Universe</p>
-            
-            <input type="text" id="auth-input-name" placeholder="Full Name (for new signups)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
-            
-            <div>
-                <div class="relative">
-                    <input type="text" id="auth-input-handle" placeholder="Unique Username (@handle)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white pr-9">
-                    <span id="signup-handle-status-icon" class="absolute right-3.5 top-3.5 text-xs"></span>
-                </div>
-                <p id="signup-handle-helper" class="text-[10px] text-gray-500 mt-1 pl-1"></p>
-            </div>
-
-            <input type="text" id="auth-input-email" placeholder="Username (@handle) or Gmail" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
-            <input type="password" id="auth-input-pass" placeholder="Password (6+ chars)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-xs text-white">
-            
-            <div class="flex justify-end">
-                <button type="button" onclick="window.handleForgotPasswordDirect()" class="text-[11px] text-blue-400 font-semibold hover:underline">Forgot password?</button>
-            </div>
-
-            <div class="flex space-x-2 pt-1">
-                <button type="button" id="btn-main-login" onclick="window.handleLoginDirect()" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-blue">Login</button>
-                <button type="button" id="btn-main-signup" onclick="window.handleSignupDirect()" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-red">Sign Up</button>
-            </div>
-        </div>
     </div>
 
     <!-- BOTTOM NAVBAR -->
@@ -709,7 +553,7 @@
 
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
-    <!-- INLINE SAFEGUARD FALLBACK -->
+    <!-- BULLETPROOF AUDIO & UI ROUTING SCRIPTS -->
     <script>
         window.showToast = function(msg) {
             var t = document.getElementById('toast');
@@ -719,224 +563,174 @@
             setTimeout(function() { t.classList.add('hidden'); }, 2300);
         };
 
-        window.switchTab = window.switchTab || function(tab) {
-            ['home', 'search', 'reels', 'live', 'profile', 'public-profile'].forEach(function(t) {
-                var el = document.getElementById('view-' + t);
-                var nav = document.getElementById('nav-' + t);
-                if (el) el.classList.add('hidden');
-                if (nav) nav.className = 'text-gray-500 text-xl icon-btn';
-            });
-            var active = document.getElementById('view-' + tab);
-            var activeNav = document.getElementById('nav-' + tab);
-            if (active) active.classList.remove('hidden');
-            if (activeNav) {
-                if (tab === 'home') activeNav.className = 'neon-nav-home text-xl icon-btn';
-                else if (tab === 'search') activeNav.className = 'neon-nav-search text-xl icon-btn';
-                else if (tab === 'reels') activeNav.className = 'neon-nav-reels text-xl icon-btn';
-                else if (tab === 'profile') activeNav.className = 'neon-nav-profile text-xl icon-btn';
-                else activeNav.className = 'text-white text-xl icon-btn';
+        // 🔊 BULLETPROOF SOUND TOGGLE (VOLUME 1.0 + MUTED FALSE)
+        window.toggleFeedVideoAudio = function(triggerEl) {
+            var box = triggerEl.closest('.relative');
+            var vid = box ? box.querySelector('video') : null;
+            if (!vid) return;
+
+            var iconBtn = box.querySelector('.audio-btn-icon');
+
+            if (vid.muted) {
+                vid.muted = false;
+                vid.volume = 1.0;
+                vid.play().catch(function() {});
+                if (iconBtn) iconBtn.innerHTML = '<i class="fa-solid fa-volume-high text-white"></i>';
+                window.showToast("Sound Unmuted 🔊");
+            } else {
+                vid.muted = true;
+                if (iconBtn) iconBtn.innerHTML = '<i class="fa-solid fa-volume-xmark text-white"></i>';
+                window.showToast("Sound Muted 🔇");
             }
         };
 
-        window.openCreateModal = window.openCreateModal || function(type) {
+        window.openCreateModal = function(type) {
+            window.activeUploadType = type || 'post';
             var m = document.getElementById('modal-create');
             if (m) m.classList.remove('hidden');
         };
 
-        window.closeCreateModal = window.closeCreateModal || function() {
+        window.closeCreateModal = function() {
             var m = document.getElementById('modal-create');
             if (m) m.classList.add('hidden');
         };
 
-        window.openDirectInbox = window.openDirectInbox || function() {
+        window.setUploadType = function(t) {
+            window.activeUploadType = t;
+            ['post', 'reel', 'story'].forEach(function(tp) {
+                var btn = document.getElementById('type-btn-' + tp);
+                if (btn) btn.className = tp === t ? 'font-bold text-white border-b-2 border-white pb-1 px-3' : 'text-gray-500 pb-1 px-3';
+            });
+        };
+
+        window.openDirectInbox = function() {
             var m = document.getElementById('modal-direct-inbox');
             if (m) m.classList.remove('hidden');
         };
 
-        window.closeDirectInbox = window.closeDirectInbox || function() {
+        window.closeDirectInbox = function() {
             var m = document.getElementById('modal-direct-inbox');
             if (m) m.classList.add('hidden');
-        };
-
-        window.openAccountSwitcher = window.openAccountSwitcher || function() {
-            var m = document.getElementById('modal-account-switcher');
-            if (m) m.classList.remove('hidden');
         };
     </script>
 
-    <!-- DIRECT FIREBASE AUTH ENGINE -->
+    <!-- DIRECT ROBUST UPLOAD & SHARE ENGINE -->
     <script type="module">
-        import { 
-            auth, 
-            db, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            sendPasswordResetEmail, 
-            signOut, 
-            onAuthStateChanged, 
-            doc, 
-            getDoc, 
-            setDoc, 
-            collection, 
-            getDocs, 
-            query, 
-            where 
-        } from './js/config.js';
+        import { auth, db, doc, getDoc, collection, addDoc, CLOUDINARY_CONFIG } from './js/config.js';
+        import { openProEditorSuite } from './js/editor.js';
 
-        // Direct Login
-        window.handleLoginDirect = async function() {
-            const emailOrHandle = document.getElementById('auth-input-email').value.trim();
-            const pass = document.getElementById('auth-input-pass').value.trim();
-            const btn = document.getElementById('btn-main-login');
+        let currentSelectedBlob = null;
+        let currentSelectedDataUrl = '';
+        let currentSelectedType = 'image';
 
-            if (!emailOrHandle || !pass) {
-                window.showToast("Email aur Password daalein!");
+        window.handleFileSelectedDirect = function(e) {
+            const f = e.target.files && e.target.files[0];
+            if (!f) return;
+
+            window.showToast("Opening Editor...");
+            currentSelectedBlob = f;
+            currentSelectedType = f.type.startsWith('video') ? 'video' : 'image';
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                currentSelectedDataUrl = evt.target.result;
+                const lbl = document.getElementById('lbl-picker-text');
+                if (lbl) lbl.innerText = "Selected: " + f.name;
+
+                // Close create modal and launch Pro Editor Studio
+                window.closeCreateModal();
+                openProEditorSuite(currentSelectedDataUrl, currentSelectedType);
+            };
+            reader.readAsDataURL(f);
+        };
+
+        window.publishMediaDirect = async function() {
+            const user = auth.currentUser;
+            if (!user) { window.showToast("Please login first!"); return; }
+            if (!currentSelectedBlob && !currentSelectedDataUrl) { window.showToast("Please select media first!"); return; }
+
+            const capInput = document.getElementById('create-caption-input');
+            const locInput = document.getElementById('create-location-input');
+            const caption = capInput ? capInput.value.trim() : '';
+            const location = locInput ? locInput.value.trim() : '';
+            const uploadType = window.activeUploadType || 'post';
+
+            if (!caption && uploadType !== 'story') {
+                window.showToast("Caption is required!");
+                capInput?.focus();
                 return;
             }
 
-            if (btn) { btn.innerText = "Checking..."; btn.disabled = true; }
-            window.showToast("Connecting to IB65 account...");
+            const btn = document.getElementById('btn-publish');
+            if (btn) { btn.innerText = "Uploading..."; btn.disabled = true; }
+            window.showToast("Sharing your " + uploadType + "...");
 
             try {
-                let finalEmail = emailOrHandle;
-                if (!emailOrHandle.includes('@')) {
-                    const clean = emailOrHandle.replace(/^@+/, '').toLowerCase();
-                    const q = query(collection(db, "users"), where("handle", "==", clean));
-                    const snap = await getDocs(q);
-                    if (!snap.empty) {
-                        finalEmail = snap.docs[0].id;
-                    } else {
-                        finalEmail = clean + '@ib65.app';
-                    }
+                let finalMediaUrl = currentSelectedDataUrl;
+
+                if (currentSelectedBlob) {
+                    const fd = new FormData();
+                    fd.append("file", currentSelectedBlob);
+                    fd.append("upload_preset", CLOUDINARY_CONFIG.uploadPreset);
+
+                    const endpoint = currentSelectedType === 'video'
+                        ? `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/video/upload`
+                        : `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
+
+                    const res = await fetch(endpoint, { method: "POST", body: fd });
+                    const cData = await res.json();
+                    if (cData.secure_url) finalMediaUrl = cData.secure_url;
                 }
 
-                const cred = await signInWithEmailAndPassword(auth, finalEmail, pass);
-                window.showToast("Welcome back!");
-                document.getElementById('modal-auth').classList.add('hidden');
+                const cleanAuthor = (user.displayName || user.email.split('@')[0]).replace(/^@+/, '');
+                const uDoc = await getDoc(doc(db, "users", user.email));
+                const badgeType = uDoc.data()?.badgeType || (cleanAuthor.toLowerCase() === 'ib65' ? 'gold_red' : 'none');
 
-                if (window.loadMyProfile) window.loadMyProfile();
-                if (window.loadPostsFeed) window.loadPostsFeed();
-                window.switchTab('home');
-            } catch(e) {
-                window.showToast("Login Failed: " + e.message);
-            } finally {
-                if (btn) { btn.innerText = "Login"; btn.disabled = false; }
-            }
-        };
-
-        // Direct Signup
-        window.handleSignupDirect = async function() {
-            const name = document.getElementById('auth-input-name').value.trim();
-            const rawHandle = document.getElementById('auth-input-handle').value.trim();
-            let email = document.getElementById('auth-input-email').value.trim();
-            const pass = document.getElementById('auth-input-pass').value.trim();
-            const btn = document.getElementById('btn-main-signup');
-
-            if (!pass || !rawHandle) {
-                window.showToast("Full details fill karein!");
-                return;
-            }
-
-            if (!email.includes('@')) {
-                email = rawHandle.replace(/^@+/, '') + '@ib65.app';
-            }
-
-            const cleanHandle = rawHandle.replace(/^@+/, '').toLowerCase();
-            if (btn) { btn.innerText = "Creating..."; btn.disabled = true; }
-
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                const badgeType = cleanHandle === 'ib65' ? 'gold_red' : 'none';
-
-                await setDoc(doc(db, "users", email), {
-                    name: name || 'User',
-                    handle: cleanHandle,
-                    email: email,
-                    bio: "Welcome to my IB65 profile!",
+                const itemData = {
+                    author: cleanAuthor,
+                    handle: cleanAuthor,
+                    authorEmail: user.email,
+                    caption: caption,
+                    location: location,
+                    mediaUrl: finalMediaUrl,
                     badgeType: badgeType,
-                    followers: 0,
-                    following: 0,
-                    followersList: [],
-                    followingList: [],
-                    savedPosts: [],
-                    accountType: "creator",
+                    mediaType: currentSelectedType,
+                    views: 0,
+                    viewedUsers: [],
+                    shares: 0,
+                    watchSeconds: 0,
+                    likes: [],
+                    comments: [],
+                    isArchived: false,
                     createdAt: Date.now()
-                }, { merge: true });
+                };
 
-                window.showToast("Account created successfully!");
-                document.getElementById('modal-auth').classList.add('hidden');
+                if (uploadType === 'reel') {
+                    await addDoc(collection(db, "reels"), { ...itemData, videoUrl: finalMediaUrl });
+                    window.switchTab('reels');
+                } else if (uploadType === 'story') {
+                    await addDoc(collection(db, "stories"), itemData);
+                    window.switchTab('home');
+                } else {
+                    await addDoc(collection(db, "posts"), itemData);
+                    window.switchTab('home');
+                }
 
-                if (window.loadMyProfile) window.loadMyProfile();
-                if (window.loadPostsFeed) window.loadPostsFeed();
-                window.switchTab('home');
+                window.closeCreateModal();
+                currentSelectedBlob = null;
+                currentSelectedDataUrl = '';
+                if (capInput) capInput.value = '';
+                if (locInput) locInput.value = '';
+                window.showToast("Shared successfully! 🎉");
             } catch(e) {
-                window.showToast(e.message);
+                window.showToast("Upload Error: " + e.message);
             } finally {
-                if (btn) { btn.innerText = "Sign Up"; btn.disabled = false; }
+                if (btn) { btn.innerText = "Share"; btn.disabled = false; }
             }
         };
-
-        // Direct Forgot Password
-        window.handleForgotPasswordDirect = async function() {
-            const email = document.getElementById('auth-input-email').value.trim();
-            if (!email || !email.includes('@')) {
-                window.showToast("Enter valid registered email!");
-                return;
-            }
-            try {
-                await sendPasswordResetEmail(auth, email);
-                window.showToast("Password reset link sent to " + email);
-            } catch(e) {
-                window.showToast(e.message);
-            }
-        };
-
-        // Direct Logout
-        window.handleLogoutDirect = async function() {
-            try {
-                await signOut(auth);
-                window.showToast("Logged out successfully");
-                document.getElementById('modal-auth').classList.remove('hidden');
-            } catch(e) {
-                window.showToast(e.message);
-            }
-        };
-
-        // Direct Auto-Login Detection
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                document.getElementById('modal-auth').classList.add('hidden');
-                try {
-                    const uDoc = await getDoc(doc(db, "users", user.email));
-                    if (uDoc.exists()) {
-                        const d = uDoc.data();
-                        const handle = d.handle || user.email.split('@')[0];
-                        document.getElementById('profile-top-username').innerText = '@' + handle;
-                        document.getElementById('my-profile-name').innerText = d.name || 'User';
-                        document.getElementById('my-profile-handle').innerText = '@' + handle;
-                        document.getElementById('my-profile-avatar').innerText = (d.name || 'U')[0].toUpperCase();
-                        document.getElementById('home-tray-avatar').innerText = (d.name || 'U')[0].toUpperCase();
-                    }
-                } catch(e) {}
-                if (window.loadMyProfile) window.loadMyProfile();
-                if (window.loadPostsFeed) window.loadPostsFeed();
-            } else {
-                document.getElementById('modal-auth').classList.remove('hidden');
-            }
-        });
-    </script>
-
-    <!-- FEED DIRECT AUTO-LOAD TRIGGER -->
-    <script type="module">
-        import { loadPostsFeed, loadStoriesTray, loadExploreMedia } from './js/feed.js';
-        setTimeout(() => {
-            loadStoriesTray();
-            loadPostsFeed();
-            loadExploreMedia();
-        }, 1000);
     </script>
 
     <!-- MODULAR SCRIPT ENTRY POINT -->
-    <script type="module" src="./js/app.js?v=7"></script>
+    <script type="module" src="./js/app.js?v=10"></script>
 </body>
 </html>
