@@ -129,9 +129,6 @@
             100% { transform: scale(1); opacity: 0; }
         }
         .heart-burst-animate { animation: heartBurst 0.75s ease-out forwards; }
-
-        @keyframes storyBar { from { width: 0%; } to { width: 100%; } }
-        .story-progress-active { animation: storyBar 7s linear forwards; }
     </style>
 </head>
 <body class="min-h-screen select-none bg-black text-white">
@@ -152,7 +149,7 @@
                     if (sp.parentNode) sp.parentNode.removeChild(sp);
                 }, 350);
             }
-        }, 800);
+        }, 700);
     </script>
 
     <!-- Header -->
@@ -206,7 +203,7 @@
         <div id="view-search" class="space-y-3 p-3 hidden pb-24">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-xs"></i>
-                <input type="text" id="global-search-input" oninput="window.handleSearch?.(event)" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-700">
+                <input type="text" id="global-search-input" placeholder="Search users, captions, #hashtags..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-zinc-700">
             </div>
 
             <div id="search-users-results" class="space-y-2 hidden"></div>
@@ -236,33 +233,22 @@
                     </h2>
                     <p class="text-[10px] text-gray-400">Broadcast video & chat in real time</p>
                 </div>
-                <button onclick="window.startBroadcast?.()" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
-            </div>
-            
-            <div class="space-y-2">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Broadcasts</h3>
-                <div id="live-rooms-list" class="space-y-2">
-                    <div class="text-center text-gray-500 py-10 text-xs">No active live streams right now.</div>
-                </div>
+                <button onclick="window.showToast('Live setup ready')" class="bg-red-600 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-lg icon-btn">Go Live</button>
             </div>
         </div>
 
         <!-- 5. MY PROFILE VIEW -->
         <div id="view-profile" class="space-y-3 p-4 hidden pb-24">
             <div class="flex justify-between items-center px-1">
-                <div onclick="window.openAccountSwitcher?.()" class="flex items-center space-x-1.5 cursor-pointer icon-btn">
+                <div class="flex items-center space-x-1.5 cursor-pointer icon-btn">
                     <span class="text-base font-extrabold text-white flex items-center space-x-1" id="profile-top-username">
                         <span>@IB65</span>
                     </span>
                     <span id="profile-top-badge"></span>
-                    <i class="fa-solid fa-chevron-down text-xs text-gray-400 ml-1"></i>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <span id="profile-privacy-badge" class="text-[10px] bg-zinc-800 px-2 py-0.5 rounded-full text-yellow-400 font-semibold hidden"><i class="fa-solid fa-lock text-[9px] mr-1"></i>Private</span>
-                    <button onclick="window.handleLogoutDirect()" class="text-gray-400 text-sm icon-btn p-1" title="Log Out">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    </button>
-                </div>
+                <button onclick="window.handleLogoutDirect()" class="text-gray-400 text-sm icon-btn p-1" title="Log Out">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
             </div>
 
             <div class="clay-card p-5 text-center space-y-3 relative">
@@ -293,195 +279,7 @@
             <div class="grid grid-cols-3 gap-1" id="my-media-grid"></div>
         </div>
 
-        <!-- 6. PUBLIC PROFILE -->
-        <div id="view-public-profile" class="space-y-4 p-4 hidden pb-24">
-            <div class="flex items-center space-x-3">
-                <button onclick="window.switchTab('home')" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
-                <span class="font-bold text-sm" id="pub-top-handle">Profile</span>
-            </div>
-            <div class="clay-card p-5 text-center space-y-3">
-                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
-                    <div class="w-full h-full bg-zinc-900 rounded-full overflow-hidden flex items-center justify-center text-2xl font-black text-white">
-                        <span id="pub-avatar">C</span>
-                    </div>
-                </div>
-                <div>
-                    <h2 id="pub-name" class="text-base font-bold text-white flex items-center justify-center space-x-1">
-                        <span>Creator</span>
-                    </h2>
-                    <p id="pub-handle" class="text-xs text-gray-400">@creator</p>
-                </div>
-                <div class="flex justify-around py-2 border-y border-zinc-800 text-xs">
-                    <div><span id="pub-stat-posts" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Posts</span></div>
-                    <div><span id="pub-stat-followers" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
-                    <div><span id="pub-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
-                </div>
-            </div>
-            <div class="grid grid-cols-3 gap-1" id="pub-media-grid"></div>
-        </div>
-
     </main>
-
-    <!-- 🔥 INSHOT PRO STUDIO (NEW PROFESSIONAL HORIZONTAL EDITOR) -->
-    <div id="modal-pro-editor" class="fixed inset-0 z-50 bg-[#09090b] flex flex-col justify-between hidden select-none">
-        <!-- InShot Top Bar -->
-        <div class="p-3.5 flex justify-between items-center z-20 bg-black/90 border-b border-zinc-800">
-            <button onclick="window.closeProEditor?.()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-white icon-btn">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="flex items-center space-x-2 bg-zinc-900/90 px-3.5 py-1.5 rounded-full border border-zinc-700 shadow-lg">
-                <i class="fa-solid fa-wand-magic-sparkles text-red-500 text-xs"></i>
-                <span class="text-xs font-black tracking-wider text-white neon-fire-logo">IB65 Pro Studio</span>
-            </div>
-            <button onclick="window.proceedToPublishFromEditor?.()" class="px-4 py-1.5 rounded-full bg-zinc-900 text-white flex items-center space-x-1 font-bold text-xs icon-btn glow-btn-blue">
-                <span>Next</span>
-                <i class="fa-solid fa-arrow-right text-[10px] ml-1"></i>
-            </button>
-        </div>
-
-        <!-- Video Canvas Box -->
-        <div class="flex-1 relative flex items-center justify-center overflow-hidden my-auto p-2">
-            <div id="editor-canvas-box" class="relative rounded-2xl overflow-hidden bg-black flex items-center justify-center border border-zinc-800 shadow-2xl transition-all duration-200" style="aspect-ratio: 9/16; max-width: 275px; height: 50vh;">
-                <video id="editor-main-video" crossorigin="anonymous" playsinline loop class="w-full h-full object-cover origin-center transition-transform duration-100"></video>
-                <img id="editor-main-img" class="w-full h-full object-cover origin-center transition-transform duration-100 hidden">
-
-                <!-- Draggable On-Screen Text Overlay (InShot Style) -->
-                <div id="pro-text-overlay-box" class="absolute select-none hidden px-3.5 py-1.5 rounded-xl bg-black/75 font-extrabold text-center text-sm shadow-2xl border-2 border-cyan-400 touch-none z-30 cursor-move" style="left: 25px; top: 35px;">
-                    <span id="pro-text-overlay-val">IB65 Studio</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- InShot Sub-Tool Panels (Opened Above Carousel) -->
-        <!-- Panel 1: Live Text & Color Selector -->
-        <div id="inshot-text-panel" class="bg-zinc-900/95 border-t border-zinc-800 p-3 space-y-2.5 hidden z-30 backdrop-blur-md">
-            <div class="flex justify-between items-center">
-                <span class="text-[11px] font-bold text-gray-300">Text & Color Palette</span>
-                <button onclick="document.getElementById('inshot-text-panel').classList.add('hidden')" class="text-gray-400 text-xs"><i class="fa-solid fa-check text-cyan-400"></i> Done</button>
-            </div>
-            <input type="text" id="inshot-text-input" oninput="window.updateInshotText(this.value)" placeholder="Type overlay text here..." class="w-full bg-black border border-zinc-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-            <div class="flex space-x-3 items-center pt-1 overflow-x-auto">
-                <span class="text-[10px] text-gray-400">Color:</span>
-                <button onclick="window.setTextColor('#ffffff')" class="w-6 h-6 rounded-full bg-white border border-gray-400"></button>
-                <button onclick="window.setTextColor('#00f0ff')" class="w-6 h-6 rounded-full bg-[#00f0ff] border border-cyan-300"></button>
-                <button onclick="window.setTextColor('#ff2b2b')" class="w-6 h-6 rounded-full bg-[#ff2b2b] border border-red-400"></button>
-                <button onclick="window.setTextColor('#facc15')" class="w-6 h-6 rounded-full bg-[#facc15] border border-yellow-300"></button>
-                <button onclick="window.setTextColor('#ec4899')" class="w-6 h-6 rounded-full bg-[#ec4899] border border-pink-400"></button>
-            </div>
-        </div>
-
-        <!-- Panel 2: Ratio / Canvas Selector -->
-        <div id="inshot-ratio-panel" class="bg-zinc-900/95 border-t border-zinc-800 p-3 hidden z-30 backdrop-blur-md">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-[11px] font-bold text-gray-300">Canvas Ratio</span>
-                <button onclick="document.getElementById('inshot-ratio-panel').classList.add('hidden')" class="text-gray-400 text-xs"><i class="fa-solid fa-check text-cyan-400"></i> Done</button>
-            </div>
-            <div class="flex justify-around text-xs">
-                <button onclick="window.applyCanvasRatio('9/16')" class="px-3.5 py-1.5 rounded-xl bg-black border border-zinc-700 hover:border-cyan-400">9:16 Reel</button>
-                <button onclick="window.applyCanvasRatio('1/1')" class="px-3.5 py-1.5 rounded-xl bg-black border border-zinc-700 hover:border-cyan-400">1:1 Square</button>
-                <button onclick="window.applyCanvasRatio('16/9')" class="px-3.5 py-1.5 rounded-xl bg-black border border-zinc-700 hover:border-cyan-400">16:9 Cinema</button>
-            </div>
-        </div>
-
-        <!-- Panel 3: InShot Horizontal Filter Bar -->
-        <div id="inshot-filter-panel" class="bg-zinc-900/95 border-t border-zinc-800 p-3 hidden z-30 backdrop-blur-md">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-[11px] font-bold text-gray-300">Filter Presets</span>
-                <button onclick="document.getElementById('inshot-filter-panel').classList.add('hidden')" class="text-gray-400 text-xs"><i class="fa-solid fa-check text-cyan-400"></i> Done</button>
-            </div>
-            <div class="flex space-x-3 overflow-x-auto py-1">
-                <button onclick="window.applyFilterEffect('none', 'Original')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-600 flex items-center justify-center text-xs">None</div>
-                    <span class="text-[10px] text-gray-400">Original</span>
-                </button>
-                <button onclick="window.applyFilterEffect('saturate(1.5) contrast(1.1)', 'Vibrant')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-orange-600 border border-yellow-400 flex items-center justify-center text-xs font-bold">Vibe</div>
-                    <span class="text-[10px] text-gray-400">Vibrant</span>
-                </button>
-                <button onclick="window.applyFilterEffect('hue-rotate(190deg) contrast(1.2)', 'Cyberpunk')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-cyan-600 border border-purple-400 flex items-center justify-center text-xs font-bold">Cyber</div>
-                    <span class="text-[10px] text-gray-400">Cyberpunk</span>
-                </button>
-                <button onclick="window.applyFilterEffect('sepia(0.35) contrast(1.1)', 'Warm')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-amber-800 border border-amber-500 flex items-center justify-center text-xs font-bold">Warm</div>
-                    <span class="text-[10px] text-gray-400">Warm Film</span>
-                </button>
-                <button onclick="window.applyFilterEffect('grayscale(1) contrast(1.2)', 'Mono')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-zinc-700 border border-white flex items-center justify-center text-xs font-bold">B&W</div>
-                    <span class="text-[10px] text-gray-400">Mono</span>
-                </button>
-                <button onclick="window.applyFilterEffect('contrast(1.4) brightness(1.1) saturate(1.8)', 'Neon')" class="flex flex-col items-center flex-shrink-0 space-y-1">
-                    <div class="w-12 h-12 rounded-xl bg-fuchsia-700 border border-pink-400 flex items-center justify-center text-xs font-bold">Neon</div>
-                    <span class="text-[10px] text-gray-400">Neon Glow</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- InShot Video Track & Scrubber Bar -->
-        <div class="bg-zinc-950 p-2.5 border-t border-zinc-900 space-y-2">
-            <div class="flex justify-between items-center px-2 text-xs">
-                <button onclick="window.toggleEditorPlayback?.()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white glow-btn-red">
-                    <i id="btn-play-pause-icon" class="fa-solid fa-play text-xs"></i>
-                </button>
-                <span id="editor-time-counter" class="text-gray-300 font-bold tracking-widest text-[11px]">0:00 / 0:00</span>
-                <div class="flex items-center space-x-2">
-                    <span class="text-[10px] text-gray-400">Zoom</span>
-                    <input type="range" id="editor-zoom-slider" min="1" max="2.5" step="0.1" value="1" oninput="window.handleZoomSlider?.(this.value)" class="w-16 accent-white h-1 bg-zinc-800 rounded">
-                </div>
-            </div>
-
-            <!-- Tap-To-Seek Interactive Timeline -->
-            <div id="timeline-frames-track" onclick="window.seekTimeline(event)" class="relative h-11 bg-zinc-900 rounded-xl overflow-hidden flex items-center border border-zinc-800 cursor-pointer">
-                <div class="flex-1 flex overflow-hidden h-full items-center justify-center space-x-1 opacity-60">
-                    <div class="w-full h-full bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800 flex items-center justify-around px-2 text-[10px] text-zinc-400 font-bold tracking-widest uppercase">
-                        <span>• Frame •</span>
-                        <span>• Waveform •</span>
-                        <span>• Audio •</span>
-                    </div>
-                </div>
-                <div id="timeline-playhead-line" class="absolute top-0 bottom-0 left-0 w-1 bg-white z-20 pointer-events-none shadow-[0_0_8px_#ffffff]"></div>
-            </div>
-        </div>
-
-        <!-- InShot Horizontal Tool Carousel (Icon + Label Scroll Bar) -->
-        <div class="bg-black border-t border-zinc-800 py-2.5 px-3 flex space-x-5 overflow-x-auto items-center">
-            <!-- 1. Canvas / Ratio -->
-            <button onclick="window.openToolPanel('inshot-ratio-panel')" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-blue"><i class="fa-solid fa-crop text-sm"></i></div>
-                <span class="text-[10px] text-gray-300">Canvas</span>
-            </button>
-
-            <!-- 2. Text Overlay -->
-            <button onclick="window.openToolPanel('inshot-text-panel')" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-red"><i class="fa-solid fa-font text-sm"></i></div>
-                <span class="text-[10px] text-gray-300">Text</span>
-            </button>
-
-            <!-- 3. Filters / Effects -->
-            <button onclick="window.openToolPanel('inshot-filter-panel')" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-blue"><i class="fa-solid fa-wand-magic text-sm"></i></div>
-                <span class="text-[10px] text-gray-300">Filters</span>
-            </button>
-
-            <!-- 4. Video Speed (0.5x, 1x, 2x) -->
-            <button onclick="window.cycleVideoSpeed()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-red"><i class="fa-solid fa-bolt text-sm"></i></div>
-                <span id="lbl-tool-speed" class="text-[10px] text-gray-300">Speed (1x)</span>
-            </button>
-
-            <!-- 5. Audio Booster / Mute -->
-            <button onclick="window.toggleAudioBoost()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-blue"><i id="btn-tool-volume-icon" class="fa-solid fa-volume-high text-sm"></i></div>
-                <span id="lbl-tool-volume" class="text-[10px] text-gray-300">Volume</span>
-            </button>
-
-            <!-- 6. Capture Cover Frame -->
-            <button onclick="window.captureCurrentThumbnailFrame?.()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-red"><i class="fa-solid fa-camera text-sm"></i></div>
-                <span class="text-[10px] text-gray-300">Cover Frame</span>
-            </button>
-        </div>
-    </div>
 
     <!-- CREATE MODAL -->
     <div id="modal-create" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
@@ -492,9 +290,9 @@
         </div>
         <div class="flex-1 p-4 space-y-3 max-w-md mx-auto w-full overflow-y-auto">
             <div class="flex space-x-2 border-b border-zinc-800 pb-2 text-xs">
-                <button onclick="window.setUploadType?.('post')" id="type-btn-post" class="font-bold text-white border-b-2 border-white pb-1 px-3">Post</button>
-                <button onclick="window.setUploadType?.('reel')" id="type-btn-reel" class="text-gray-500 pb-1 px-3">Reel</button>
-                <button onclick="window.setUploadType?.('story')" id="type-btn-story" class="text-gray-500 pb-1 px-3">Story</button>
+                <button onclick="window.setUploadType('post')" id="type-btn-post" class="font-bold text-white border-b-2 border-white pb-1 px-3">Post</button>
+                <button onclick="window.setUploadType('reel')" id="type-btn-reel" class="text-gray-500 pb-1 px-3">Reel</button>
+                <button onclick="window.setUploadType('story')" id="type-btn-story" class="text-gray-500 pb-1 px-3">Story</button>
             </div>
             
             <div class="space-y-1 relative">
@@ -515,94 +313,6 @@
             </div>
             <input type="file" id="file-gallery-picker" accept="image/*,video/*" class="hidden" onchange="window.handleFileSelectedDirect(event)">
         </div>
-    </div>
-
-    <!-- COMMENTS MODAL -->
-    <div id="modal-comments" class="fixed inset-0 z-50 bg-black/80 flex items-end justify-center hidden" onclick="window.closeComments?.()">
-        <div class="clay-card w-full max-w-md h-[60vh] rounded-t-3xl p-4 flex flex-col justify-between" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                <span class="font-bold text-xs text-white">Comments</span>
-                <button onclick="window.closeComments?.()" class="text-gray-400 text-base"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div id="comments-items-list" class="flex-1 overflow-y-auto space-y-2 py-3 text-xs"></div>
-            <div class="flex space-x-2 pt-2 border-t border-zinc-800">
-                <input type="text" id="comment-text-input" placeholder="Add a comment..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-                <button onclick="window.submitComment?.()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Post</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- STORY VIEWER -->
-    <div id="modal-story" class="fixed inset-0 z-50 bg-black flex items-center justify-center hidden">
-        <div class="relative w-full max-w-md h-full bg-black flex flex-col justify-between p-3 select-none">
-            <div class="w-full flex space-x-1 pt-2 z-30">
-                <div class="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
-                    <div id="story-progress-bar" class="h-full bg-white w-0"></div>
-                </div>
-            </div>
-
-            <div class="flex justify-between items-center z-30 pt-2">
-                <div class="flex items-center space-x-2.5 cursor-pointer bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full" onclick="window.openProfileFromStory?.()">
-                    <div class="w-8 h-8 rounded-full bg-zinc-800 text-white font-extrabold flex items-center justify-center text-xs overflow-hidden" id="story-top-avatar-box">
-                        <span id="story-top-avatar">I</span>
-                    </div>
-                    <span class="text-xs font-bold text-white hover:underline flex items-center" id="story-top-author">Creator</span>
-                </div>
-                <button onclick="window.closeStory?.()" class="text-white text-lg p-2 icon-btn"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
-                <img id="story-img" class="w-full h-full object-cover hidden">
-                <video id="story-vid" class="w-full h-full object-cover hidden" playsinline></video>
-            </div>
-
-            <div class="z-30 flex items-center space-x-2.5 pb-2">
-                <input type="text" placeholder="Send message..." class="flex-1 bg-zinc-900/80 border border-zinc-700 rounded-full px-4 py-2 text-xs text-white focus:outline-none">
-                <button id="story-like-icon" class="text-2xl text-white icon-btn"><i class="fa-regular fa-heart"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- DIRECT INBOX & MESSAGING -->
-    <div id="modal-direct-inbox" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
-        <div class="p-4 border-b border-zinc-900 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <button onclick="window.closeDirectInbox()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
-                <span class="font-bold text-sm">Direct Messages</span>
-            </div>
-        </div>
-        <div id="direct-inbox-list" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
-    </div>
-
-    <div id="modal-direct-chat" class="fixed inset-0 z-50 bg-black flex flex-col hidden">
-        <div class="p-3 border-b border-zinc-900 flex justify-between items-center bg-black/95">
-            <div class="flex items-center space-x-3">
-                <button onclick="window.closeDirectChat?.()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
-                <div class="flex items-center space-x-2.5 cursor-pointer icon-btn">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 overflow-hidden">
-                        <div class="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center text-xs font-bold" id="chat-user-avatar">I</div>
-                    </div>
-                    <div>
-                        <p class="font-bold text-xs text-white flex items-center" id="chat-user-name">User</p>
-                        <p class="text-[10px] font-semibold text-emerald-400">Active now</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="chat-messages-scroll" class="flex-1 overflow-y-auto p-4 space-y-2.5 text-xs"></div>
-        <div class="p-3 border-t border-zinc-900 flex items-center space-x-2 bg-black">
-            <input type="text" id="chat-input-field" placeholder="Message..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2.5 text-xs text-white focus:outline-none">
-            <button onclick="window.sendChatMessageDirect?.()" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">Send</button>
-        </div>
-    </div>
-
-    <!-- MEDIA VIEWER -->
-    <div id="modal-media-viewer" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-3 hidden">
-        <div class="flex justify-between items-center pt-2">
-            <button onclick="window.closeMediaViewer?.()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i> Back</button>
-            <span class="text-xs font-bold text-gray-400">IB65 View</span>
-        </div>
-        <div class="flex-1 flex items-center justify-center overflow-hidden my-3" id="media-viewer-content"></div>
     </div>
 
     <!-- BOTTOM NAVBAR -->
@@ -626,8 +336,24 @@
 
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
-    <!-- SCRIPT LOGIC -->
-    <script>
+    <!-- DIRECT INLINE FIRESTORE DATA & AUDIO CONTROLLER -->
+    <script type="module">
+        import { 
+            auth, 
+            db, 
+            doc, 
+            getDoc, 
+            collection, 
+            getDocs, 
+            addDoc, 
+            updateDoc, 
+            arrayUnion, 
+            arrayRemove, 
+            onAuthStateChanged, 
+            signOut,
+            CLOUDINARY_CONFIG 
+        } from './js/config.js';
+
         window.showToast = function(msg) {
             var t = document.getElementById('toast');
             if (!t) return;
@@ -636,6 +362,12 @@
             setTimeout(function() { t.classList.add('hidden'); }, 2300);
         };
 
+        window.shareLink = function() {
+            navigator.clipboard.writeText(window.location.href);
+            window.showToast("Link copied to clipboard!");
+        };
+
+        // 🔊 Bulletproof Audio Toggle
         window.toggleFeedVideoAudio = function(triggerEl) {
             var box = triggerEl.closest('.relative');
             var vid = box ? box.querySelector('video') : null;
@@ -656,6 +388,250 @@
             }
         };
 
+        // 1. Direct Feed Loader
+        window.loadDirectPostsFeed = async function() {
+            const container = document.getElementById('posts-stream');
+            if (!container) return;
+
+            try {
+                const [postsSnap, reelsSnap] = await Promise.allSettled([
+                    getDocs(collection(db, "posts")),
+                    getDocs(collection(db, "reels"))
+                ]);
+
+                const allItems = [];
+                if (postsSnap.status === 'fulfilled') {
+                    postsSnap.value.forEach(d => allItems.push({ id: d.id, col: 'posts', ...d.data() }));
+                }
+                if (reelsSnap.status === 'fulfilled') {
+                    reelsSnap.value.forEach(d => {
+                        const data = d.data();
+                        allItems.push({ id: d.id, col: 'reels', mediaType: 'video', mediaUrl: data.videoUrl || data.mediaUrl || data.url, ...data });
+                    });
+                }
+
+                if (allItems.length === 0) {
+                    container.innerHTML = `
+                        <div class="clay-card p-8 text-center space-y-3 my-6">
+                            <i class="fa-regular fa-compass text-3xl text-zinc-600"></i>
+                            <p class="text-xs text-zinc-400">No posts yet on IB65.</p>
+                            <button onclick="window.openCreateModal('post')" class="px-4 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-blue">
+                                Upload Your First Post
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                allItems.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                container.innerHTML = allItems.map(p => {
+                    const rawAuthor = (p.author || p.handle || 'User').replace(/^@+/, '');
+                    const media = p.mediaUrl || p.url || p.videoUrl || '';
+                    const isVid = p.mediaType === 'video' || p.col === 'reels';
+                    const captionText = p.caption || p.title || '';
+
+                    return `
+                    <div class="clay-card p-3 space-y-2.5">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
+                                <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-bold text-xs">${rawAuthor[0].toUpperCase()}</div>
+                            </div>
+                            <div>
+                                <span class="font-bold text-xs text-white">@${rawAuthor}</span>
+                            </div>
+                        </div>
+
+                        <div class="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[260px] max-h-[460px]">
+                            ${isVid ? `
+                                <video src="${media}" loop playsinline preload="metadata" muted class="feed-video-card w-full h-full max-h-[460px] object-cover cursor-pointer" onclick="window.toggleFeedVideoAudio(this)"></video>
+                                <button onclick="window.toggleFeedVideoAudio(this)" class="audio-btn-icon absolute bottom-3 right-3 bg-black/70 border border-white/20 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-20 shadow-lg">
+                                    <i class="fa-solid fa-volume-xmark"></i>
+                                </button>
+                            ` : `
+                                <img src="${media}" class="w-full h-full max-h-[460px] object-cover" onerror="this.parentElement.style.display='none'">
+                            `}
+                        </div>
+
+                        <div class="px-1 text-xs text-white">
+                            <span class="font-bold mr-1">@${rawAuthor}</span>
+                            <span class="text-gray-200 leading-relaxed">${captionText}</span>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            } catch(e) {
+                container.innerHTML = '<div class="text-center text-zinc-500 py-10 text-xs">Error connecting to feed.</div>';
+            }
+        };
+
+        // 2. Direct Reels Loader
+        window.loadDirectReels = async function() {
+            const container = document.getElementById('reels-container');
+            if (!container) return;
+
+            try {
+                const snap = await getDocs(collection(db, "reels"));
+                const reels = [];
+                snap.forEach(d => reels.push({ id: d.id, ...d.data() }));
+
+                if (reels.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">No reels available right now. Tap + to upload!</div>';
+                    return;
+                }
+
+                reels.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                container.innerHTML = reels.map(r => {
+                    const rawAuthor = (r.author || r.handle || 'Creator').replace(/^@+/, '');
+                    const vidUrl = r.videoUrl || r.mediaUrl || '';
+                    const reelCaption = r.caption || r.title || '';
+
+                    return `
+                    <div class="reel-item-box relative w-full bg-black flex flex-col justify-between overflow-hidden">
+                        <video src="${vidUrl}" class="reel-video-element absolute inset-0 w-full h-full object-cover cursor-pointer" loop playsinline muted onclick="window.toggleFeedVideoAudio(this)"></video>
+                        
+                        <button onclick="window.toggleFeedVideoAudio(this)" class="audio-btn-icon absolute top-5 left-5 bg-black/60 border border-white/20 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs z-30 shadow-lg">
+                            <i class="fa-solid fa-volume-xmark"></i>
+                        </button>
+
+                        <div class="relative z-20 flex justify-between items-center p-4">
+                            <span class="text-lg font-bold text-white tracking-wide">Reels</span>
+                        </div>
+
+                        <div class="relative z-20 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent space-y-2">
+                            <div class="flex items-center space-x-2.5">
+                                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
+                                    <div class="w-full h-full bg-black rounded-full flex items-center justify-center font-extrabold text-xs">${rawAuthor[0].toUpperCase()}</div>
+                                </div>
+                                <span class="font-bold text-xs text-white">@${rawAuthor}</span>
+                            </div>
+                            <p class="text-xs text-gray-200 line-clamp-3">${reelCaption}</p>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            } catch(e) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-24 text-xs">Could not load reels.</div>';
+            }
+        };
+
+        // 3. Direct Explore Loader
+        window.loadDirectExplore = async function() {
+            const grid = document.getElementById('explore-grid');
+            if (!grid) return;
+
+            try {
+                const [postsSnap, reelsSnap] = await Promise.allSettled([
+                    getDocs(collection(db, "posts")),
+                    getDocs(collection(db, "reels"))
+                ]);
+
+                const items = [];
+                if (postsSnap.status === 'fulfilled') {
+                    postsSnap.value.forEach(d => {
+                        const data = d.data();
+                        if (data.mediaUrl || data.url) items.push({ id: d.id, ...data });
+                    });
+                }
+                if (reelsSnap.status === 'fulfilled') {
+                    reelsSnap.value.forEach(d => {
+                        const data = d.data();
+                        const vidUrl = data.videoUrl || data.mediaUrl || data.url;
+                        if (vidUrl) items.push({ id: d.id, mediaType: 'video', mediaUrl: vidUrl, ...data });
+                    });
+                }
+
+                if (items.length === 0) {
+                    grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-12 text-xs">No explore media found</div>';
+                    return;
+                }
+
+                items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                grid.innerHTML = items.map(it => {
+                    const media = it.mediaUrl || it.url || it.videoUrl || '';
+                    const isVid = it.mediaType === 'video';
+
+                    return `
+                        <div class="relative h-32 bg-zinc-900 overflow-hidden rounded-lg border border-zinc-800 flex items-center justify-center">
+                            ${isVid ? `
+                                <video src="${media}#t=0.1" preload="metadata" muted playsinline class="w-full h-full object-cover pointer-events-none"></video>
+                                <span class="absolute top-1.5 right-1.5 bg-black/60 rounded-full px-1.5 py-0.5 text-[9px] text-white">
+                                    <i class="fa-solid fa-play text-[8px]"></i>
+                                </span>
+                            ` : `
+                                <img src="${media}" loading="lazy" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
+                            `}
+                        </div>
+                    `;
+                }).join('');
+            } catch(e) {
+                grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-12 text-xs">Explore loading error</div>';
+            }
+        };
+
+        // 4. Direct Profile Stats Loader
+        window.loadDirectProfile = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                const uDoc = await getDoc(doc(db, "users", user.email));
+                if (uDoc.exists()) {
+                    const d = uDoc.data();
+                    const cleanHandle = (d.handle || user.email.split('@')[0]).replace(/^@+/, '');
+
+                    document.getElementById('profile-top-username').innerText = '@' + cleanHandle;
+                    document.getElementById('my-profile-name').innerText = d.name || 'IB65';
+                    document.getElementById('my-profile-handle').innerText = '@' + cleanHandle;
+                    document.getElementById('my-profile-avatar').innerText = (d.name || 'I')[0].toUpperCase();
+
+                    const fCount = typeof d.followers === 'number' ? d.followers : (d.followersList ? d.followersList.length : 0);
+                    const fgCount = typeof d.following === 'number' ? d.following : (d.followingList ? d.followingList.length : 0);
+
+                    document.getElementById('my-stat-followers').innerText = fCount;
+                    document.getElementById('my-stat-following').innerText = fgCount;
+                }
+
+                const [pSnap, rSnap] = await Promise.all([
+                    getDocs(collection(db, "posts")),
+                    getDocs(collection(db, "reels"))
+                ]);
+
+                let totalCount = 0;
+                const myMedia = [];
+                pSnap.forEach(p => { 
+                    if (p.data().authorEmail === user.email) {
+                        totalCount++;
+                        myMedia.push(p.data());
+                    }
+                });
+                rSnap.forEach(r => { 
+                    if (r.data().authorEmail === user.email) {
+                        totalCount++;
+                        myMedia.push({ ...r.data(), mediaType: 'video', mediaUrl: r.data().videoUrl });
+                    }
+                });
+
+                document.getElementById('my-stat-posts').innerText = totalCount;
+
+                const grid = document.getElementById('my-media-grid');
+                if (grid) {
+                    grid.innerHTML = myMedia.length === 0 ? '<div class="col-span-3 text-gray-500 py-8 text-xs text-center">No media uploaded yet</div>' : myMedia.map(p => `
+                        <div class="relative h-32 bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800 flex items-center justify-center">
+                            ${p.mediaType === 'video' ? `
+                                <video src="${p.mediaUrl || p.videoUrl}#t=0.1" preload="metadata" muted playsinline class="w-full h-full object-cover"></video>
+                            ` : `
+                                <img src="${p.mediaUrl}" loading="lazy" class="w-full h-full object-cover">
+                            `}
+                        </div>
+                    `).join('');
+                }
+            } catch(e) {}
+        };
+
+        // Tab Switcher with Memory
         window.switchTab = function(tab) {
             try { localStorage.setItem('ib65_active_tab', tab); } catch(e) {}
             document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(function(v) { v.pause(); });
@@ -674,7 +650,7 @@
                 }
             }
 
-            ['home', 'search', 'reels', 'live', 'profile', 'public-profile'].forEach(function(t) {
+            ['home', 'search', 'reels', 'live', 'profile'].forEach(function(t) {
                 var el = document.getElementById('view-' + t);
                 var nav = document.getElementById('nav-' + t);
                 if (el) el.classList.add('hidden');
@@ -692,210 +668,98 @@
                 else activeNav.className = 'text-white text-xl icon-btn';
             }
 
-            if (tab === 'home') { 
-                if (window.loadStoriesTray) window.loadStoriesTray(); 
-                if (window.loadPostsFeed) window.loadPostsFeed(); 
-            }
-            if (tab === 'search' && window.loadExploreMedia) window.loadExploreMedia();
-            if (tab === 'reels' && window.loadReelsFeed) window.loadReelsFeed();
-            if (tab === 'profile' && window.loadMyProfile) window.loadMyProfile();
+            if (tab === 'home') window.loadDirectPostsFeed();
+            if (tab === 'search') window.loadDirectExplore();
+            if (tab === 'reels') window.loadDirectReels();
+            if (tab === 'profile') window.loadDirectProfile();
         };
 
-        window.addEventListener('DOMContentLoaded', function() {
-            var savedTab = 'home';
-            try { savedTab = localStorage.getItem('ib65_active_tab') || 'home'; } catch(e) {}
-            window.switchTab(savedTab);
-            if (window.initDraggableText) window.initDraggableText();
-        });
-
-        window.openCreateModal = function(type) {
-            window.activeUploadType = type || 'post';
-            var m = document.getElementById('modal-create');
-            if (m) m.classList.remove('hidden');
+        window.handleLogoutDirect = async function() {
+            try {
+                await signOut(auth);
+                location.reload();
+            } catch(e) {}
         };
 
-        window.closeCreateModal = function() {
-            var m = document.getElementById('modal-create');
-            if (m) m.classList.add('hidden');
-        };
-
-        window.setUploadType = function(t) {
-            window.activeUploadType = t;
-            ['post', 'reel', 'story'].forEach(function(tp) {
-                var btn = document.getElementById('type-btn-' + tp);
-                if (btn) btn.className = tp === t ? 'font-bold text-white border-b-2 border-white pb-1 px-3' : 'text-gray-500 pb-1 px-3';
-            });
-        };
-
-        window.openDirectInbox = function() {
-            var m = document.getElementById('modal-direct-inbox');
-            if (m) m.classList.remove('hidden');
-        };
-
-        window.closeDirectInbox = function() {
-            var m = document.getElementById('modal-direct-inbox');
-            if (m) m.classList.add('hidden');
-        };
-    </script>
-
-    <!-- ROBUST UPLOAD HANDLERS -->
-    <script type="module">
-        import { auth, db, doc, getDoc, collection, addDoc, CLOUDINARY_CONFIG } from './js/config.js';
-        import { 
-            openProEditorSuite, 
-            closeProEditor, 
-            proceedToPublishFromEditor, 
-            toggleEditorPlayback, 
-            handleZoomSlider, 
-            openToolPanel, 
-            applyCanvasRatio, 
-            cycleVideoSpeed, 
-            toggleAudioBoost, 
-            applyFilterEffect, 
-            updateInshotText, 
-            setTextColor, 
-            captureCurrentThumbnailFrame, 
-            seekTimeline, 
-            customThumbnailBlob 
-        } from './js/editor.js';
-
-        window.openProEditorSuite = openProEditorSuite;
-        window.closeProEditor = closeProEditor;
-        window.proceedToPublishFromEditor = proceedToPublishFromEditor;
-        window.toggleEditorPlayback = toggleEditorPlayback;
-        window.handleZoomSlider = handleZoomSlider;
-        window.openToolPanel = openToolPanel;
-        window.applyCanvasRatio = applyCanvasRatio;
-        window.cycleVideoSpeed = cycleVideoSpeed;
-        window.toggleAudioBoost = toggleAudioBoost;
-        window.applyFilterEffect = applyFilterEffect;
-        window.updateInshotText = updateInshotText;
-        window.setTextColor = setTextColor;
-        window.captureCurrentThumbnailFrame = captureCurrentThumbnailFrame;
-        window.seekTimeline = seekTimeline;
-
-        let currentSelectedBlob = null;
-        let currentSelectedDataUrl = '';
-        let currentSelectedType = 'image';
-
+        // Upload Handlers
+        let selectedUploadFile = null;
         window.handleFileSelectedDirect = function(e) {
             const f = e.target.files && e.target.files[0];
             if (!f) return;
-
-            window.showToast("Opening IB65 Pro Studio...");
-            currentSelectedBlob = f;
-            currentSelectedType = f.type.startsWith('video') ? 'video' : 'image';
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                currentSelectedDataUrl = evt.target.result;
-                const lbl = document.getElementById('lbl-picker-text');
-                if (lbl) lbl.innerText = "Selected: " + f.name;
-
-                window.closeCreateModal();
-                openProEditorSuite(currentSelectedDataUrl, currentSelectedType);
-            };
-            reader.readAsDataURL(f);
+            selectedUploadFile = f;
+            document.getElementById('lbl-picker-text').innerText = "Selected: " + f.name;
         };
 
         window.publishMediaDirect = async function() {
             const user = auth.currentUser;
-            if (!user) { window.showToast("Please login first!"); return; }
-            if (!currentSelectedBlob && !currentSelectedDataUrl) { window.showToast("Please select media first!"); return; }
+            if (!user) { window.showToast("Login required!"); return; }
+            if (!selectedUploadFile) { window.showToast("Select media first!"); return; }
 
-            const capInput = document.getElementById('create-caption-input');
-            const locInput = document.getElementById('create-location-input');
-            const caption = capInput ? capInput.value.trim() : '';
-            const location = locInput ? locInput.value.trim() : '';
+            const cap = document.getElementById('create-caption-input').value.trim();
+            const loc = document.getElementById('create-location-input').value.trim();
             const uploadType = window.activeUploadType || 'post';
 
-            if (!caption && uploadType !== 'story') {
+            if (!cap && uploadType !== 'story') {
                 window.showToast("Caption is required!");
-                capInput?.focus();
                 return;
             }
 
             const btn = document.getElementById('btn-publish');
-            if (btn) { btn.innerText = "Uploading..."; btn.disabled = true; }
-            window.showToast("Sharing your " + uploadType + "...");
+            if (btn) { btn.innerText = "Sharing..."; btn.disabled = true; }
 
             try {
-                let finalMediaUrl = currentSelectedDataUrl;
-                let finalThumbUrl = '';
+                const fd = new FormData();
+                fd.append("file", selectedUploadFile);
+                fd.append("upload_preset", CLOUDINARY_CONFIG.uploadPreset);
 
-                if (currentSelectedBlob) {
-                    const fd = new FormData();
-                    fd.append("file", currentSelectedBlob);
-                    fd.append("upload_preset", CLOUDINARY_CONFIG.uploadPreset);
+                const endpoint = selectedUploadFile.type.startsWith('video')
+                    ? `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/video/upload`
+                    : `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
 
-                    const endpoint = currentSelectedType === 'video'
-                        ? `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/video/upload`
-                        : `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`;
-
-                    const res = await fetch(endpoint, { method: "POST", body: fd });
-                    const cData = await res.json();
-                    if (cData.secure_url) finalMediaUrl = cData.secure_url;
-                }
-
-                if (customThumbnailBlob) {
-                    const tfd = new FormData();
-                    tfd.append("file", customThumbnailBlob);
-                    tfd.append("upload_preset", CLOUDINARY_CONFIG.uploadPreset);
-                    const tres = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, { method: "POST", body: tfd });
-                    const tData = await tres.json();
-                    if (tData.secure_url) finalThumbUrl = tData.secure_url;
-                }
+                const res = await fetch(endpoint, { method: "POST", body: fd });
+                const cData = await res.json();
+                const mediaUrl = cData.secure_url;
 
                 const cleanAuthor = (user.displayName || user.email.split('@')[0]).replace(/^@+/, '');
-                const uDoc = await getDoc(doc(db, "users", user.email));
-                const badgeType = uDoc.data()?.badgeType || (cleanAuthor.toLowerCase() === 'ib65' ? 'gold_red' : 'none');
 
                 const itemData = {
                     author: cleanAuthor,
                     handle: cleanAuthor,
                     authorEmail: user.email,
-                    caption: caption,
-                    location: location,
-                    mediaUrl: finalMediaUrl,
-                    thumbnailUrl: finalThumbUrl,
-                    badgeType: badgeType,
-                    mediaType: currentSelectedType,
-                    views: 0,
-                    viewedUsers: [],
-                    shares: 0,
-                    watchSeconds: 0,
-                    likes: [],
-                    comments: [],
-                    isArchived: false,
+                    caption: cap,
+                    location: loc,
+                    mediaUrl: mediaUrl,
+                    mediaType: selectedUploadFile.type.startsWith('video') ? 'video' : 'image',
                     createdAt: Date.now()
                 };
 
                 if (uploadType === 'reel') {
-                    await addDoc(collection(db, "reels"), { ...itemData, videoUrl: finalMediaUrl });
+                    await addDoc(collection(db, "reels"), { ...itemData, videoUrl: mediaUrl });
                     window.switchTab('reels');
-                } else if (uploadType === 'story') {
-                    await addDoc(collection(db, "stories"), itemData);
-                    window.switchTab('home');
                 } else {
                     await addDoc(collection(db, "posts"), itemData);
                     window.switchTab('home');
                 }
 
                 window.closeCreateModal();
-                currentSelectedBlob = null;
-                currentSelectedDataUrl = '';
-                if (capInput) capInput.value = '';
-                if (locInput) locInput.value = '';
-                window.showToast("Shared successfully! 🎉");
+                selectedUploadFile = null;
+                document.getElementById('create-caption-input').value = '';
+                window.showToast("Shared successfully!");
             } catch(e) {
                 window.showToast("Upload Error: " + e.message);
             } finally {
                 if (btn) { btn.innerText = "Share"; btn.disabled = false; }
             }
         };
-    </script>
 
-    <!-- MODULAR SCRIPT ENTRY POINT -->
-    <script type="module" src="./js/app.js?v=14"></script>
+        // Auth Monitor & Direct Auto-Start
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                var savedTab = 'home';
+                try { savedTab = localStorage.getItem('ib65_active_tab') || 'home'; } catch(e) {}
+                window.switchTab(savedTab);
+            }
+        });
+    </script>
 </body>
 </html>
