@@ -48,15 +48,9 @@
         }
 
         @keyframes flameFlicker {
-            0% {
-                text-shadow: 0 0 4px #ff3b00, 0 0 10px #ff5100, 0 0 18px #ff7700;
-            }
-            50% {
-                text-shadow: 0 0 6px #ff2200, 0 0 14px #ff4400, 0 0 25px #ff9900;
-            }
-            100% {
-                text-shadow: 0 0 4px #ff3b00, 0 0 10px #ff5100, 0 0 18px #ff7700;
-            }
+            0% { text-shadow: 0 0 4px #ff3b00, 0 0 10px #ff5100, 0 0 18px #ff7700; }
+            50% { text-shadow: 0 0 6px #ff2200, 0 0 14px #ff4400, 0 0 25px #ff9900; }
+            100% { text-shadow: 0 0 4px #ff3b00, 0 0 10px #ff5100, 0 0 18px #ff7700; }
         }
 
         /* 🔥 RED NEON FIRE BUTTON */
@@ -106,28 +100,12 @@
         }
 
         /* 🌈 BOTTOM NAVBAR NEON FIRE ICONS */
-        .neon-nav-home {
-            color: #ff3333 !important;
-            filter: drop-shadow(0 0 8px rgba(255, 51, 51, 0.9));
-        }
-        .neon-nav-search {
-            color: #c084fc !important;
-            filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.9));
-        }
-        .neon-nav-reels {
-            color: #f43f5e !important;
-            filter: drop-shadow(0 0 8px rgba(244, 63, 94, 0.9));
-        }
-        .neon-nav-profile {
-            color: #2dd4bf !important;
-            filter: drop-shadow(0 0 8px rgba(45, 212, 191, 0.9));
-        }
+        .neon-nav-home { color: #ff3333 !important; filter: drop-shadow(0 0 8px rgba(255, 51, 51, 0.9)); }
+        .neon-nav-search { color: #c084fc !important; filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.9)); }
+        .neon-nav-reels { color: #f43f5e !important; filter: drop-shadow(0 0 8px rgba(244, 63, 94, 0.9)); }
+        .neon-nav-profile { color: #2dd4bf !important; filter: drop-shadow(0 0 8px rgba(45, 212, 191, 0.9)); }
 
-        .icon-btn:active { 
-            transform: scale(0.85); 
-            transition: transform 0.1s ease; 
-        }
-        
+        .icon-btn:active { transform: scale(0.85); transition: transform 0.1s ease; }
         ::-webkit-scrollbar { display: none; }
 
         .reels-scroll-container {
@@ -185,18 +163,17 @@
 
     <!-- Top Navigation Header -->
     <header id="main-app-header" class="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-zinc-900 px-4 py-2.5 flex justify-between items-center">
-        <!-- IB65 NEON FIRE LOGO -->
         <h1 class="text-2xl font-black tracking-wider neon-fire-logo cursor-pointer" onclick="window.switchTab('home')">IB65</h1>
         
         <div id="home-header-actions" class="flex items-center space-x-3.5">
-            <!-- LIVE BUTTON (SOLID RED PILL PRESERVED) -->
+            <!-- LIVE BUTTON -->
             <button onclick="window.switchTab('live')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5 shadow-lg icon-btn">
                 <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                 <span>LIVE</span>
             </button>
 
-            <!-- NOTIFICATION BELL ICON (WITH RED NEON PULSE DOT) -->
-            <button onclick="window.openNotificationsModal?.() || window.showToast?.('No new notifications')" class="text-gray-300 hover:text-white text-lg icon-btn relative p-1">
+            <!-- NOTIFICATION BELL ICON -->
+            <button onclick="window.showToast?.('No new notifications')" class="text-gray-300 hover:text-white text-lg icon-btn relative p-1">
                 <i class="fa-regular fa-bell"></i>
                 <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ff0000]"></span>
             </button>
@@ -217,7 +194,7 @@
                 <div onclick="window.openCreateModal('story')" class="flex flex-col items-center space-y-1 cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-pink-600 to-purple-600 flex items-center justify-center relative">
                         <div class="w-full h-full bg-black rounded-full overflow-hidden flex items-center justify-center">
-                            <span class="text-base font-black text-white" id="home-tray-avatar">U</span>
+                            <span class="text-base font-black text-white" id="home-tray-avatar">I</span>
                         </div>
                         <span class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] border border-black font-bold">+</span>
                     </div>
@@ -313,14 +290,14 @@
                 <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 relative">
                     <div class="w-full h-full bg-zinc-900 rounded-full overflow-hidden flex items-center justify-center text-2xl font-black text-white">
                         <img id="my-profile-avatar-img" class="w-full h-full object-cover hidden">
-                        <span id="my-profile-avatar">U</span>
+                        <span id="my-profile-avatar">I</span>
                     </div>
                 </div>
                 <div>
                     <h2 id="my-profile-name" class="text-base font-bold text-white flex items-center justify-center space-x-1">
-                        <span>User</span>
+                        <span>IB65</span>
                     </h2>
-                    <p id="my-profile-handle" class="text-xs text-gray-400">@handle</p>
+                    <p id="my-profile-handle" class="text-xs text-gray-400">@IB65</p>
                     <p id="my-profile-bio" class="text-xs text-gray-300 mt-1 max-w-xs mx-auto"></p>
                 </div>
                 <div class="flex justify-around py-2 border-y border-zinc-800 text-xs">
@@ -329,7 +306,6 @@
                     <div><span id="my-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
                 <div class="flex space-x-2 pt-2">
-                    <!-- Blue Neon Fire Share Button -->
                     <button onclick="window.shareLink?.()" class="flex-1 bg-zinc-900 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">
                         Share profile
                     </button>
@@ -591,7 +567,7 @@
             <div class="flex justify-between items-center z-30 pt-2">
                 <div class="flex items-center space-x-2.5 cursor-pointer bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full" onclick="window.openProfileFromStory?.()">
                     <div class="w-8 h-8 rounded-full bg-zinc-800 text-white font-extrabold flex items-center justify-center text-xs overflow-hidden" id="story-top-avatar-box">
-                        <span id="story-top-avatar">U</span>
+                        <span id="story-top-avatar">I</span>
                     </div>
                     <span class="text-xs font-bold text-white hover:underline flex items-center" id="story-top-author">Creator</span>
                 </div>
@@ -617,7 +593,7 @@
                 <span class="bg-red-600 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold animate-pulse">IB65 LIVE</span>
                 <span id="live-viewers-tag" class="text-xs font-bold text-white">👁️ 1</span>
                 <div class="flex items-center space-x-1.5 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-zinc-800">
-                    <div class="w-4 h-4 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-[9px]" id="live-host-avatar">U</div>
+                    <div class="w-4 h-4 rounded-full bg-white text-black font-extrabold flex items-center justify-center text-[9px]" id="live-host-avatar">I</div>
                     <span id="live-host-title" class="text-xs text-white font-bold flex items-center">Host</span>
                 </div>
             </div>
@@ -657,7 +633,7 @@
                 
                 <div class="flex items-center space-x-2.5 cursor-pointer icon-btn" onclick="window.navigateToChatUserProfile?.()">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 overflow-hidden">
-                        <div class="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center text-xs font-bold" id="chat-user-avatar">U</div>
+                        <div class="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center text-xs font-bold" id="chat-user-avatar">I</div>
                     </div>
                     <div>
                         <p class="font-bold text-xs text-white flex items-center" id="chat-user-name">User</p>
@@ -682,7 +658,7 @@
         <div class="flex-1 flex items-center justify-center overflow-hidden my-3" id="media-viewer-content"></div>
     </div>
 
-    <!-- AUTH MODAL (DIRECT ENGINE INTEGRATED) -->
+    <!-- AUTH MODAL -->
     <div id="modal-auth" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 hidden">
         <div class="clay-card p-6 w-full max-w-sm space-y-3">
             <h2 class="text-3xl font-black text-center neon-fire-logo">IB65</h2>
@@ -706,33 +682,26 @@
             </div>
 
             <div class="flex space-x-2 pt-1">
-                <!-- Direct Bulletproof Login Button -->
                 <button type="button" id="btn-main-login" onclick="window.handleLoginDirect()" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-blue">Login</button>
-                <!-- Direct Bulletproof Sign Up Button -->
                 <button type="button" id="btn-main-signup" onclick="window.handleSignupDirect()" class="flex-1 bg-zinc-900 py-2.5 text-xs font-bold text-white rounded-xl glow-btn-red">Sign Up</button>
             </div>
         </div>
     </div>
 
-    <!-- BOTTOM NAVBAR (MULTI-COLOR NEON FIRE ICONS) -->
+    <!-- BOTTOM NAVBAR -->
     <nav id="main-app-nav" class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-zinc-900 py-2.5 px-6 flex justify-around items-center z-40">
-        <!-- 1. Home: Crimson Fire -->
         <button onclick="window.switchTab('home')" id="nav-home" class="neon-nav-home text-xl icon-btn">
             <i class="fa-solid fa-house"></i>
         </button>
-        <!-- 2. Search: Violet Fire -->
         <button onclick="window.switchTab('search')" id="nav-search" class="text-gray-500 text-xl icon-btn">
             <i class="fa-solid fa-magnifying-glass"></i>
         </button>
-        <!-- 3. Center Plus: Electric Cyan Fire Ring -->
         <button onclick="window.openCreateModal('post')" class="w-11 h-11 rounded-full bg-zinc-950 flex items-center justify-center text-white font-extrabold text-xl icon-btn -mt-3 glow-btn-blue shadow-2xl">
             <i class="fa-solid fa-plus"></i>
         </button>
-        <!-- 4. Reels: Hot Pink Fire -->
         <button onclick="window.switchTab('reels')" id="nav-reels" class="text-gray-500 text-xl icon-btn">
             <i class="fa-solid fa-clapperboard"></i>
         </button>
-        <!-- 5. Profile: Emerald Green Fire -->
         <button onclick="window.switchTab('profile')" id="nav-profile" class="text-gray-500 text-xl icon-btn">
             <i class="fa-solid fa-user"></i>
         </button>
@@ -740,7 +709,7 @@
 
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
-    <!-- INLINE SAFEGUARD FALLBACK (Instant Response on Button Tap) -->
+    <!-- INLINE SAFEGUARD FALLBACK -->
     <script>
         window.showToast = function(msg) {
             var t = document.getElementById('toast');
@@ -795,7 +764,7 @@
         };
     </script>
 
-    <!-- DIRECT FIREBASE AUTH ENGINE (FAIL-SAFE DIRECT INTEGRATION) -->
+    <!-- DIRECT FIREBASE AUTH ENGINE -->
     <script type="module">
         import { 
             auth, 
@@ -957,7 +926,17 @@
         });
     </script>
 
+    <!-- FEED DIRECT AUTO-LOAD TRIGGER -->
+    <script type="module">
+        import { loadPostsFeed, loadStoriesTray, loadExploreMedia } from './js/feed.js';
+        setTimeout(() => {
+            loadStoriesTray();
+            loadPostsFeed();
+            loadExploreMedia();
+        }, 1000);
+    </script>
+
     <!-- MODULAR SCRIPT ENTRY POINT -->
-    <script type="module" src="./js/app.js?v=5"></script>
+    <script type="module" src="./js/app.js?v=7"></script>
 </body>
 </html>
