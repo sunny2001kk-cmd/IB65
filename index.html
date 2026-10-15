@@ -25,7 +25,6 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #000000;
             color: #ffffff;
-            /* 🚫 Disable mobile browser pull-to-refresh while allowing smooth scrolling */
             overscroll-behavior-y: none !important;
             overscroll-behavior: none !important;
             -webkit-overscroll-behavior: none !important;
@@ -266,22 +265,9 @@
                 </div>
             </div>
 
-            <!-- Professional Dashboard -->
-            <div id="pro-dashboard-pill" onclick="window.openProfessionalDashboard?.()" class="clay-card p-3 flex justify-between items-center cursor-pointer hover:border-zinc-600 transition hidden">
-                <div>
-                    <p class="text-xs font-bold text-white flex items-center space-x-1.5">
-                        <i class="fa-solid fa-chart-simple text-blue-500"></i>
-                        <span>Professional dashboard</span>
-                    </p>
-                    <p class="text-[10px] text-gray-400">Total views & real watch hours insights</p>
-                </div>
-                <i class="fa-solid fa-chevron-right text-xs text-gray-500"></i>
-            </div>
-
             <div class="clay-card p-5 text-center space-y-3 relative">
                 <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 relative">
                     <div class="w-full h-full bg-zinc-900 rounded-full overflow-hidden flex items-center justify-center text-2xl font-black text-white">
-                        <img id="my-profile-avatar-img" class="w-full h-full object-cover hidden">
                         <span id="my-profile-avatar">I</span>
                     </div>
                 </div>
@@ -307,7 +293,7 @@
             <div class="grid grid-cols-3 gap-1" id="my-media-grid"></div>
         </div>
 
-        <!-- 6. PUBLIC CREATOR PROFILE VIEW -->
+        <!-- 6. PUBLIC PROFILE -->
         <div id="view-public-profile" class="space-y-4 p-4 hidden pb-24">
             <div class="flex items-center space-x-3">
                 <button onclick="window.switchTab('home')" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
@@ -316,7 +302,6 @@
             <div class="clay-card p-5 text-center space-y-3">
                 <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
                     <div class="w-full h-full bg-zinc-900 rounded-full overflow-hidden flex items-center justify-center text-2xl font-black text-white">
-                        <img id="pub-avatar-img" class="w-full h-full object-cover hidden">
                         <span id="pub-avatar">C</span>
                     </div>
                 </div>
@@ -325,88 +310,175 @@
                         <span>Creator</span>
                     </h2>
                     <p id="pub-handle" class="text-xs text-gray-400">@creator</p>
-                    <p id="pub-bio" class="text-xs text-gray-300 mt-1 max-w-xs mx-auto"></p>
                 </div>
                 <div class="flex justify-around py-2 border-y border-zinc-800 text-xs">
                     <div><span id="pub-stat-posts" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Posts</span></div>
                     <div><span id="pub-stat-followers" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Followers</span></div>
                     <div><span id="pub-stat-following" class="font-bold block text-sm">0</span><span class="text-gray-500 text-[10px]">Following</span></div>
                 </div>
-                <div class="flex space-x-2 pt-1">
-                    <button id="pub-follow-btn" class="flex-1 py-2 text-xs font-bold rounded-xl bg-zinc-900 text-white glow-btn-red">Follow</button>
-                    <button id="pub-msg-btn" class="flex-1 bg-zinc-900 py-2 rounded-xl text-xs font-bold text-white glow-btn-blue">Message</button>
-                </div>
             </div>
-
             <div class="grid grid-cols-3 gap-1" id="pub-media-grid"></div>
         </div>
 
     </main>
 
-    <!-- PRO REEL EDITOR SUITE -->
-    <div id="modal-pro-editor" class="fixed inset-0 z-50 bg-black flex flex-col justify-between hidden">
-        <div class="p-3.5 flex justify-between items-center z-20 bg-black/80 border-b border-zinc-900">
+    <!-- 🔥 INSHOT PRO STUDIO (NEW PROFESSIONAL HORIZONTAL EDITOR) -->
+    <div id="modal-pro-editor" class="fixed inset-0 z-50 bg-[#09090b] flex flex-col justify-between hidden select-none">
+        <!-- InShot Top Bar -->
+        <div class="p-3.5 flex justify-between items-center z-20 bg-black/90 border-b border-zinc-800">
             <button onclick="window.closeProEditor?.()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-white icon-btn">
-                <i class="fa-solid fa-chevron-down"></i>
+                <i class="fa-solid fa-xmark"></i>
             </button>
-            <div class="flex items-center space-x-2 bg-zinc-900 px-3 py-1.5 rounded-full border border-zinc-800">
-                <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-xs"></i>
-                <span class="text-xs font-bold text-white tracking-wider">Pro Editor Studio</span>
+            <div class="flex items-center space-x-2 bg-zinc-900/90 px-3.5 py-1.5 rounded-full border border-zinc-700 shadow-lg">
+                <i class="fa-solid fa-wand-magic-sparkles text-red-500 text-xs"></i>
+                <span class="text-xs font-black tracking-wider text-white neon-fire-logo">IB65 Pro Studio</span>
             </div>
-            <button onclick="window.proceedToPublishFromEditor?.()" class="w-9 h-9 rounded-full bg-zinc-900 text-white flex items-center justify-center font-bold text-sm icon-btn glow-btn-blue">
-                <i class="fa-solid fa-arrow-right"></i>
+            <button onclick="window.proceedToPublishFromEditor?.()" class="px-4 py-1.5 rounded-full bg-zinc-900 text-white flex items-center space-x-1 font-bold text-xs icon-btn glow-btn-blue">
+                <span>Next</span>
+                <i class="fa-solid fa-arrow-right text-[10px] ml-1"></i>
             </button>
         </div>
 
-        <div class="flex-1 relative flex items-center justify-center overflow-hidden my-1">
-            <div class="relative w-full max-w-[280px] h-[52vh] rounded-2xl overflow-hidden bg-zinc-900 flex items-center justify-center border border-zinc-800">
+        <!-- Video Canvas Box -->
+        <div class="flex-1 relative flex items-center justify-center overflow-hidden my-auto p-2">
+            <div id="editor-canvas-box" class="relative rounded-2xl overflow-hidden bg-black flex items-center justify-center border border-zinc-800 shadow-2xl transition-all duration-200" style="aspect-ratio: 9/16; max-width: 275px; height: 50vh;">
                 <video id="editor-main-video" crossorigin="anonymous" playsinline loop class="w-full h-full object-cover origin-center transition-transform duration-100"></video>
                 <img id="editor-main-img" class="w-full h-full object-cover origin-center transition-transform duration-100 hidden">
 
-                <div id="pro-text-overlay-box" class="absolute select-none hidden px-3.5 py-1.5 rounded-xl bg-black/60 font-bold text-center text-sm shadow-2xl border border-white/20 touch-none z-30" style="left: 20px; top: 40px; cursor: move;">
+                <!-- Draggable On-Screen Text Overlay (InShot Style) -->
+                <div id="pro-text-overlay-box" class="absolute select-none hidden px-3.5 py-1.5 rounded-xl bg-black/75 font-extrabold text-center text-sm shadow-2xl border-2 border-cyan-400 touch-none z-30 cursor-move" style="left: 25px; top: 35px;">
                     <span id="pro-text-overlay-val">IB65 Studio</span>
                 </div>
             </div>
         </div>
 
-        <div class="px-6 py-1 flex items-center space-x-3 bg-zinc-950/70 border-t border-zinc-900 text-xs">
-            <span class="text-[10px] text-gray-400 font-semibold">Scale</span>
-            <input type="range" id="editor-zoom-slider" min="1" max="2.5" step="0.1" value="1" oninput="window.handleZoomSlider?.(this.value)" class="flex-1 accent-white h-1 bg-zinc-800 rounded">
-            <span id="lbl-zoom-val" class="text-[10px] font-bold text-white">1.0x</span>
-        </div>
-
-        <div class="px-5 py-1.5 flex justify-between items-center text-xs">
-            <button onclick="window.toggleEditorPlayback?.()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white glow-btn-red">
-                <i id="btn-play-pause-icon" class="fa-solid fa-play"></i>
-            </button>
-            <span id="editor-time-counter" class="text-gray-300 font-bold tracking-widest text-[11px]">0:00 / 0:00</span>
-            <div class="w-8"></div>
-        </div>
-
-        <div class="bg-zinc-950 p-3 space-y-2 border-t border-zinc-900">
-            <div class="relative h-14 bg-zinc-900 rounded-xl overflow-hidden flex items-center border border-zinc-800 select-none">
-                <div id="timeline-frames-preview" class="flex-1 flex overflow-hidden h-full items-center">
-                    <div class="w-full text-center text-[10px] text-gray-500">Real Video Frames Loaded</div>
-                </div>
-                <div id="timeline-playhead-line" class="absolute top-0 bottom-0 left-0 w-1 bg-white z-20 pointer-events-none shadow-lg"></div>
+        <!-- InShot Sub-Tool Panels (Opened Above Carousel) -->
+        <!-- Panel 1: Live Text & Color Selector -->
+        <div id="inshot-text-panel" class="bg-zinc-900/95 border-t border-zinc-800 p-3 space-y-2.5 hidden z-30 backdrop-blur-md">
+            <div class="flex justify-between items-center">
+                <span class="text-[11px] font-bold text-gray-300">Text & Color Palette</span>
+                <button onclick="document.getElementById('inshot-text-panel').classList.add('hidden')" class="text-gray-400 text-xs"><i class="fa-solid fa-check text-cyan-400"></i> Done</button>
             </div>
+            <input type="text" id="inshot-text-input" oninput="window.updateInshotText(this.value)" placeholder="Type overlay text here..." class="w-full bg-black border border-zinc-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+            <div class="flex space-x-3 items-center pt-1 overflow-x-auto">
+                <span class="text-[10px] text-gray-400">Color:</span>
+                <button onclick="window.setTextColor('#ffffff')" class="w-6 h-6 rounded-full bg-white border border-gray-400"></button>
+                <button onclick="window.setTextColor('#00f0ff')" class="w-6 h-6 rounded-full bg-[#00f0ff] border border-cyan-300"></button>
+                <button onclick="window.setTextColor('#ff2b2b')" class="w-6 h-6 rounded-full bg-[#ff2b2b] border border-red-400"></button>
+                <button onclick="window.setTextColor('#facc15')" class="w-6 h-6 rounded-full bg-[#facc15] border border-yellow-300"></button>
+                <button onclick="window.setTextColor('#ec4899')" class="w-6 h-6 rounded-full bg-[#ec4899] border border-pink-400"></button>
+            </div>
+        </div>
 
-            <div class="flex space-x-2">
-                <button onclick="window.captureCurrentThumbnailFrame?.()" class="flex-1 h-8 bg-zinc-900 rounded-lg text-[11px] font-bold text-white flex items-center justify-center space-x-1.5 glow-btn-blue">
-                    <i class="fa-solid fa-camera text-blue-400 text-xs"></i>
-                    <span>Capture Cover Frame</span>
+        <!-- Panel 2: Ratio / Canvas Selector -->
+        <div id="inshot-ratio-panel" class="bg-zinc-900/95 border-t border-zinc-800 p-3 hidden z-30 backdrop-blur-md">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-[11px] font-bold text-gray-300">Canvas Ratio</span>
+                <button onclick="document.getElementById('inshot-ratio-panel').classList.add('hidden')" class="text-gray-400 text-xs"><i class="fa-solid fa-check text-cyan-400"></i> Done</button>
+            </div>
+            <div class="flex justify-around text-xs">
+                <button onclick="window.applyCanvasRatio('9/16')" class="px-3.5 py-1.5 rounded-xl bg-black border border-zinc-700 hover:border-cyan-400">9:16 Reel</button>
+                <button onclick="window.applyCanvasRatio('1/1')" class="px-3.5 py-1.5 rounded-xl bg-black border border-zinc-700 hover:border-cyan-400">1:1 Square</button>
+                <button onclick="window.applyCanvasRatio('16/9')" class="px-3.5 py-1.5 rounded-xl bg-black border border-zinc-700 hover:border-cyan-400">16:9 Cinema</button>
+            </div>
+        </div>
+
+        <!-- Panel 3: InShot Horizontal Filter Bar -->
+        <div id="inshot-filter-panel" class="bg-zinc-900/95 border-t border-zinc-800 p-3 hidden z-30 backdrop-blur-md">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-[11px] font-bold text-gray-300">Filter Presets</span>
+                <button onclick="document.getElementById('inshot-filter-panel').classList.add('hidden')" class="text-gray-400 text-xs"><i class="fa-solid fa-check text-cyan-400"></i> Done</button>
+            </div>
+            <div class="flex space-x-3 overflow-x-auto py-1">
+                <button onclick="window.applyFilterEffect('none', 'Original')" class="flex flex-col items-center flex-shrink-0 space-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-600 flex items-center justify-center text-xs">None</div>
+                    <span class="text-[10px] text-gray-400">Original</span>
                 </button>
-                <div onclick="window.openAddTextTool?.()" class="flex-1 h-8 bg-zinc-900 rounded-lg flex items-center justify-center px-3 space-x-1.5 cursor-pointer text-gray-200 glow-btn-red">
-                    <i class="fa-solid fa-plus text-[10px]"></i>
-                    <span class="text-[11px] font-medium">Add text</span>
-                </div>
+                <button onclick="window.applyFilterEffect('saturate(1.5) contrast(1.1)', 'Vibrant')" class="flex flex-col items-center flex-shrink-0 space-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-orange-600 border border-yellow-400 flex items-center justify-center text-xs font-bold">Vibe</div>
+                    <span class="text-[10px] text-gray-400">Vibrant</span>
+                </button>
+                <button onclick="window.applyFilterEffect('hue-rotate(190deg) contrast(1.2)', 'Cyberpunk')" class="flex flex-col items-center flex-shrink-0 space-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-600 border border-purple-400 flex items-center justify-center text-xs font-bold">Cyber</div>
+                    <span class="text-[10px] text-gray-400">Cyberpunk</span>
+                </button>
+                <button onclick="window.applyFilterEffect('sepia(0.35) contrast(1.1)', 'Warm')" class="flex flex-col items-center flex-shrink-0 space-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-amber-800 border border-amber-500 flex items-center justify-center text-xs font-bold">Warm</div>
+                    <span class="text-[10px] text-gray-400">Warm Film</span>
+                </button>
+                <button onclick="window.applyFilterEffect('grayscale(1) contrast(1.2)', 'Mono')" class="flex flex-col items-center flex-shrink-0 space-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-zinc-700 border border-white flex items-center justify-center text-xs font-bold">B&W</div>
+                    <span class="text-[10px] text-gray-400">Mono</span>
+                </button>
+                <button onclick="window.applyFilterEffect('contrast(1.4) brightness(1.1) saturate(1.8)', 'Neon')" class="flex flex-col items-center flex-shrink-0 space-y-1">
+                    <div class="w-12 h-12 rounded-xl bg-fuchsia-700 border border-pink-400 flex items-center justify-center text-xs font-bold">Neon</div>
+                    <span class="text-[10px] text-gray-400">Neon Glow</span>
+                </button>
             </div>
         </div>
 
-        <div class="bg-black border-t border-zinc-900 py-2.5 px-4 flex space-x-4 overflow-x-auto items-center">
-            <button onclick="window.cycleFilterPresets?.()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
-                <div class="w-10 h-10 rounded-2xl bg-zinc-900 flex items-center justify-center text-white glow-btn-blue"><i class="fa-solid fa-circle-half-stroke text-sm"></i></div>
+        <!-- InShot Video Track & Scrubber Bar -->
+        <div class="bg-zinc-950 p-2.5 border-t border-zinc-900 space-y-2">
+            <div class="flex justify-between items-center px-2 text-xs">
+                <button onclick="window.toggleEditorPlayback?.()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white glow-btn-red">
+                    <i id="btn-play-pause-icon" class="fa-solid fa-play text-xs"></i>
+                </button>
+                <span id="editor-time-counter" class="text-gray-300 font-bold tracking-widest text-[11px]">0:00 / 0:00</span>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] text-gray-400">Zoom</span>
+                    <input type="range" id="editor-zoom-slider" min="1" max="2.5" step="0.1" value="1" oninput="window.handleZoomSlider?.(this.value)" class="w-16 accent-white h-1 bg-zinc-800 rounded">
+                </div>
+            </div>
+
+            <!-- Tap-To-Seek Interactive Timeline -->
+            <div id="timeline-frames-track" onclick="window.seekTimeline(event)" class="relative h-11 bg-zinc-900 rounded-xl overflow-hidden flex items-center border border-zinc-800 cursor-pointer">
+                <div class="flex-1 flex overflow-hidden h-full items-center justify-center space-x-1 opacity-60">
+                    <div class="w-full h-full bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800 flex items-center justify-around px-2 text-[10px] text-zinc-400 font-bold tracking-widest uppercase">
+                        <span>• Frame •</span>
+                        <span>• Waveform •</span>
+                        <span>• Audio •</span>
+                    </div>
+                </div>
+                <div id="timeline-playhead-line" class="absolute top-0 bottom-0 left-0 w-1 bg-white z-20 pointer-events-none shadow-[0_0_8px_#ffffff]"></div>
+            </div>
+        </div>
+
+        <!-- InShot Horizontal Tool Carousel (Icon + Label Scroll Bar) -->
+        <div class="bg-black border-t border-zinc-800 py-2.5 px-3 flex space-x-5 overflow-x-auto items-center">
+            <!-- 1. Canvas / Ratio -->
+            <button onclick="window.openToolPanel('inshot-ratio-panel')" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
+                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-blue"><i class="fa-solid fa-crop text-sm"></i></div>
+                <span class="text-[10px] text-gray-300">Canvas</span>
+            </button>
+
+            <!-- 2. Text Overlay -->
+            <button onclick="window.openToolPanel('inshot-text-panel')" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
+                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-red"><i class="fa-solid fa-font text-sm"></i></div>
+                <span class="text-[10px] text-gray-300">Text</span>
+            </button>
+
+            <!-- 3. Filters / Effects -->
+            <button onclick="window.openToolPanel('inshot-filter-panel')" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
+                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-blue"><i class="fa-solid fa-wand-magic text-sm"></i></div>
                 <span class="text-[10px] text-gray-300">Filters</span>
+            </button>
+
+            <!-- 4. Video Speed (0.5x, 1x, 2x) -->
+            <button onclick="window.cycleVideoSpeed()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
+                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-red"><i class="fa-solid fa-bolt text-sm"></i></div>
+                <span id="lbl-tool-speed" class="text-[10px] text-gray-300">Speed (1x)</span>
+            </button>
+
+            <!-- 5. Audio Booster / Mute -->
+            <button onclick="window.toggleAudioBoost()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
+                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-blue"><i id="btn-tool-volume-icon" class="fa-solid fa-volume-high text-sm"></i></div>
+                <span id="lbl-tool-volume" class="text-[10px] text-gray-300">Volume</span>
+            </button>
+
+            <!-- 6. Capture Cover Frame -->
+            <button onclick="window.captureCurrentThumbnailFrame?.()" class="flex flex-col items-center space-y-1 icon-btn flex-shrink-0">
+                <div class="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white glow-btn-red"><i class="fa-solid fa-camera text-sm"></i></div>
+                <span class="text-[10px] text-gray-300">Cover Frame</span>
             </button>
         </div>
     </div>
@@ -506,14 +578,13 @@
         <div class="p-3 border-b border-zinc-900 flex justify-between items-center bg-black/95">
             <div class="flex items-center space-x-3">
                 <button onclick="window.closeDirectChat?.()" class="text-white text-base"><i class="fa-solid fa-arrow-left"></i></button>
-                
-                <div class="flex items-center space-x-2.5 cursor-pointer icon-btn" onclick="window.navigateToChatUserProfile?.()">
+                <div class="flex items-center space-x-2.5 cursor-pointer icon-btn">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5 overflow-hidden">
                         <div class="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center text-xs font-bold" id="chat-user-avatar">I</div>
                     </div>
                     <div>
                         <p class="font-bold text-xs text-white flex items-center" id="chat-user-name">User</p>
-                        <p class="text-[10px] font-semibold" id="chat-user-presence">Active now</p>
+                        <p class="text-[10px] font-semibold text-emerald-400">Active now</p>
                     </div>
                 </div>
             </div>
@@ -555,7 +626,7 @@
 
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs px-4 py-2 rounded-full border border-zinc-800 shadow-2xl hidden z-50"></div>
 
-    <!-- CORE UI ROUTING WITH REFRESH TAB MEMORY PERSISTENCE -->
+    <!-- SCRIPT LOGIC -->
     <script>
         window.showToast = function(msg) {
             var t = document.getElementById('toast');
@@ -565,7 +636,6 @@
             setTimeout(function() { t.classList.add('hidden'); }, 2300);
         };
 
-        // 🔊 BULLETPROOF SOUND TOGGLE (VOLUME 1.0 + MUTED FALSE)
         window.toggleFeedVideoAudio = function(triggerEl) {
             var box = triggerEl.closest('.relative');
             var vid = box ? box.querySelector('video') : null;
@@ -586,11 +656,8 @@
             }
         };
 
-        // 🧠 TAB SWITCHING WITH PERSISTENT ACTIVE STATE
         window.switchTab = function(tab) {
-            // Memory mein save karein taaki refresh karne par wahi page open rahe
             try { localStorage.setItem('ib65_active_tab', tab); } catch(e) {}
-
             document.querySelectorAll('.feed-video-card, .reel-video-element').forEach(function(v) { v.pause(); });
 
             var header = document.getElementById('main-app-header');
@@ -634,11 +701,11 @@
             if (tab === 'profile' && window.loadMyProfile) window.loadMyProfile();
         };
 
-        // 🔄 RESTORE SAVED TAB ON PAGE RELOAD
         window.addEventListener('DOMContentLoaded', function() {
             var savedTab = 'home';
             try { savedTab = localStorage.getItem('ib65_active_tab') || 'home'; } catch(e) {}
             window.switchTab(savedTab);
+            if (window.initDraggableText) window.initDraggableText();
         });
 
         window.openCreateModal = function(type) {
@@ -671,10 +738,41 @@
         };
     </script>
 
-    <!-- DIRECT ROBUST UPLOAD & SHARE ENGINE -->
+    <!-- ROBUST UPLOAD HANDLERS -->
     <script type="module">
         import { auth, db, doc, getDoc, collection, addDoc, CLOUDINARY_CONFIG } from './js/config.js';
-        import { openProEditorSuite } from './js/editor.js';
+        import { 
+            openProEditorSuite, 
+            closeProEditor, 
+            proceedToPublishFromEditor, 
+            toggleEditorPlayback, 
+            handleZoomSlider, 
+            openToolPanel, 
+            applyCanvasRatio, 
+            cycleVideoSpeed, 
+            toggleAudioBoost, 
+            applyFilterEffect, 
+            updateInshotText, 
+            setTextColor, 
+            captureCurrentThumbnailFrame, 
+            seekTimeline, 
+            customThumbnailBlob 
+        } from './js/editor.js';
+
+        window.openProEditorSuite = openProEditorSuite;
+        window.closeProEditor = closeProEditor;
+        window.proceedToPublishFromEditor = proceedToPublishFromEditor;
+        window.toggleEditorPlayback = toggleEditorPlayback;
+        window.handleZoomSlider = handleZoomSlider;
+        window.openToolPanel = openToolPanel;
+        window.applyCanvasRatio = applyCanvasRatio;
+        window.cycleVideoSpeed = cycleVideoSpeed;
+        window.toggleAudioBoost = toggleAudioBoost;
+        window.applyFilterEffect = applyFilterEffect;
+        window.updateInshotText = updateInshotText;
+        window.setTextColor = setTextColor;
+        window.captureCurrentThumbnailFrame = captureCurrentThumbnailFrame;
+        window.seekTimeline = seekTimeline;
 
         let currentSelectedBlob = null;
         let currentSelectedDataUrl = '';
@@ -684,7 +782,7 @@
             const f = e.target.files && e.target.files[0];
             if (!f) return;
 
-            window.showToast("Opening Editor...");
+            window.showToast("Opening IB65 Pro Studio...");
             currentSelectedBlob = f;
             currentSelectedType = f.type.startsWith('video') ? 'video' : 'image';
 
@@ -723,6 +821,7 @@
 
             try {
                 let finalMediaUrl = currentSelectedDataUrl;
+                let finalThumbUrl = '';
 
                 if (currentSelectedBlob) {
                     const fd = new FormData();
@@ -738,6 +837,15 @@
                     if (cData.secure_url) finalMediaUrl = cData.secure_url;
                 }
 
+                if (customThumbnailBlob) {
+                    const tfd = new FormData();
+                    tfd.append("file", customThumbnailBlob);
+                    tfd.append("upload_preset", CLOUDINARY_CONFIG.uploadPreset);
+                    const tres = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, { method: "POST", body: tfd });
+                    const tData = await tres.json();
+                    if (tData.secure_url) finalThumbUrl = tData.secure_url;
+                }
+
                 const cleanAuthor = (user.displayName || user.email.split('@')[0]).replace(/^@+/, '');
                 const uDoc = await getDoc(doc(db, "users", user.email));
                 const badgeType = uDoc.data()?.badgeType || (cleanAuthor.toLowerCase() === 'ib65' ? 'gold_red' : 'none');
@@ -749,6 +857,7 @@
                     caption: caption,
                     location: location,
                     mediaUrl: finalMediaUrl,
+                    thumbnailUrl: finalThumbUrl,
                     badgeType: badgeType,
                     mediaType: currentSelectedType,
                     views: 0,
@@ -787,6 +896,6 @@
     </script>
 
     <!-- MODULAR SCRIPT ENTRY POINT -->
-    <script type="module" src="./js/app.js?v=11"></script>
+    <script type="module" src="./js/app.js?v=14"></script>
 </body>
 </html>
